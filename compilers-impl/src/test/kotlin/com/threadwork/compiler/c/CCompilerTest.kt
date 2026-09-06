@@ -39,9 +39,9 @@ class CCompilerTest {
             .files.single()
             .content
 
-        assertTrue(Regex("(?s)/\\*\\* Threadwork entity.*?@phase init.*?\\*/\\nstatic int tw_init_").containsMatchIn(generated))
-        assertTrue(Regex("(?s)/\\*\\* Threadwork entity.*?@phase run.*?\\*/\\nstatic int tw_run_").containsMatchIn(generated))
-        assertTrue(Regex("(?s)/\\*\\* Threadwork transport.*?@packet_type.*?\\*/\\nstatic int transport_").containsMatchIn(generated))
+        assertTrue(Regex("(?s)/\\*\\* Threadwork entity.*?@phase init.*?\\*/\\nstatic threadwork_error_t tw_init_").containsMatchIn(generated))
+        assertTrue(Regex("(?s)/\\*\\* Threadwork entity.*?@phase run.*?\\*/\\nstatic threadwork_error_t tw_run_").containsMatchIn(generated))
+        assertTrue(Regex("(?s)/\\*\\* Threadwork transport.*?@packet_type.*?\\*/\\nstatic threadwork_error_t transport_").containsMatchIn(generated))
         assertFalse(generated.contains("@node_id:"))
     }
 
@@ -94,7 +94,7 @@ class CCompilerTest {
     }
 
     @Test
-    fun `C generator shutdown is owned by the generated runtime and main`() {
+    fun `C generator shutdown is owned by model code and the generated main`() {
         val repository = cProject()
         val root = repository.getDocument().rootNodeId
         val packet = repository.createNode(root, "Packet", NodeKind.Type)
@@ -112,8 +112,18 @@ class CCompilerTest {
             generator.id,
             generator.text.copy(
                 declaration = """
-                    Packet item = { 7.0 };
-                    if (push(packet, &item) != THREADWORK_OK) {
+                    static int emitted = 0;
+                    int shutdown_signal = 0;
+                    if (threadwork_runner__get_shutdown_signal(&context->runner, &shutdown_signal) != THREADWORK_OK) {
+                        return THREADWORK_ERROR;
+                    }
+                    if (emitted == 0) {
+                        Packet item = { 7.0 };
+                        if (push(packet, &item) != THREADWORK_OK) {
+                            return THREADWORK_ERROR;
+                        }
+                        emitted = 1;
+                    } else if (threadwork_runner__shutdown_request(&context->runner) != THREADWORK_OK) {
                         return THREADWORK_ERROR;
                     }
                 """.trimIndent(),
@@ -137,23 +147,26 @@ class CCompilerTest {
 
         assertTrue(result.success, result.diagnostics.joinToString { it.message })
         val source = assertNotNull(result.generatedProject).files.single().content
-        assertTrue(source.contains("volatile sig_atomic_t threadwork_running = 1;"))
-        assertTrue(source.contains("unsigned long long threadwork_transit = 0ULL;"))
-        assertTrue(source.contains("int threadwork_install_shutdown_signal_handlers(void)"))
-        assertTrue(source.contains("void threadwork_network_shutdown_begin(unsigned int idle_ticks)"))
-        assertTrue(source.contains("int threadwork_network_has_recent_transit(void)"))
-        assertTrue(source.contains("if (!threadwork_running) {"))
+        assertTrue(source.contains("typedef int threadwork_error_t;"))
+        assertTrue(source.contains("typedef struct threadwork_runner_t {"))
+        assertTrue(source.contains("threadwork_error_t threadwork_runner__install_shutdown_signal_handlers(threadwork_runner_t *this)"))
+        assertTrue(source.contains("threadwork_error_t threadwork_runner__get_shutdown_signal("))
+        assertTrue(source.contains("threadwork_error_t threadwork_runner__begin_shutdown_drain("))
+        assertTrue(source.contains("threadwork_error_t threadwork_runner__has_recent_transit("))
+        assertTrue(source.contains("threadwork_runner__is_running(&context->runner, &running)"))
         assertTrue(source.contains("threadwork_buffer_count(&packet1_a_port) > 0U"))
-        assertTrue(source.contains("threadwork_transit++;"))
-        assertTrue(source.contains("status = threadwork_install_shutdown_signal_handlers();"))
-        assertTrue(source.contains("threadwork_network_shutdown_begin(10U);"))
-        assertTrue(source.contains("threadwork_shutdown_request();"))
-        assertTrue(source.contains("while (threadwork_network_has_recent_transit())"))
-        assertTrue(
-            CCompiler().codeIntelligence(repository.getDocument(), generator).symbols.any {
-                it.name == "threadwork_running" && it.kind == CompilerCodeSymbolKind.RuntimeSymbol
-            },
-        )
+        assertTrue(source.contains("threadwork_runner__record_transit(&context->runner)"))
+        assertTrue(source.contains("status = threadwork_runner__install_shutdown_signal_handlers(&context.runner);"))
+        assertTrue(source.contains("threadwork_runner__begin_shutdown_drain(&context.runner, 10U)"))
+        assertTrue(source.contains("threadwork_runner__shutdown_request(&context->runner)"))
+        assertTrue(source.contains("threadwork_runner__has_recent_transit(&context.runner, &recent_transit)"))
+        val intelligence = CCompiler().codeIntelligence(repository.getDocument(), generator)
+        assertTrue(intelligence.symbols.any {
+            it.name == "threadwork_runner__get_shutdown_signal" && it.kind == CompilerCodeSymbolKind.RuntimeSymbol
+        })
+        assertFalse(intelligence.symbols.any {
+            it.name == "threadwork_runner__is_running" && it.kind == CompilerCodeSymbolKind.RuntimeSymbol
+        })
         compileAndRunWhenAvailable(source)
     }
 
@@ -169,7 +182,7 @@ class CCompilerTest {
         val runtime = repository.createNode(root, "@RuntimeSupport", NodeKind.Processor)
         repository.updateNodeText(
             runtime.id,
-            runtime.text.copy(declaration = "unsigned long long threadwork_transit = 0ULL;"),
+            runtime.text.copy(declaration = "/* custom runtime support */"),
         )
         val transport = repository.createNode(root, "@LinkInstantiation", NodeKind.Processor)
         repository.updateNodeText(
@@ -177,7 +190,7 @@ class CCompilerTest {
             transport.text.copy(
                 declaration = """
                     {% if not link.isCapability %}
-                        threadwork_transit++;
+                        threadwork_runner__record_transit(&context->runner);
                     {% endif %}
                 """.trimIndent(),
             ),
@@ -187,8 +200,8 @@ class CCompilerTest {
 
         assertTrue(result.success, result.diagnostics.joinToString { it.message })
         val output = assertNotNull(result.generatedProject).files.single().content
-        assertTrue(output.contains("unsigned long long threadwork_transit = 0ULL;"))
-        assertTrue(output.contains("threadwork_transit++;"))
+        assertTrue(output.contains("/* custom runtime support */"))
+        assertTrue(output.contains("threadwork_runner__record_transit(&context->runner);"))
         assertFalse(output.contains("threadwork_buffer_transport(&packet_a, &packet_b)"))
     }
 
@@ -273,18 +286,18 @@ class CCompilerTest {
         assertEquals(1, source.lines().count { it.trim() == "typedef struct WorkOrder {" })
         assertEquals(1, Regex("\\bint main\\(void\\)").findAll(source).count())
         assertEquals(1, source.lines().count { it.trim() == "typedef struct threadwork_context {" })
-        assertTrue(source.indexOf("typedef struct WorkOrder") < source.indexOf("static int tw_init_"))
-        val producerPrototype = Regex("static int (tw_init_[A-Za-z0-9_]+)\\(threadwork_context \\*context[^;]*\\);").find(source)
+        assertTrue(source.indexOf("typedef struct WorkOrder") < source.indexOf("static threadwork_error_t tw_init_"))
+        val producerPrototype = Regex("static threadwork_error_t (tw_init_[A-Za-z0-9_]+)\\(threadwork_context \\*context[^;]*\\);").find(source)
         assertNotNull(producerPrototype)
         val producerDefinition = source.indexOf(
-            "static int ${producerPrototype.groupValues[1]}(threadwork_context *context, threadwork_buffer *orders_to_validator)\n{",
+            "static threadwork_error_t ${producerPrototype.groupValues[1]}(threadwork_context *context, threadwork_buffer *orders_to_validator)\n{",
         )
         assertTrue(producerDefinition > producerPrototype.range.first)
         assertTrue(source.contains("static threadwork_buffer orders_to_validator1_a_port"))
         assertTrue(source.contains("static threadwork_buffer orders_to_validator1_b_port"))
-        assertTrue(source.contains("static int transport_orders_to_validator1("))
+        assertTrue(source.contains("static threadwork_error_t transport_orders_to_validator1("))
         assertTrue(source.contains("transport_orders_to_validator1(&orders_to_validator1_a_port, &orders_to_validator1_b_port)"))
-        assertFalse(source.contains("static int tw_run_switch("))
+        assertFalse(source.contains("static threadwork_error_t tw_run_switch("))
     }
 
     @Test
@@ -358,6 +371,9 @@ class CCompilerTest {
                     if (push(records, &order) != THREADWORK_OK) {
                         return THREADWORK_ERROR;
                     }
+                    if (threadwork_runner__shutdown_request(&context->runner) != THREADWORK_OK) {
+                        return THREADWORK_ERROR;
+                    }
                 """.trimIndent(),
             ),
         )
@@ -374,8 +390,8 @@ class CCompilerTest {
         assertTrue(source.contains("#include <stdbool.h>"))
         assertTrue(source.contains("bool is_ready;"))
         assertFalse(source.contains("struct boolean"))
-        assertTrue(source.contains("int push(void *target, void *package)"))
-        assertTrue(source.contains("int pop(void *target, void *package)"))
+        assertTrue(source.contains("threadwork_error_t push(void *target, void *package)"))
+        assertTrue(source.contains("threadwork_error_t pop(void *target, void *package)"))
         assertTrue(source.contains("size_t threadwork_buffer_count(const threadwork_buffer *buffer)"))
         val directory = createTempDirectory("threadwork-c-compiler-")
         try {

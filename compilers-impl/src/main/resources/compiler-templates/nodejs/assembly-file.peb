@@ -10,9 +10,12 @@ function threadworkRun() {
   const context = createRuntimeContext();
   threadworkInstallShutdownHandlers();
   {{ initializerSymbol }}(context);
-  {{ runSymbol }}(context);
+
+  while (threadworkIsRunning()) {
+    {{ runSymbol }}(context);
+  }
+
   threadworkNetworkShutdownBegin(10);
-  threadworkShutdownRequest();
   while (threadworkNetworkHasRecentTransit()) {
     {{ runSymbol }}(context);
   }

@@ -182,6 +182,11 @@ class JSCompilerTest {
         assertTrue(generated.contains("threadworkRecordTransit()"))
         assertTrue(generated.contains("if (!threadworkIsRunning()) return;"))
         assertTrue(generated.contains("threadworkNetworkHasRecentTransit()"))
+        assertTrue(generated.contains("function threadworkGetShutdownSignal()"))
+
+        val intelligence = JSCompiler().codeIntelligence(repository.getDocument(), source)
+        assertTrue(intelligence.symbols.any { it.name == "threadworkShutdownRequest" })
+        assertTrue(intelligence.symbols.any { it.name == "threadworkGetShutdownSignal" })
     }
 
     @Test
@@ -237,6 +242,7 @@ class JSCompilerTest {
                     if (generatedPage() !== "Hello World") {
                       throw new Error("Runnable capability did not return the compiled provider.");
                     }
+                    threadworkShutdownRequest();
                 """.trimIndent(),
             ),
         )

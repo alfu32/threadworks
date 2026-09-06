@@ -4,9 +4,10 @@ fun main() {
     val context = RuntimeContext()
     threadworkInstallShutdownHook()
 {% for node in scopeRoots %}    generated.nodes.{{ node.initializerSymbol }}(context)
-{% endfor %}{% for node in scopeRoots %}    generated.nodes.{{ node.runSymbol }}(context)
-{% endfor %}    threadworkNetworkShutdownBegin(10U)
-    threadworkShutdownRequest()
+{% endfor %}    while (threadworkRunning) {
+{% for node in scopeRoots %}        generated.nodes.{{ node.runSymbol }}(context)
+{% endfor %}    }
+    threadworkNetworkShutdownBegin(10U)
     while (threadworkNetworkHasRecentTransit()) {
 {% for node in scopeRoots %}        generated.nodes.{{ node.runSymbol }}(context)
 {% endfor %}    }

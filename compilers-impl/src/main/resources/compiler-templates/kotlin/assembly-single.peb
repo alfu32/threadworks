@@ -7,6 +7,9 @@ class RuntimeContext {
 @Volatile
 var threadworkRunning = true
 
+@Volatile
+var threadworkShutdownSignal = 0
+
 var threadworkTransit = 0UL
 private var threadworkShutdownPreviousTransit = 0UL
 private var threadworkShutdownIdleTicks = 0U
@@ -19,6 +22,8 @@ fun threadworkInstallShutdownHook() {
 fun threadworkShutdownRequest() {
     threadworkRunning = false
 }
+
+fun threadworkGetShutdownSignal(): Int = threadworkShutdownSignal
 
 fun threadworkRecordTransit() {
     threadworkTransit++
@@ -49,9 +54,12 @@ fun main() {
     val context = RuntimeContext()
     threadworkInstallShutdownHook()
     {{ initializerSymbol }}(context)
-    {{ runSymbol }}(context)
+
+    while (threadworkRunning) {
+        {{ runSymbol }}(context)
+    }
+
     threadworkNetworkShutdownBegin(10U)
-    threadworkShutdownRequest()
     while (threadworkNetworkHasRecentTransit()) {
         {{ runSymbol }}(context)
     }

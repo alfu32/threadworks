@@ -2,6 +2,7 @@
 const threadworkRuntimeKey = Symbol.for("threadwork.runtime");
 const threadworkRuntime = globalThis[threadworkRuntimeKey] ??= {
   running: true,
+  shutdownSignal: 0,
   transit: 0,
   shutdownPreviousTransit: 0,
   shutdownIdleTicks: 0,
@@ -15,14 +16,22 @@ function createRuntimeContext() {
 
 /** Stop generators on SIGINT/SIGTERM while queued packets continue to drain. */
 function threadworkInstallShutdownHandlers() {
-  const requestShutdown = () => { threadworkRuntime.running = false; };
-  process.once("SIGINT", requestShutdown);
-  process.once("SIGTERM", requestShutdown);
+  const requestShutdown = (signalNumber) => {
+    threadworkRuntime.shutdownSignal = signalNumber;
+    threadworkRuntime.running = false;
+  };
+  process.once("SIGINT", () => requestShutdown(2));
+  process.once("SIGTERM", () => requestShutdown(15));
 }
 
 /** Stop generators while already queued packets continue to drain. */
 function threadworkShutdownRequest() {
   threadworkRuntime.running = false;
+}
+
+/** Return the last SIGINT or SIGTERM number received by the runtime, or zero. */
+function threadworkGetShutdownSignal() {
+  return threadworkRuntime.shutdownSignal || 0;
 }
 
 /** Return whether generator ingress is still open. */
@@ -53,3 +62,11 @@ function threadworkNetworkHasRecentTransit() {
   threadworkRuntime.shutdownRemainingTicks -= 1;
   return true;
 }
+
+// Delegated child modules resolve runtime helpers through the shared global.
+globalThis.threadworkShutdownRequest ??= threadworkShutdownRequest;
+globalThis.threadworkGetShutdownSignal ??= threadworkGetShutdownSignal;
+globalThis.threadworkIsRunning ??= threadworkIsRunning;
+globalThis.threadworkRecordTransit ??= threadworkRecordTransit;
+globalThis.threadworkNetworkShutdownBegin ??= threadworkNetworkShutdownBegin;
+globalThis.threadworkNetworkHasRecentTransit ??= threadworkNetworkHasRecentTransit;

@@ -8,6 +8,10 @@ class RuntimeContext {
 @Volatile
 var threadworkRunning = true
 
+/** Last OS shutdown signal known to this JVM runtime, or zero when unavailable. */
+@Volatile
+var threadworkShutdownSignal = 0
+
 var threadworkTransit = 0UL
 private var threadworkShutdownPreviousTransit = 0UL
 private var threadworkShutdownIdleTicks = 0U
@@ -22,6 +26,9 @@ fun threadworkInstallShutdownHook() {
 fun threadworkShutdownRequest() {
     threadworkRunning = false
 }
+
+/** Return the last OS shutdown signal known to the runtime, or zero. */
+fun threadworkGetShutdownSignal(): Int = threadworkShutdownSignal
 
 /** Increment the count of packets completed by modeled transports. */
 fun threadworkRecordTransit() {

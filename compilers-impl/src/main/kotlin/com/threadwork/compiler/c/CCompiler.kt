@@ -117,46 +117,32 @@ class CCompiler : TemplateSetCompiler() {
         }
         val runtimeSymbols = listOf(
             CompilerCodeSymbol(
-                name = "threadwork_running",
+                name = "threadwork_error_t",
                 kind = CompilerCodeSymbolKind.RuntimeSymbol,
-                typeName = "volatile sig_atomic_t",
-                detail = "C runtime ingress flag",
-                documentation = "Set to zero by SIGINT, SIGTERM, or the generated one-shot shutdown. C generator nodes return before producing new packets when this flag is zero.",
+                typeName = "typedef int threadwork_error_t",
+                detail = "Threadwork runtime result type",
+                documentation = "Returned by Threadwork runtime operations. Compare the result with THREADWORK_OK before using an out value.",
             ),
             CompilerCodeSymbol(
-                name = "threadwork_transit",
+                name = "threadwork_runner_t",
                 kind = CompilerCodeSymbolKind.RuntimeSymbol,
-                typeName = "unsigned long long",
-                detail = "C runtime completed transport count",
-                documentation = "Incremented after each non-empty modeled data-link transport completes.",
+                typeName = "struct threadwork_runner_t",
+                detail = "application execution state",
+                documentation = "Owned by context->runner. It holds ingress state, the last OS shutdown signal, transit accounting, and drain-window state.",
             ),
             CompilerCodeSymbol(
-                name = "threadwork_network_shutdown_begin",
+                name = "threadwork_runner__shutdown_request",
                 kind = CompilerCodeSymbolKind.RuntimeSymbol,
-                typeName = "void threadwork_network_shutdown_begin(unsigned int idle_ticks)",
-                detail = "begin network drain monitoring",
-                documentation = "Begins a bounded idle-window check for residual modeled link traffic.",
-            ),
-            CompilerCodeSymbol(
-                name = "threadwork_network_has_recent_transit",
-                kind = CompilerCodeSymbolKind.RuntimeSymbol,
-                typeName = "int threadwork_network_has_recent_transit(void)",
-                detail = "continue network drain while traffic is recent",
-                documentation = "Returns non-zero while link transports are still active or the configured idle window has not elapsed.",
-            ),
-            CompilerCodeSymbol(
-                name = "threadwork_install_shutdown_signal_handlers",
-                kind = CompilerCodeSymbolKind.RuntimeSymbol,
-                typeName = "int threadwork_install_shutdown_signal_handlers(void)",
-                detail = "install SIGINT and SIGTERM shutdown handling",
-                documentation = "Installs the standard C runtime signal handlers that close generator ingress by setting threadwork_running to zero.",
-            ),
-            CompilerCodeSymbol(
-                name = "threadwork_shutdown_request",
-                kind = CompilerCodeSymbolKind.RuntimeSymbol,
-                typeName = "void threadwork_shutdown_request(void)",
+                typeName = "threadwork_error_t threadwork_runner__shutdown_request(threadwork_runner_t *this)",
                 detail = "close generator ingress",
-                documentation = "Requests a graceful shutdown by setting threadwork_running to zero while processors continue draining modeled links.",
+                documentation = "Requests graceful shutdown for context->runner while processors continue draining modeled links.",
+            ),
+            CompilerCodeSymbol(
+                name = "threadwork_runner__get_shutdown_signal",
+                kind = CompilerCodeSymbolKind.RuntimeSymbol,
+                typeName = "threadwork_error_t threadwork_runner__get_shutdown_signal(const threadwork_runner_t *this, int *out_signal)",
+                detail = "read the last OS shutdown signal",
+                documentation = "Writes the last SIGINT or SIGTERM number to out_signal, or zero when no OS shutdown signal has been received. It does not consume the value.",
             ),
         )
         return defaults.copy(
@@ -214,7 +200,7 @@ class CCompiler : TemplateSetCompiler() {
         node.outgoingLinks.mapNotNull(document.nodes::get)
             .filterNot { LinkClassifier.isCapability(document, it) }
             .forEach { arguments += "threadwork_buffer *${compilerArgumentName(it.name)}" }
-        return "static int tw_${functionPrefix}_${indexedNodeSymbol(document, node)}(${arguments.joinToString(", ")}) {"
+        return "static threadwork_error_t tw_${functionPrefix}_${indexedNodeSymbol(document, node)}(${arguments.joinToString(", ")}) {"
     }
 
     override fun hoistedDeclarationFor(context: NodeCompilerContext): String {

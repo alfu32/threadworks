@@ -1,6 +1,7 @@
 {# Shared execution state: ingress stops first, then queued packets drain. #}
 if (!isset($GLOBALS['threadwork_running'])) {
     $GLOBALS['threadwork_running'] = true;
+    $GLOBALS['threadwork_shutdown_signal'] = 0;
     $GLOBALS['threadwork_transit'] = 0;
     $GLOBALS['threadwork_shutdown_previous_transit'] = 0;
     $GLOBALS['threadwork_shutdown_idle_ticks'] = 0;
@@ -18,6 +19,12 @@ function createRuntimeContext(): array
 function threadwork_shutdown_request(): void
 {
     $GLOBALS['threadwork_running'] = false;
+}
+
+/** @brief Return the last OS shutdown signal received by the runtime, or zero. */
+function threadwork_get_shutdown_signal(): int
+{
+    return (int) ($GLOBALS['threadwork_shutdown_signal'] ?? 0);
 }
 
 /** @brief Increment the count of packets completed by modeled transports. */
@@ -58,7 +65,11 @@ function threadwork_install_shutdown_handlers(): void
 {
     if (!function_exists('pcntl_signal')) return;
     pcntl_async_signals(true);
-    pcntl_signal(SIGINT, static fn() => threadwork_shutdown_request());
-    pcntl_signal(SIGTERM, static fn() => threadwork_shutdown_request());
+    $handleSignal = static function (int $signal): void {
+        $GLOBALS['threadwork_shutdown_signal'] = $signal;
+        threadwork_shutdown_request();
+    };
+    pcntl_signal(SIGINT, $handleSignal);
+    pcntl_signal(SIGTERM, $handleSignal);
 }
 }

@@ -188,13 +188,6 @@ class PhpCompiler : TemplateSetCompiler() {
                 documentation = "Execution context supplied to every generated PHP node function.",
             ),
             CompilerCodeSymbol(
-                name = "\$GLOBALS['threadwork_running']",
-                kind = CompilerCodeSymbolKind.RuntimeSymbol,
-                typeName = "bool",
-                detail = "PHP runtime ingress flag",
-                documentation = "Set to false by SIGINT, SIGTERM, or threadwork_shutdown_request(). PHP generator nodes return before producing new packets when this flag is false.",
-            ),
-            CompilerCodeSymbol(
                 name = "\$GLOBALS['threadwork_transit']",
                 kind = CompilerCodeSymbolKind.RuntimeSymbol,
                 typeName = "int",
@@ -207,6 +200,13 @@ class PhpCompiler : TemplateSetCompiler() {
                 typeName = "void threadwork_shutdown_request()",
                 detail = "close generator ingress",
                 documentation = "Requests a graceful shutdown while processors continue draining modeled links.",
+            ),
+            CompilerCodeSymbol(
+                name = "threadwork_get_shutdown_signal",
+                kind = CompilerCodeSymbolKind.RuntimeSymbol,
+                typeName = "int threadwork_get_shutdown_signal()",
+                detail = "read the last OS shutdown signal",
+                documentation = "Returns the last SIGINT or SIGTERM number received by the runtime, or zero when no OS shutdown signal has been received. It does not consume the value.",
             ),
             CompilerCodeSymbol(
                 name = "threadwork_record_transit",

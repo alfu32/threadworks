@@ -45,8 +45,14 @@ class QuickJsCompilerTest {
         assertTrue(result.success, result.diagnostics.joinToString { it.message })
         val source = assertNotNull(result.generatedProject).files.single().content
         assertTrue(source.contains("threadworkRun();"))
+        assertTrue(source.contains("function threadworkGetShutdownSignal()"))
         assertFalse(source.contains("require("))
         assertFalse(source.contains("module.exports"))
         assertFalse(source.contains("process.once"))
+
+        val intelligence = QuickJsCompiler().codeIntelligence(repository.getDocument(), worker)
+        assertTrue(intelligence.symbols.any { it.name == "threadworkShutdownRequest" })
+        assertTrue(intelligence.symbols.any { it.name == "threadworkGetShutdownSignal" })
+        assertFalse(intelligence.symbols.any { it.name == "threadworkIsRunning" })
     }
 }

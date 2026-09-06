@@ -2,6 +2,7 @@
 const threadworkRuntimeKey = Symbol.for("threadwork.runtime");
 const threadworkRuntime = globalThis[threadworkRuntimeKey] ??= {
   running: true,
+  shutdownSignal: 0,
   transit: 0,
   shutdownPreviousTransit: 0,
   shutdownIdleTicks: 0,
@@ -16,6 +17,11 @@ function createRuntimeContext() {
 /** Stop generators while already queued packets continue to drain. */
 function threadworkShutdownRequest() {
   threadworkRuntime.running = false;
+}
+
+/** Return the last OS shutdown signal observed by this runtime, or zero. */
+function threadworkGetShutdownSignal() {
+  return threadworkRuntime.shutdownSignal || 0;
 }
 
 /** Return whether generator ingress is still open. */

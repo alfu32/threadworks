@@ -2,6 +2,10 @@ package com.threadwork.compiler.naivekotlin
 
 import com.threadwork.compiler.api.CompilerOptions
 import com.threadwork.compiler.api.CompilerTechnology
+import com.threadwork.compiler.api.CompilerCodeIntelligence
+import com.threadwork.compiler.api.CompilerCodeSymbol
+import com.threadwork.compiler.api.CompilerCodeSymbolKind
+import com.threadwork.compiler.api.defaultCodeIntelligence
 import com.threadwork.compiler.generic.CompilerTemplateSet
 import com.threadwork.compiler.generic.CompilerTemplateSetLoader
 import com.threadwork.compiler.generic.TemplateSetCompiler
@@ -10,6 +14,7 @@ import com.threadwork.core.diagnostics.DiagnosticSeverity
 import com.threadwork.core.classification.LinkClassifier
 import com.threadwork.core.classification.LinkStereotype
 import com.threadwork.core.model.ThreadworkDocument
+import com.threadwork.core.model.Node
 import com.threadwork.core.model.effectiveTechnologyId
 import com.threadwork.core.validation.DocumentValidator
 
@@ -36,8 +41,27 @@ class NaiveKotlinCompiler : TemplateSetCompiler() {
                 )
             }
 
+    override fun codeIntelligence(document: ThreadworkDocument, node: Node): CompilerCodeIntelligence {
+        val defaults = defaultCodeIntelligence(document, node)
+        val runtimeSymbols = listOf(
+            runtimeSymbol("threadworkShutdownRequest", "close generator ingress"),
+            runtimeSymbol("threadworkGetShutdownSignal", "read the last OS shutdown signal, or zero"),
+        )
+        return defaults.copy(
+            symbols = (defaults.symbols + runtimeSymbols).distinctBy { it.name to it.kind },
+        )
+    }
+
     override fun templatesFor(document: ThreadworkDocument, options: CompilerOptions): CompilerTemplateSet =
         TEMPLATES
+
+    private fun runtimeSymbol(name: String, detail: String): CompilerCodeSymbol =
+        CompilerCodeSymbol(
+            name = name,
+            kind = CompilerCodeSymbolKind.RuntimeSymbol,
+            detail = detail,
+            documentation = "Kotlin/JVM Threadwork runtime helper. JVM shutdown hooks do not expose a portable OS signal number, so the getter returns zero.",
+        )
 
     private companion object {
         val TEMPLATES = CompilerTemplateSetLoader.load("/compiler-templates/kotlin/compiler.properties")

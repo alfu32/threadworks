@@ -37,8 +37,8 @@ class QuickJsCompiler : TemplateSetCompiler() {
         val defaults = defaultCodeIntelligence(document, node)
         val runtimeSymbols = listOf(
             runtimeSymbol("createRuntimeContext", "create QuickJS execution context"),
-            runtimeSymbol("threadworkIsRunning", "test whether generator ingress is open"),
             runtimeSymbol("threadworkShutdownRequest", "close generator ingress"),
+            runtimeSymbol("threadworkGetShutdownSignal", "read the last OS shutdown signal, or zero"),
             runtimeSymbol("threadworkRecordTransit", "record one completed transport"),
             runtimeSymbol("threadworkNetworkShutdownBegin", "begin bounded network draining"),
             runtimeSymbol("threadworkNetworkHasRecentTransit", "test for recent transport activity"),
@@ -63,7 +63,11 @@ class QuickJsCompiler : TemplateSetCompiler() {
             name = name,
             kind = CompilerCodeSymbolKind.RuntimeSymbol,
             detail = detail,
-            documentation = "QuickJS Threadwork runtime helper.",
+            documentation = if (name == "threadworkGetShutdownSignal") {
+                "QuickJS does not expose OS signal numbers to this generated script; this helper returns zero."
+            } else {
+                "QuickJS Threadwork runtime helper."
+            },
         )
 
     private companion object {

@@ -226,6 +226,9 @@ class PhpCompilerTest {
             it.name == "\$context" && it.kind == CompilerCodeSymbolKind.RuntimeSymbol
         })
         assertTrue(intelligence.symbols.any {
+            it.name == "threadwork_get_shutdown_signal" && it.kind == CompilerCodeSymbolKind.RuntimeSymbol
+        })
+        assertTrue(intelligence.symbols.none {
             it.name == "\$GLOBALS['threadwork_running']" && it.kind == CompilerCodeSymbolKind.RuntimeSymbol
         })
         assertTrue(intelligence.symbols.any {

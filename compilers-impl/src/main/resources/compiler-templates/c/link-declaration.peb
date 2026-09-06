@@ -29,7 +29,7 @@ static threadwork_buffer {{ link.bPortSymbol }} = {
 };
 
 {{ transportProvenanceComment }}
-static int {{ link.transportSymbol }}(threadwork_buffer *a, threadwork_buffer *b)
+static threadwork_error_t {{ link.transportSymbol }}(threadwork_buffer *a, threadwork_buffer *b)
 {
     return threadwork_buffer_transport(a, b);
 }

@@ -1,6 +1,6 @@
 {# Defines one terminal processor. Instantiation is setup code; declaration is recurring code. #}
 {{ initializerProvenanceComment }}
-static int tw_{{ initializerSymbol }}(threadwork_context *context{% for link in incomingDataLinks %}, threadwork_buffer *{{ link.argumentSymbol }}{% endfor %}{% for link in outgoingDataLinks %}, threadwork_buffer *{{ link.argumentSymbol }}{% endfor %}{% for link in dependencyInjectionLinks %}{% if not link.isLibraryCapability %}, {% if link.isSourceCapability %}{{ link.capabilityTypeSymbol }} *{% elseif link.sourceNodeTypeSymbol is not empty %}{{ link.sourceNodeTypeSymbol }}{% else %}void *{% endif %} {{ link.argumentSymbol }}{% endif %}{% endfor %})
+static threadwork_error_t tw_{{ initializerSymbol }}(threadwork_context *context{% for link in incomingDataLinks %}, threadwork_buffer *{{ link.argumentSymbol }}{% endfor %}{% for link in outgoingDataLinks %}, threadwork_buffer *{{ link.argumentSymbol }}{% endfor %}{% for link in dependencyInjectionLinks %}{% if not link.isLibraryCapability %}, {% if link.isSourceCapability %}{{ link.capabilityTypeSymbol }} *{% elseif link.sourceNodeTypeSymbol is not empty %}{{ link.sourceNodeTypeSymbol }}{% else %}void *{% endif %} {{ link.argumentSymbol }}{% endif %}{% endfor %})
 {
     (void)context;
 {% for link in incomingDataLinks %}    (void){{ link.argumentSymbol }};
@@ -13,7 +13,7 @@ static int tw_{{ initializerSymbol }}(threadwork_context *context{% for link in 
 }
 
 {{ runProvenanceComment }}
-static int tw_{{ runSymbol }}(threadwork_context *context{% for link in incomingDataLinks %}, threadwork_buffer *{{ link.argumentSymbol }}{% endfor %}{% for link in outgoingDataLinks %}, threadwork_buffer *{{ link.argumentSymbol }}{% endfor %}{% for link in dependencyInjectionLinks %}{% if not link.isLibraryCapability %}, {% if link.isSourceCapability %}{{ link.capabilityTypeSymbol }} *{% elseif link.sourceNodeTypeSymbol is not empty %}{{ link.sourceNodeTypeSymbol }}{% else %}void *{% endif %} {{ link.argumentSymbol }}{% endif %}{% endfor %})
+static threadwork_error_t tw_{{ runSymbol }}(threadwork_context *context{% for link in incomingDataLinks %}, threadwork_buffer *{{ link.argumentSymbol }}{% endfor %}{% for link in outgoingDataLinks %}, threadwork_buffer *{{ link.argumentSymbol }}{% endfor %}{% for link in dependencyInjectionLinks %}{% if not link.isLibraryCapability %}, {% if link.isSourceCapability %}{{ link.capabilityTypeSymbol }} *{% elseif link.sourceNodeTypeSymbol is not empty %}{{ link.sourceNodeTypeSymbol }}{% else %}void *{% endif %} {{ link.argumentSymbol }}{% endif %}{% endfor %})
 {
     (void)context;
 {% for link in incomingDataLinks %}    (void){{ link.argumentSymbol }};
