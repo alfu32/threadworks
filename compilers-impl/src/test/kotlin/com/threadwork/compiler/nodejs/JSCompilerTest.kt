@@ -180,13 +180,14 @@ class JSCompilerTest {
         assertTrue(generated.contains("init_writer_") && generated.contains("run_writer_"))
         assertTrue(generated.contains("transport_record_pipe1(record_pipe1_a_port, record_pipe1_b_port);"))
         assertTrue(generated.contains("threadworkRecordTransit()"))
-        assertTrue(generated.contains("if (!threadworkIsRunning()) return;"))
+        assertFalse(generated.contains("if (!threadworkIsRunning()) return;"))
         assertTrue(generated.contains("threadworkNetworkHasRecentTransit()"))
         assertTrue(generated.contains("function threadworkGetShutdownSignal()"))
 
         val intelligence = JSCompiler().codeIntelligence(repository.getDocument(), source)
         assertTrue(intelligence.symbols.any { it.name == "threadworkShutdownRequest" })
         assertTrue(intelligence.symbols.any { it.name == "threadworkGetShutdownSignal" })
+        assertTrue(intelligence.symbols.any { it.name == "threadworkIsRunning" })
     }
 
     @Test

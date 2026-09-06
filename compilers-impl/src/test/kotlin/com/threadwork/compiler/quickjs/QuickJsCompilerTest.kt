@@ -49,10 +49,11 @@ class QuickJsCompilerTest {
         assertFalse(source.contains("require("))
         assertFalse(source.contains("module.exports"))
         assertFalse(source.contains("process.once"))
+        assertFalse(source.contains("if (!threadworkIsRunning()) return;"))
 
         val intelligence = QuickJsCompiler().codeIntelligence(repository.getDocument(), worker)
         assertTrue(intelligence.symbols.any { it.name == "threadworkShutdownRequest" })
         assertTrue(intelligence.symbols.any { it.name == "threadworkGetShutdownSignal" })
-        assertFalse(intelligence.symbols.any { it.name == "threadworkIsRunning" })
+        assertTrue(intelligence.symbols.any { it.name == "threadworkIsRunning" })
     }
 }

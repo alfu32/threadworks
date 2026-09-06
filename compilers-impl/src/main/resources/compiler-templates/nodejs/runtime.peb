@@ -1,4 +1,4 @@
-{# Shared execution state: ingress may stop while already queued packets drain. #}
+{# Shared execution state: modeled nodes decide whether shutdown state stops emission. #}
 const threadworkRuntimeKey = Symbol.for("threadwork.runtime");
 const threadworkRuntime = globalThis[threadworkRuntimeKey] ??= {
   running: true,
@@ -14,7 +14,7 @@ function createRuntimeContext() {
   return { imports: Object.create(null) };
 }
 
-/** Stop generators on SIGINT/SIGTERM while queued packets continue to drain. */
+/** Record SIGINT/SIGTERM shutdown state for modeled code to inspect. */
 function threadworkInstallShutdownHandlers() {
   const requestShutdown = (signalNumber) => {
     threadworkRuntime.shutdownSignal = signalNumber;
@@ -24,7 +24,7 @@ function threadworkInstallShutdownHandlers() {
   process.once("SIGTERM", () => requestShutdown(15));
 }
 
-/** Stop generators while already queued packets continue to drain. */
+/** Request shutdown; modeled nodes decide whether they continue emitting packets. */
 function threadworkShutdownRequest() {
   threadworkRuntime.running = false;
 }
@@ -34,7 +34,7 @@ function threadworkGetShutdownSignal() {
   return threadworkRuntime.shutdownSignal || 0;
 }
 
-/** Return whether generator ingress is still open. */
+/** Return the requested running state for modeled code to inspect. */
 function threadworkIsRunning() {
   return threadworkRuntime.running;
 }

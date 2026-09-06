@@ -1,4 +1,4 @@
-{# Generators stop ingress after shutdown is requested; consumers continue draining. #}<?php
+{# Modeled generator code decides whether shutdown state permits emission. #}<?php
 {{ initializerProvenanceComment }}
 function {{ initializerSymbol }}(array &$context{% for link in incomingDataLinks %}, array &${{ link.argumentSymbol }}{% endfor %}{% for link in outgoingDataLinks %}, array &${{ link.argumentSymbol }}{% endfor %}{% for link in dependencyInjectionLinks %}{% if not link.isLibraryCapability %}, mixed ${{ link.argumentSymbol }}{% endif %}{% endfor %}): void
 {
@@ -8,7 +8,6 @@ function {{ initializerSymbol }}(array &$context{% for link in incomingDataLinks
 {{ runProvenanceComment }}
 function {{ runSymbol }}(array &$context{% for link in incomingDataLinks %}, array &${{ link.argumentSymbol }}{% endfor %}{% for link in outgoingDataLinks %}, array &${{ link.argumentSymbol }}{% endfor %}{% for link in dependencyInjectionLinks %}{% if not link.isLibraryCapability %}, mixed ${{ link.argumentSymbol }}{% endif %}{% endfor %}): void
 {
-    if (!$GLOBALS['threadwork_running']) return;
 {% if declaration is not empty %}{{ declarationIndent4 }}
 {% else %}    // {{ name }} has no declaration text yet.
 {% endif %}}

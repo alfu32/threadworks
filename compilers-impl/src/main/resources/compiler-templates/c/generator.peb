@@ -1,4 +1,4 @@
-{# Defines one terminal generator. It stops ingress during runtime shutdown while downstream nodes drain. #}
+{# Defines one terminal generator. Modeled code decides whether shutdown state permits emission. #}
 {{ initializerProvenanceComment }}
 static threadwork_error_t tw_{{ initializerSymbol }}(threadwork_context *context{% for link in incomingDataLinks %}, threadwork_buffer *{{ link.argumentSymbol }}{% endfor %}{% for link in outgoingDataLinks %}, threadwork_buffer *{{ link.argumentSymbol }}{% endfor %}{% for link in dependencyInjectionLinks %}{% if not link.isLibraryCapability %}, {% if link.isSourceCapability %}{{ link.capabilityTypeSymbol }} *{% elseif link.sourceNodeTypeSymbol is not empty %}{{ link.sourceNodeTypeSymbol }}{% else %}void *{% endif %} {{ link.argumentSymbol }}{% endif %}{% endfor %})
 {
@@ -14,18 +14,11 @@ static threadwork_error_t tw_{{ initializerSymbol }}(threadwork_context *context
 {{ runProvenanceComment }}
 static threadwork_error_t tw_{{ runSymbol }}(threadwork_context *context{% for link in incomingDataLinks %}, threadwork_buffer *{{ link.argumentSymbol }}{% endfor %}{% for link in outgoingDataLinks %}, threadwork_buffer *{{ link.argumentSymbol }}{% endfor %}{% for link in dependencyInjectionLinks %}{% if not link.isLibraryCapability %}, {% if link.isSourceCapability %}{{ link.capabilityTypeSymbol }} *{% elseif link.sourceNodeTypeSymbol is not empty %}{{ link.sourceNodeTypeSymbol }}{% else %}void *{% endif %} {{ link.argumentSymbol }}{% endif %}{% endfor %})
 {
-    int running;
     (void)context;
 {% for link in incomingDataLinks %}    (void){{ link.argumentSymbol }};
 {% endfor %}{% for link in outgoingDataLinks %}    (void){{ link.argumentSymbol }};
 {% endfor %}{% for link in dependencyInjectionLinks %}{% if not link.isLibraryCapability %}    (void){{ link.argumentSymbol }};
 {% endif %}
-{% endfor %}    if (threadwork_runner__is_running(&threadwork_runner, &running) != THREADWORK_OK) {
-        return THREADWORK_ERROR;
-    }
-    if (!running) {
-        return THREADWORK_OK;
-    }
-{% if declaration is not empty %}{{ declarationIndent4 }}
+{% endfor %}{% if declaration is not empty %}{{ declarationIndent4 }}
 {% endif %}    return THREADWORK_OK;
 }

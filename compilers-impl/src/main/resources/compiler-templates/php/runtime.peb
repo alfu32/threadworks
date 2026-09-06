@@ -1,4 +1,4 @@
-{# Shared execution state: ingress stops first, then queued packets drain. #}
+{# Shared execution state: modeled nodes decide whether shutdown state stops emission. #}
 if (!isset($GLOBALS['threadwork_running'])) {
     $GLOBALS['threadwork_running'] = true;
     $GLOBALS['threadwork_shutdown_signal'] = 0;
@@ -15,7 +15,7 @@ function createRuntimeContext(): array
     return ['imports' => []];
 }
 
-/** @brief Stop generators while already queued packets continue to drain. */
+/** @brief Request shutdown; modeled nodes decide whether they continue emitting packets. */
 function threadwork_shutdown_request(): void
 {
     $GLOBALS['threadwork_running'] = false;
@@ -25,6 +25,12 @@ function threadwork_shutdown_request(): void
 function threadwork_get_shutdown_signal(): int
 {
     return (int) ($GLOBALS['threadwork_shutdown_signal'] ?? 0);
+}
+
+/** @brief Return whether the runtime is still accepting normal work. */
+function threadwork_is_running(): bool
+{
+    return (bool) ($GLOBALS['threadwork_running'] ?? false);
 }
 
 /** @brief Increment the count of packets completed by modeled transports. */

@@ -232,6 +232,9 @@ class PhpCompilerTest {
             it.name == "\$GLOBALS['threadwork_running']" && it.kind == CompilerCodeSymbolKind.RuntimeSymbol
         })
         assertTrue(intelligence.symbols.any {
+            it.name == "threadwork_is_running" && it.kind == CompilerCodeSymbolKind.RuntimeSymbol
+        })
+        assertTrue(intelligence.symbols.any {
             it.name == "threadwork_network_has_recent_transit" && it.kind == CompilerCodeSymbolKind.RuntimeSymbol
         })
         assertTrue(

@@ -141,8 +141,8 @@ class CCompiler : TemplateSetCompiler() {
                 name = "threadwork_runner__shutdown_request",
                 kind = CompilerCodeSymbolKind.RuntimeSymbol,
                 typeName = "threadwork_error_t threadwork_runner__shutdown_request(threadwork_runner_t *this)",
-                detail = "close generator ingress",
-                documentation = "Requests graceful shutdown for the global threadwork_runner while processors continue draining modeled links.",
+                detail = "request application shutdown",
+                documentation = "Sets the global threadwork_runner shutdown state. Modeled nodes decide whether that state stops their own packet emission.",
             ),
             CompilerCodeSymbol(
                 name = "threadwork_runner__get_shutdown_signal",
@@ -150,6 +150,13 @@ class CCompiler : TemplateSetCompiler() {
                 typeName = "threadwork_error_t threadwork_runner__get_shutdown_signal(const threadwork_runner_t *this, int *out_signal)",
                 detail = "read the last OS shutdown signal",
                 documentation = "Writes the last SIGINT or SIGTERM number to out_signal, or zero when no OS shutdown signal has been received. It does not consume the value.",
+            ),
+            CompilerCodeSymbol(
+                name = "threadwork_runner__is_running",
+                kind = CompilerCodeSymbolKind.RuntimeSymbol,
+                typeName = "threadwork_error_t threadwork_runner__is_running(const threadwork_runner_t *this, int *out_running)",
+                detail = "read the requested running state",
+                documentation = "Writes one to out_running while the runner accepts normal work, or zero after a shutdown request or catchable OS shutdown signal.",
             ),
         )
         return defaults.copy(

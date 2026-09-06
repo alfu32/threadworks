@@ -44,8 +44,9 @@ class NaiveKotlinCompiler : TemplateSetCompiler() {
     override fun codeIntelligence(document: ThreadworkDocument, node: Node): CompilerCodeIntelligence {
         val defaults = defaultCodeIntelligence(document, node)
         val runtimeSymbols = listOf(
-            runtimeSymbol("threadworkShutdownRequest", "close generator ingress"),
+            runtimeSymbol("threadworkShutdownRequest", "request application shutdown"),
             runtimeSymbol("threadworkGetShutdownSignal", "read the last OS shutdown signal, or zero"),
+            runtimeSymbol("threadworkIsRunning", "read the requested running state"),
         )
         return defaults.copy(
             symbols = (defaults.symbols + runtimeSymbols).distinctBy { it.name to it.kind },

@@ -198,8 +198,8 @@ class PhpCompiler : TemplateSetCompiler() {
                 name = "threadwork_shutdown_request",
                 kind = CompilerCodeSymbolKind.RuntimeSymbol,
                 typeName = "void threadwork_shutdown_request()",
-                detail = "close generator ingress",
-                documentation = "Requests a graceful shutdown while processors continue draining modeled links.",
+                detail = "request application shutdown",
+                documentation = "Sets the runtime shutdown state. Modeled nodes decide whether that state stops their own packet emission.",
             ),
             CompilerCodeSymbol(
                 name = "threadwork_get_shutdown_signal",
@@ -207,6 +207,13 @@ class PhpCompiler : TemplateSetCompiler() {
                 typeName = "int threadwork_get_shutdown_signal()",
                 detail = "read the last OS shutdown signal",
                 documentation = "Returns the last SIGINT or SIGTERM number received by the runtime, or zero when no OS shutdown signal has been received. It does not consume the value.",
+            ),
+            CompilerCodeSymbol(
+                name = "threadwork_is_running",
+                kind = CompilerCodeSymbolKind.RuntimeSymbol,
+                typeName = "bool threadwork_is_running()",
+                detail = "read the requested running state",
+                documentation = "Returns false after a shutdown request or catchable OS shutdown signal. Modeled generators decide whether that state stops their own emission.",
             ),
             CompilerCodeSymbol(
                 name = "threadwork_record_transit",

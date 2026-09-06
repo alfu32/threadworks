@@ -162,6 +162,7 @@ class CCompilerTest {
         assertTrue(source.contains("threadwork_runner__begin_shutdown_drain(&threadwork_runner, 10U)"))
         assertTrue(source.contains("threadwork_runner__shutdown_request(&threadwork_runner)"))
         assertTrue(source.contains("threadwork_runner__has_recent_transit(&threadwork_runner, &recent_transit)"))
+        assertFalse(source.contains("if (!running) {\n        return THREADWORK_OK;\n    }"))
         val intelligence = CCompiler().codeIntelligence(repository.getDocument(), generator)
         assertTrue(intelligence.symbols.any {
             it.name == "threadwork_runner" && it.kind == CompilerCodeSymbolKind.RuntimeSymbol
@@ -169,7 +170,7 @@ class CCompilerTest {
         assertTrue(intelligence.symbols.any {
             it.name == "threadwork_runner__get_shutdown_signal" && it.kind == CompilerCodeSymbolKind.RuntimeSymbol
         })
-        assertFalse(intelligence.symbols.any {
+        assertTrue(intelligence.symbols.any {
             it.name == "threadwork_runner__is_running" && it.kind == CompilerCodeSymbolKind.RuntimeSymbol
         })
         compileAndRunWhenAvailable(source)

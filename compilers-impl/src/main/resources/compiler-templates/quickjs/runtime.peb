@@ -14,7 +14,7 @@ function createRuntimeContext() {
   return { imports: Object.create(null) };
 }
 
-/** Stop generators while already queued packets continue to drain. */
+/** Request shutdown; modeled nodes decide whether they continue emitting packets. */
 function threadworkShutdownRequest() {
   threadworkRuntime.running = false;
 }

@@ -78,7 +78,7 @@ threadwork_error_t threadwork_runner__install_shutdown_signal_handlers(threadwor
     return THREADWORK_OK;
 }
 
-/** @brief Stop generators while allowing already queued packets to drain. */
+/** @brief Request shutdown; modeled nodes decide whether they continue emitting packets. */
 threadwork_error_t threadwork_runner__shutdown_request(threadwork_runner_t *this)
 {
     if (this == NULL) {
