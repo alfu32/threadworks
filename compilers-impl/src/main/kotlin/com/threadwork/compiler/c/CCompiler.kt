@@ -128,14 +128,21 @@ class CCompiler : TemplateSetCompiler() {
                 kind = CompilerCodeSymbolKind.RuntimeSymbol,
                 typeName = "struct threadwork_runner_t",
                 detail = "application execution state",
-                documentation = "Owned by context->runner. It holds ingress state, the last OS shutdown signal, transit accounting, and drain-window state.",
+                documentation = "Global execution state for the generated application. It holds ingress state, the last OS shutdown signal, transit accounting, and drain-window state.",
+            ),
+            CompilerCodeSymbol(
+                name = "threadwork_runner",
+                kind = CompilerCodeSymbolKind.RuntimeSymbol,
+                typeName = "threadwork_runner_t",
+                detail = "global application runner",
+                documentation = "Pass &threadwork_runner as the receiver to public threadwork_runner__* operations from modeled C code.",
             ),
             CompilerCodeSymbol(
                 name = "threadwork_runner__shutdown_request",
                 kind = CompilerCodeSymbolKind.RuntimeSymbol,
                 typeName = "threadwork_error_t threadwork_runner__shutdown_request(threadwork_runner_t *this)",
                 detail = "close generator ingress",
-                documentation = "Requests graceful shutdown for context->runner while processors continue draining modeled links.",
+                documentation = "Requests graceful shutdown for the global threadwork_runner while processors continue draining modeled links.",
             ),
             CompilerCodeSymbol(
                 name = "threadwork_runner__get_shutdown_signal",

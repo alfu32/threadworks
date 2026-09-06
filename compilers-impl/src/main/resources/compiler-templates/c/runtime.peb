@@ -17,6 +17,9 @@ typedef struct threadwork_runner_t {
     unsigned int shutdown_remaining_ticks;
 } threadwork_runner_t;
 
+/** @brief Global execution state for the generated application. */
+threadwork_runner_t threadwork_runner;
+
 /* POSIX signal handlers cannot receive a context pointer. */
 static threadwork_runner_t *threadwork_active_signal_runner = NULL;
 
@@ -210,9 +213,8 @@ typedef struct threadwork_endpoint {
     struct threadwork_endpoint *next;
 } threadwork_endpoint;
 
-/** @brief Runtime state shared by generated node functions. */
+/** @brief Endpoint state shared by generated node functions. */
 typedef struct threadwork_context {
-    threadwork_runner_t runner;
     threadwork_endpoint *inputs;
     threadwork_endpoint *outputs;
 } threadwork_context;
@@ -500,9 +502,6 @@ threadwork_error_t threadwork_context_init(threadwork_context *context)
     if (context == NULL) {
         return THREADWORK_ERROR;
     }
-    if (threadwork_runner__init(&context->runner) != THREADWORK_OK) {
-        return THREADWORK_ERROR;
-    }
     context->inputs = NULL;
     context->outputs = NULL;
     return THREADWORK_OK;
@@ -518,7 +517,6 @@ void threadwork_context_destroy(threadwork_context *context)
     threadwork_endpoint_list_destroy(context->outputs);
     context->inputs = NULL;
     context->outputs = NULL;
-    (void)threadwork_runner__destroy(&context->runner);
 }
 
 /** @brief Write a packet to a named output endpoint. */

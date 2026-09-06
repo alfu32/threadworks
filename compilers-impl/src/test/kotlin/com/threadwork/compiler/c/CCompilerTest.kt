@@ -114,7 +114,7 @@ class CCompilerTest {
                 declaration = """
                     static int emitted = 0;
                     int shutdown_signal = 0;
-                    if (threadwork_runner__get_shutdown_signal(&context->runner, &shutdown_signal) != THREADWORK_OK) {
+                    if (threadwork_runner__get_shutdown_signal(&threadwork_runner, &shutdown_signal) != THREADWORK_OK) {
                         return THREADWORK_ERROR;
                     }
                     if (emitted == 0) {
@@ -123,7 +123,7 @@ class CCompilerTest {
                             return THREADWORK_ERROR;
                         }
                         emitted = 1;
-                    } else if (threadwork_runner__shutdown_request(&context->runner) != THREADWORK_OK) {
+                    } else if (threadwork_runner__shutdown_request(&threadwork_runner) != THREADWORK_OK) {
                         return THREADWORK_ERROR;
                     }
                 """.trimIndent(),
@@ -149,18 +149,23 @@ class CCompilerTest {
         val source = assertNotNull(result.generatedProject).files.single().content
         assertTrue(source.contains("typedef int threadwork_error_t;"))
         assertTrue(source.contains("typedef struct threadwork_runner_t {"))
+        assertTrue(source.contains("threadwork_runner_t threadwork_runner;"))
+        assertFalse(source.contains("threadwork_runner_t runner;"))
         assertTrue(source.contains("threadwork_error_t threadwork_runner__install_shutdown_signal_handlers(threadwork_runner_t *this)"))
         assertTrue(source.contains("threadwork_error_t threadwork_runner__get_shutdown_signal("))
         assertTrue(source.contains("threadwork_error_t threadwork_runner__begin_shutdown_drain("))
         assertTrue(source.contains("threadwork_error_t threadwork_runner__has_recent_transit("))
-        assertTrue(source.contains("threadwork_runner__is_running(&context->runner, &running)"))
+        assertTrue(source.contains("threadwork_runner__is_running(&threadwork_runner, &running)"))
         assertTrue(source.contains("threadwork_buffer_count(&packet1_a_port) > 0U"))
-        assertTrue(source.contains("threadwork_runner__record_transit(&context->runner)"))
-        assertTrue(source.contains("status = threadwork_runner__install_shutdown_signal_handlers(&context.runner);"))
-        assertTrue(source.contains("threadwork_runner__begin_shutdown_drain(&context.runner, 10U)"))
-        assertTrue(source.contains("threadwork_runner__shutdown_request(&context->runner)"))
-        assertTrue(source.contains("threadwork_runner__has_recent_transit(&context.runner, &recent_transit)"))
+        assertTrue(source.contains("threadwork_runner__record_transit(&threadwork_runner)"))
+        assertTrue(source.contains("status = threadwork_runner__install_shutdown_signal_handlers(&threadwork_runner);"))
+        assertTrue(source.contains("threadwork_runner__begin_shutdown_drain(&threadwork_runner, 10U)"))
+        assertTrue(source.contains("threadwork_runner__shutdown_request(&threadwork_runner)"))
+        assertTrue(source.contains("threadwork_runner__has_recent_transit(&threadwork_runner, &recent_transit)"))
         val intelligence = CCompiler().codeIntelligence(repository.getDocument(), generator)
+        assertTrue(intelligence.symbols.any {
+            it.name == "threadwork_runner" && it.kind == CompilerCodeSymbolKind.RuntimeSymbol
+        })
         assertTrue(intelligence.symbols.any {
             it.name == "threadwork_runner__get_shutdown_signal" && it.kind == CompilerCodeSymbolKind.RuntimeSymbol
         })
@@ -190,7 +195,7 @@ class CCompilerTest {
             transport.text.copy(
                 declaration = """
                     {% if not link.isCapability %}
-                        threadwork_runner__record_transit(&context->runner);
+                        threadwork_runner__record_transit(&threadwork_runner);
                     {% endif %}
                 """.trimIndent(),
             ),
@@ -201,7 +206,7 @@ class CCompilerTest {
         assertTrue(result.success, result.diagnostics.joinToString { it.message })
         val output = assertNotNull(result.generatedProject).files.single().content
         assertTrue(output.contains("/* custom runtime support */"))
-        assertTrue(output.contains("threadwork_runner__record_transit(&context->runner);"))
+        assertTrue(output.contains("threadwork_runner__record_transit(&threadwork_runner);"))
         assertFalse(output.contains("threadwork_buffer_transport(&packet_a, &packet_b)"))
     }
 
@@ -371,7 +376,7 @@ class CCompilerTest {
                     if (push(records, &order) != THREADWORK_OK) {
                         return THREADWORK_ERROR;
                     }
-                    if (threadwork_runner__shutdown_request(&context->runner) != THREADWORK_OK) {
+                    if (threadwork_runner__shutdown_request(&threadwork_runner) != THREADWORK_OK) {
                         return THREADWORK_ERROR;
                     }
                 """.trimIndent(),

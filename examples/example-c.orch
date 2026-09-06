@@ -1504,7 +1504,44 @@
             ],
             "link": null,
             "typeDefinition": null,
-            "diagnostics": [],
+            "diagnostics": [
+                {
+                    "severity": "Warning",
+                    "message": "implicit declaration of function 'threadwork_install_shutdown_signal_handlers'",
+                    "nodeId": "node_c43e7a55-0e44-428b-972a-6dab999df396",
+                    "textSection": null,
+                    "line": null,
+                    "column": null,
+                    "sourcePluginId": "tinycc"
+                },
+                {
+                    "severity": "Error",
+                    "message": "'threadwork_running' undeclared",
+                    "nodeId": "node_c43e7a55-0e44-428b-972a-6dab999df396",
+                    "textSection": null,
+                    "line": null,
+                    "column": null,
+                    "sourcePluginId": "tinycc"
+                },
+                {
+                    "severity": "Error",
+                    "message": "declaration expected",
+                    "nodeId": "node_c43e7a55-0e44-428b-972a-6dab999df396",
+                    "textSection": null,
+                    "line": null,
+                    "column": null,
+                    "sourcePluginId": "tinycc"
+                },
+                {
+                    "severity": "Warning",
+                    "message": "type defaults to int",
+                    "nodeId": "node_c43e7a55-0e44-428b-972a-6dab999df396",
+                    "textSection": null,
+                    "line": null,
+                    "column": null,
+                    "sourcePluginId": "tinycc"
+                }
+            ],
             "metadata": {},
             "pluginData": {},
             "nameDetail": ""
@@ -1656,7 +1693,44 @@
             ],
             "link": null,
             "typeDefinition": null,
-            "diagnostics": [],
+            "diagnostics": [
+                {
+                    "severity": "Warning",
+                    "message": "implicit declaration of function 'threadwork_install_shutdown_signal_handlers'",
+                    "nodeId": "node_3b600a6f-96a5-42b4-beae-b74338ccf170",
+                    "textSection": null,
+                    "line": null,
+                    "column": null,
+                    "sourcePluginId": "tinycc"
+                },
+                {
+                    "severity": "Error",
+                    "message": "'threadwork_running' undeclared",
+                    "nodeId": "node_3b600a6f-96a5-42b4-beae-b74338ccf170",
+                    "textSection": null,
+                    "line": null,
+                    "column": null,
+                    "sourcePluginId": "tinycc"
+                },
+                {
+                    "severity": "Error",
+                    "message": "declaration expected",
+                    "nodeId": "node_3b600a6f-96a5-42b4-beae-b74338ccf170",
+                    "textSection": null,
+                    "line": null,
+                    "column": null,
+                    "sourcePluginId": "tinycc"
+                },
+                {
+                    "severity": "Warning",
+                    "message": "type defaults to int",
+                    "nodeId": "node_3b600a6f-96a5-42b4-beae-b74338ccf170",
+                    "textSection": null,
+                    "line": null,
+                    "column": null,
+                    "sourcePluginId": "tinycc"
+                }
+            ],
             "metadata": {},
             "pluginData": {},
             "nameDetail": ""
@@ -2068,7 +2142,44 @@
             "ports": [],
             "link": null,
             "typeDefinition": null,
-            "diagnostics": [],
+            "diagnostics": [
+                {
+                    "severity": "Warning",
+                    "message": "implicit declaration of function 'threadwork_install_shutdown_signal_handlers'",
+                    "nodeId": "node_a6c39bd2-e8c7-48df-a6c4-166f189453c6",
+                    "textSection": null,
+                    "line": null,
+                    "column": null,
+                    "sourcePluginId": "tinycc"
+                },
+                {
+                    "severity": "Error",
+                    "message": "'threadwork_running' undeclared",
+                    "nodeId": "node_a6c39bd2-e8c7-48df-a6c4-166f189453c6",
+                    "textSection": null,
+                    "line": null,
+                    "column": null,
+                    "sourcePluginId": "tinycc"
+                },
+                {
+                    "severity": "Error",
+                    "message": "declaration expected",
+                    "nodeId": "node_a6c39bd2-e8c7-48df-a6c4-166f189453c6",
+                    "textSection": null,
+                    "line": null,
+                    "column": null,
+                    "sourcePluginId": "tinycc"
+                },
+                {
+                    "severity": "Warning",
+                    "message": "type defaults to int",
+                    "nodeId": "node_a6c39bd2-e8c7-48df-a6c4-166f189453c6",
+                    "textSection": null,
+                    "line": null,
+                    "column": null,
+                    "sourcePluginId": "tinycc"
+                }
+            ],
             "metadata": {},
             "pluginData": {},
             "nameDetail": "(main_busy_loop)"

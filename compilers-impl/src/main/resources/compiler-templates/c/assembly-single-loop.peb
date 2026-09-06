@@ -32,16 +32,22 @@ int main(void)
     int running;
     int recent_transit;
 
-    if (threadwork_context_init(&context) != THREADWORK_OK) {
+    status = threadwork_runner__init(&threadwork_runner);
+    if (status != THREADWORK_OK) {
         return EXIT_FAILURE;
     }
-    status = threadwork_runner__install_shutdown_signal_handlers(&context.runner);
+
+    if (threadwork_context_init(&context) != THREADWORK_OK) {
+        (void)threadwork_runner__destroy(&threadwork_runner);
+        return EXIT_FAILURE;
+    }
+    status = threadwork_runner__install_shutdown_signal_handlers(&threadwork_runner);
     if (status == THREADWORK_OK) {
         status = tw_{{ initializerSymbol }}(&context);
     }
 
     while (status == THREADWORK_OK) {
-        status = threadwork_runner__is_running(&context.runner, &running);
+        status = threadwork_runner__is_running(&threadwork_runner, &running);
         if (status != THREADWORK_OK || !running) {
             break;
         }
@@ -49,9 +55,9 @@ int main(void)
     }
 
     if (status == THREADWORK_OK) {
-        status = threadwork_runner__begin_shutdown_drain(&context.runner, 10U);
+        status = threadwork_runner__begin_shutdown_drain(&threadwork_runner, 10U);
         while (status == THREADWORK_OK) {
-            status = threadwork_runner__has_recent_transit(&context.runner, &recent_transit);
+            status = threadwork_runner__has_recent_transit(&threadwork_runner, &recent_transit);
             if (status != THREADWORK_OK || !recent_transit) {
                 break;
             }
@@ -63,6 +69,7 @@ int main(void)
     printf("Shutting down...\n");
 
     threadwork_context_destroy(&context);
+    (void)threadwork_runner__destroy(&threadwork_runner);
     return status == THREADWORK_OK ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 {% endif %}

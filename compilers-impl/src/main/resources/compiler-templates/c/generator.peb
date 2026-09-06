@@ -20,7 +20,7 @@ static threadwork_error_t tw_{{ runSymbol }}(threadwork_context *context{% for l
 {% endfor %}{% for link in outgoingDataLinks %}    (void){{ link.argumentSymbol }};
 {% endfor %}{% for link in dependencyInjectionLinks %}{% if not link.isLibraryCapability %}    (void){{ link.argumentSymbol }};
 {% endif %}
-{% endfor %}    if (threadwork_runner__is_running(&context->runner, &running) != THREADWORK_OK) {
+{% endfor %}    if (threadwork_runner__is_running(&threadwork_runner, &running) != THREADWORK_OK) {
         return THREADWORK_ERROR;
     }
     if (!running) {

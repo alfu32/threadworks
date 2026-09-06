@@ -4,7 +4,7 @@
         if ({{ link.transportSymbol }}(&{{ link.aPortSymbol }}, &{{ link.bPortSymbol }}) != THREADWORK_OK) {
             return THREADWORK_ERROR;
         }
-        if (threadwork_runner__record_transit(&context->runner) != THREADWORK_OK) {
+        if (threadwork_runner__record_transit(&threadwork_runner) != THREADWORK_OK) {
             return THREADWORK_ERROR;
         }
     }{% endif %}
