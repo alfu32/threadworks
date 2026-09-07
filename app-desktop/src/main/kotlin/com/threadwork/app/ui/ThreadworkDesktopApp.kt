@@ -230,6 +230,7 @@ class ThreadworkDesktopApp(
     private val store: KotlinxJsonDocumentStore = KotlinxJsonDocumentStore(),
     private val pluginsFolder: Path = defaultPluginsFolder(),
     private val uiPlugins: List<ThreadworkDesktopPlugin> = loadDesktopPlugins(pluginsFolder),
+    private val initialFile: Path? = null,
 ) {
     private companion object {
         const val NATIVE_PROJECT_EXTENSION = "orch"
@@ -411,6 +412,7 @@ class ThreadworkDesktopApp(
     private val resourceTimer = Timer(1_000) { updateResourceStatus() }.apply { isRepeats = true }
 
     fun show() {
+        loadInitialFile()
         registerBuiltInCommands()
         configurePlugins()
         frame.defaultCloseOperation = WindowConstants.EXIT_ON_CLOSE
@@ -431,6 +433,18 @@ class ThreadworkDesktopApp(
         frame.isVisible = true
         frame.rootPane.putClientProperty(FlatClientProperties.TITLE_BAR_SHOW_TITLE, false)
         frame.rootPane.putClientProperty(FlatClientProperties.TITLE_BAR_SHOW_ICON, false)
+    }
+
+    private fun loadInitialFile() {
+        val path = initialFile?.toAbsolutePath()?.normalize() ?: return
+        if (Files.exists(path)) {
+            repository.replaceDocument(store.load(path))
+        } else {
+            repository.replaceDocument(newDocument(path.fileName.toString().substringBeforeLast('.').ifBlank { "Untitled Threadwork" }))
+            store.save(repository.getDocument(), path)
+        }
+        currentFile = path
+        repository.clearDirty()
     }
 
     private fun layout(): JComponent {
@@ -8449,10 +8463,13 @@ private fun distributeTargets(nodes: List<Node>, vertical: Boolean): Map<Node, P
 private fun NodeLayout.rect(): Rectangle = Rectangle(x.toInt(), y.toInt(), width.toInt(), height.toInt())
 private fun NodeLayout.center(): Point = Point((x + width / 2).toInt(), (y + height / 2).toInt())
 
-fun launchDesktopApp(pluginsFolder: Path? = null) {
+fun launchDesktopApp(pluginsFolder: Path? = null, initialFile: Path? = null) {
     SwingUtilities.invokeLater {
         ThreadworkAppearance.applyLookAndFeel()
         JFrame.setDefaultLookAndFeelDecorated(true)
-        ThreadworkDesktopApp(pluginsFolder = pluginsFolder ?: defaultPluginsFolder()).show()
+        ThreadworkDesktopApp(
+            pluginsFolder = pluginsFolder ?: defaultPluginsFolder(),
+            initialFile = initialFile,
+        ).show()
     }
 }

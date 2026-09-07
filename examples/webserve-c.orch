@@ -13,12 +13,11 @@
                 "node_0feec713-8eaa-4bd5-8ea0-b02515bf358a",
                 "link_718c5de7-18b0-4a52-8337-e7b0c9d08fda",
                 "node_4cb84fd7-f340-4ed6-ac3e-10a375a07891",
-                "link_cef37610-7f36-4a3d-8276-dd08fa09020c",
-                "link_61a8fd5a-9490-4520-829e-0c51fd23645e",
                 "node_62c442a8-f28c-4351-9099-65b837788fb8",
                 "node_e9ea318e-27c5-45a4-8bf4-65ced6c66dcd",
                 "link_0813977e-4696-4150-a75c-d9de8d291880",
-                "link_245f4370-e4ab-48ba-8a1b-e4011826e037"
+                "link_245f4370-e4ab-48ba-8a1b-e4011826e037",
+                "link_f94492a8-867a-4f0b-bcaf-f9a2eb35b3da"
             ],
             "incomingLinks": [],
             "outgoingLinks": [],
@@ -60,7 +59,7 @@
             },
             "responsible": "devlin",
             "modified": {
-                "date": "2026-09-06T15:22:55.751386281Z",
+                "date": "2026-09-07T01:40:32.333601187Z",
                 "user": "devlin"
             },
             "ports": [],
@@ -81,19 +80,18 @@
             "children": [],
             "incomingLinks": [
                 "link_718c5de7-18b0-4a52-8337-e7b0c9d08fda",
-                "link_61a8fd5a-9490-4520-829e-0c51fd23645e",
                 "link_245f4370-e4ab-48ba-8a1b-e4011826e037"
             ],
             "outgoingLinks": [],
             "layout": {
-                "x": 726.0,
-                "y": 723.0,
+                "x": 670.0,
+                "y": 732.0,
                 "width": 200.0,
-                "height": 138.0,
+                "height": 78.0,
                 "closedWidth": 200.0,
-                "closedHeight": 138.0,
+                "closedHeight": 78.0,
                 "openWidth": 200.0,
-                "openHeight": 138.0,
+                "openHeight": 78.0,
                 "isExpanded": true
             },
             "fileLayoutStrategyId": "single-file",
@@ -123,7 +121,7 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-07T00:58:02.767742704Z",
+                "date": "2026-09-07T01:40:23.653477550Z",
                 "user": "devlin"
             },
             "ports": [
@@ -144,20 +142,19 @@
         },
         {
             "id": "node_0feec713-8eaa-4bd5-8ea0-b02515bf358a",
-            "name": "ping",
+            "name": "clockgen",
             "kind": "Processor",
             "parentId": "root",
             "children": [],
             "incomingLinks": [
-                "link_cef37610-7f36-4a3d-8276-dd08fa09020c",
                 "link_0813977e-4696-4150-a75c-d9de8d291880"
             ],
             "outgoingLinks": [
                 "link_718c5de7-18b0-4a52-8337-e7b0c9d08fda"
             ],
             "layout": {
-                "x": 24.0,
-                "y": 753.0,
+                "x": 183.0,
+                "y": 702.0,
                 "width": 200.0,
                 "height": 108.0,
                 "closedWidth": 200.0,
@@ -170,7 +167,7 @@
             "text": {
                 "initialization": "",
                 "initializationLanguageId": "",
-                "source": "\nprintf(\"timestamp.read:%lld\\n\", (long long)(bstate.id));\n\nint signal;\nthreadwork_runner__get_shutdown_signal(&threadwork_runner,&signal);\nprintf(\"signal:%d\\n\", signal);\n\nif(signal == 2){\n    return THREADWORK_OK;\n}\n\nbstate.id+=1;\n\nprintf(\"timestamp.sent:%lld\\n\", (long long)(bstate.id));\n\npush(clock, &bstate);",
+                "source": "\nprintf(\"timestamp.read:%lld\\n\", (long long)(bstate.id));\n\n// pattern set the speed of the show\nusleep(100000);\n\n// pattern shutdown when shutdown requested through signal\nint signal;\nthreadwork_runner__get_shutdown_signal(&threadwork_runner,&signal);\nint is_running;\nthreadwork_runner__is_running(&threadwork_runner,&is_running);\nif(signal == 2 || !is_running){\n    return THREADWORK_OK;\n}\nprintf(\"signal:%d,is_running:%d\\n\", signal,is_running);\n\n// pattern request/signal shutdown when internal condition has been reached\nif(bstate.id > 1){\n    threadwork_runner__shutdown_request(&threadwork_runner);\n    return THREADWORK_OK;\n}\n\n\n// main operation\nbstate.id+=1;\n\nprintf(\"timestamp.sent:%lld\\n\", (long long)(bstate.id));\n\npush(clock, &bstate);",
                 "sourceLanguageId": "",
                 "specification": "",
                 "specificationLanguageId": "markdown",
@@ -193,7 +190,7 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-07T01:06:57.544561389Z",
+                "date": "2026-09-07T01:40:24.541127662Z",
                 "user": "devlin"
             },
             "ports": [
@@ -295,18 +292,17 @@
             "children": [],
             "incomingLinks": [],
             "outgoingLinks": [
-                "link_cef37610-7f36-4a3d-8276-dd08fa09020c",
-                "link_61a8fd5a-9490-4520-829e-0c51fd23645e"
+                "link_f94492a8-867a-4f0b-bcaf-f9a2eb35b3da"
             ],
             "layout": {
-                "x": -3.0,
-                "y": 389.0,
+                "x": 183.0,
+                "y": 385.0,
                 "width": 200.0,
-                "height": 108.0,
+                "height": 78.0,
                 "closedWidth": 200.0,
-                "closedHeight": 108.0,
+                "closedHeight": 78.0,
                 "openWidth": 200.0,
-                "openHeight": 108.0,
+                "openHeight": 78.0,
                 "isExpanded": true
             },
             "fileLayoutStrategyId": "single-file",
@@ -336,7 +332,7 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-06T15:00:07.997407694Z",
+                "date": "2026-09-07T01:40:32.333601187Z",
                 "user": "devlin"
             },
             "ports": [
@@ -356,142 +352,6 @@
             "nameDetail": ""
         },
         {
-            "id": "link_cef37610-7f36-4a3d-8276-dd08fa09020c",
-            "name": "inc1",
-            "kind": "Link",
-            "parentId": "root",
-            "children": [],
-            "incomingLinks": [],
-            "outgoingLinks": [],
-            "layout": {
-                "x": 0.0,
-                "y": 0.0,
-                "width": 200.0,
-                "height": 70.0,
-                "closedWidth": 200.0,
-                "closedHeight": 70.0,
-                "openWidth": 200.0,
-                "openHeight": 70.0,
-                "isExpanded": true
-            },
-            "fileLayoutStrategyId": "single-file",
-            "text": {
-                "initialization": "",
-                "initializationLanguageId": "",
-                "source": "",
-                "sourceLanguageId": "",
-                "specification": "",
-                "specificationLanguageId": "markdown",
-                "tests": "",
-                "testsLanguageId": "json",
-                "aiInstructions": "",
-                "aiInstructionsLanguageId": "markdown"
-            },
-            "binaryContent": null,
-            "technology": {
-                "languageId": "",
-                "technologyId": "",
-                "compilerId": "",
-                "fileExtension": "",
-                "contentType": ""
-            },
-            "revision": {
-                "name": "A",
-                "date": "20260831"
-            },
-            "responsible": null,
-            "modified": {
-                "date": "2026-09-07T00:48:43.676800427Z",
-                "user": "devlin"
-            },
-            "ports": [],
-            "link": {
-                "sourceNodeId": "node_4cb84fd7-f340-4ed6-ac3e-10a375a07891",
-                "sourcePortName": "out",
-                "targetNodeId": "node_0feec713-8eaa-4bd5-8ea0-b02515bf358a",
-                "targetPortName": "in",
-                "transportKind": "in-process",
-                "typeName": "",
-                "payloadDefinition": "",
-                "typeDefinitionId": "",
-                "compositeBoundaryIds": [],
-                "interactionKind": "lib"
-            },
-            "typeDefinition": null,
-            "diagnostics": [],
-            "metadata": {},
-            "pluginData": {},
-            "nameDetail": ""
-        },
-        {
-            "id": "link_61a8fd5a-9490-4520-829e-0c51fd23645e",
-            "name": "inc2",
-            "kind": "Link",
-            "parentId": "root",
-            "children": [],
-            "incomingLinks": [],
-            "outgoingLinks": [],
-            "layout": {
-                "x": 0.0,
-                "y": 0.0,
-                "width": 200.0,
-                "height": 70.0,
-                "closedWidth": 200.0,
-                "closedHeight": 70.0,
-                "openWidth": 200.0,
-                "openHeight": 70.0,
-                "isExpanded": true
-            },
-            "fileLayoutStrategyId": "single-file",
-            "text": {
-                "initialization": "",
-                "initializationLanguageId": "",
-                "source": "",
-                "sourceLanguageId": "",
-                "specification": "",
-                "specificationLanguageId": "markdown",
-                "tests": "",
-                "testsLanguageId": "json",
-                "aiInstructions": "",
-                "aiInstructionsLanguageId": "markdown"
-            },
-            "binaryContent": null,
-            "technology": {
-                "languageId": "",
-                "technologyId": "",
-                "compilerId": "",
-                "fileExtension": "",
-                "contentType": ""
-            },
-            "revision": {
-                "name": "A",
-                "date": "20260831"
-            },
-            "responsible": null,
-            "modified": {
-                "date": "2026-09-07T00:48:50.655534268Z",
-                "user": "devlin"
-            },
-            "ports": [],
-            "link": {
-                "sourceNodeId": "node_4cb84fd7-f340-4ed6-ac3e-10a375a07891",
-                "sourcePortName": "out",
-                "targetNodeId": "node_904556ea-a897-47f9-a733-8e0e005e062f",
-                "targetPortName": "in",
-                "transportKind": "in-process",
-                "typeName": "",
-                "payloadDefinition": "",
-                "typeDefinitionId": "",
-                "compositeBoundaryIds": [],
-                "interactionKind": "lib"
-            },
-            "typeDefinition": null,
-            "diagnostics": [],
-            "metadata": {},
-            "pluginData": {},
-            "nameDetail": ""
-        },
-        {
             "id": "node_62c442a8-f28c-4351-9099-65b837788fb8",
             "name": "bean",
             "kind": "Type",
@@ -500,8 +360,8 @@
             "incomingLinks": [],
             "outgoingLinks": [],
             "layout": {
-                "x": 356.0,
-                "y": 396.0,
+                "x": 650.0,
+                "y": 385.0,
                 "width": 220.0,
                 "height": 86.0,
                 "closedWidth": 220.0,
@@ -567,20 +427,22 @@
             "kind": "Processor",
             "parentId": "root",
             "children": [],
-            "incomingLinks": [],
+            "incomingLinks": [
+                "link_f94492a8-867a-4f0b-bcaf-f9a2eb35b3da"
+            ],
             "outgoingLinks": [
                 "link_0813977e-4696-4150-a75c-d9de8d291880",
                 "link_245f4370-e4ab-48ba-8a1b-e4011826e037"
             ],
             "layout": {
-                "x": 362.0,
-                "y": 507.0,
+                "x": 670.0,
+                "y": 531.0,
                 "width": 200.0,
-                "height": 78.0,
+                "height": 108.0,
                 "closedWidth": 200.0,
-                "closedHeight": 78.0,
+                "closedHeight": 108.0,
                 "openWidth": 200.0,
-                "openHeight": 78.0,
+                "openHeight": 108.0,
                 "isExpanded": true
             },
             "fileLayoutStrategyId": "single-file",
@@ -610,7 +472,7 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-07T00:44:17.571808341Z",
+                "date": "2026-09-07T01:40:32.333601187Z",
                 "user": "devlin"
             },
             "ports": [
@@ -618,6 +480,13 @@
                     "id": "output_out",
                     "name": "out",
                     "direction": "Output",
+                    "dataType": "",
+                    "metadata": {}
+                },
+                {
+                    "id": "input_in",
+                    "name": "in",
+                    "direction": "Input",
                     "dataType": "",
                     "metadata": {}
                 }
@@ -751,6 +620,74 @@
                 "sourceNodeId": "node_e9ea318e-27c5-45a4-8bf4-65ced6c66dcd",
                 "sourcePortName": "out",
                 "targetNodeId": "node_904556ea-a897-47f9-a733-8e0e005e062f",
+                "targetPortName": "in",
+                "transportKind": "in-process",
+                "typeName": "",
+                "payloadDefinition": "",
+                "typeDefinitionId": "",
+                "compositeBoundaryIds": [],
+                "interactionKind": "lib"
+            },
+            "typeDefinition": null,
+            "diagnostics": [],
+            "metadata": {},
+            "pluginData": {},
+            "nameDetail": ""
+        },
+        {
+            "id": "link_f94492a8-867a-4f0b-bcaf-f9a2eb35b3da",
+            "name": "include_lib",
+            "kind": "Link",
+            "parentId": "root",
+            "children": [],
+            "incomingLinks": [],
+            "outgoingLinks": [],
+            "layout": {
+                "x": 0.0,
+                "y": 0.0,
+                "width": 200.0,
+                "height": 70.0,
+                "closedWidth": 200.0,
+                "closedHeight": 70.0,
+                "openWidth": 200.0,
+                "openHeight": 70.0,
+                "isExpanded": true
+            },
+            "fileLayoutStrategyId": "single-file",
+            "text": {
+                "initialization": "",
+                "initializationLanguageId": "",
+                "source": "",
+                "sourceLanguageId": "",
+                "specification": "",
+                "specificationLanguageId": "markdown",
+                "tests": "",
+                "testsLanguageId": "json",
+                "aiInstructions": "",
+                "aiInstructionsLanguageId": "markdown"
+            },
+            "binaryContent": null,
+            "technology": {
+                "languageId": "",
+                "technologyId": "",
+                "compilerId": "",
+                "fileExtension": "",
+                "contentType": ""
+            },
+            "revision": {
+                "name": "A",
+                "date": "20260831"
+            },
+            "responsible": null,
+            "modified": {
+                "date": "2026-09-07T01:40:56.043232422Z",
+                "user": "devlin"
+            },
+            "ports": [],
+            "link": {
+                "sourceNodeId": "node_4cb84fd7-f340-4ed6-ac3e-10a375a07891",
+                "sourcePortName": "out",
+                "targetNodeId": "node_e9ea318e-27c5-45a4-8bf4-65ced6c66dcd",
                 "targetPortName": "in",
                 "transportKind": "in-process",
                 "typeName": "",

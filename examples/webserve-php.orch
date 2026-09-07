@@ -1,0 +1,421 @@
+{
+    "id": "document_1788761496733",
+    "name": "webserve-php",
+    "rootNodeId": "root",
+    "nodes": [
+        {
+            "id": "root",
+            "name": "webserve-php",
+            "kind": "Processor",
+            "parentId": null,
+            "children": [
+                "node_fc43a3be-2347-4a0f-8dd7-63adfb30d86f",
+                "node_24257a88-cfe9-4707-bd63-c777eb75edb0",
+                "node_aea59c3c-d022-40db-bc70-4dcfceb152d4",
+                "link_40038e2a-1a1f-4653-947a-30cc135f6e2e",
+                "link_5eeeaf02-f87f-4a33-9987-3ea30a12f8b4"
+            ],
+            "incomingLinks": [],
+            "outgoingLinks": [],
+            "layout": {
+                "x": 0.0,
+                "y": 0.0,
+                "width": 200.0,
+                "height": 70.0,
+                "closedWidth": 200.0,
+                "closedHeight": 70.0,
+                "openWidth": 200.0,
+                "openHeight": 70.0,
+                "isExpanded": true
+            },
+            "fileLayoutStrategyId": "direct-file-system-homomorphism",
+            "text": {
+                "initialization": "",
+                "initializationLanguageId": "",
+                "source": "",
+                "sourceLanguageId": "",
+                "specification": "",
+                "specificationLanguageId": "markdown",
+                "tests": "",
+                "testsLanguageId": "json",
+                "aiInstructions": "",
+                "aiInstructionsLanguageId": "markdown"
+            },
+            "binaryContent": null,
+            "technology": {
+                "languageId": "php",
+                "technologyId": "php",
+                "compilerId": "",
+                "fileExtension": "",
+                "contentType": ""
+            },
+            "revision": {
+                "name": "",
+                "date": ""
+            },
+            "responsible": null,
+            "modified": {
+                "date": "2026-09-07T06:19:11.092258907Z",
+                "user": "devlin"
+            },
+            "ports": [],
+            "link": null,
+            "typeDefinition": null,
+            "diagnostics": [],
+            "metadata": {},
+            "pluginData": {},
+            "nameDetail": ""
+        },
+        {
+            "id": "node_fc43a3be-2347-4a0f-8dd7-63adfb30d86f",
+            "name": "ticker",
+            "kind": "Processor",
+            "parentId": "root",
+            "children": [],
+            "incomingLinks": [
+                "link_5eeeaf02-f87f-4a33-9987-3ea30a12f8b4"
+            ],
+            "outgoingLinks": [
+                "link_40038e2a-1a1f-4653-947a-30cc135f6e2e"
+            ],
+            "layout": {
+                "x": 302.0,
+                "y": 512.0,
+                "width": 200.0,
+                "height": 78.0,
+                "closedWidth": 200.0,
+                "closedHeight": 78.0,
+                "openWidth": 200.0,
+                "openHeight": 78.0,
+                "isExpanded": true
+            },
+            "fileLayoutStrategyId": "direct-file-system-homomorphism",
+            "text": {
+                "initialization": "",
+                "initializationLanguageId": "",
+                "source": "$now = new DateTimeImmutable();\necho \"tick_time:\" . $now->format('Y-m-d H:i:s') . \",tick_number:\" . $GLOBAL['counter'];\n\n$tick[] = $now;",
+                "sourceLanguageId": "",
+                "specification": "",
+                "specificationLanguageId": "markdown",
+                "tests": "",
+                "testsLanguageId": "json",
+                "aiInstructions": "",
+                "aiInstructionsLanguageId": "markdown"
+            },
+            "binaryContent": null,
+            "technology": {
+                "languageId": "",
+                "technologyId": "",
+                "compilerId": "",
+                "fileExtension": "",
+                "contentType": ""
+            },
+            "revision": {
+                "name": "",
+                "date": ""
+            },
+            "responsible": null,
+            "modified": {
+                "date": "2026-09-07T06:20:47.220802190Z",
+                "user": "devlin"
+            },
+            "ports": [
+                {
+                    "id": "output_out",
+                    "name": "out",
+                    "direction": "Output",
+                    "dataType": "",
+                    "metadata": {}
+                },
+                {
+                    "id": "input_in",
+                    "name": "in",
+                    "direction": "Input",
+                    "dataType": "",
+                    "metadata": {}
+                }
+            ],
+            "link": null,
+            "typeDefinition": null,
+            "diagnostics": [],
+            "metadata": {},
+            "pluginData": {},
+            "nameDetail": ""
+        },
+        {
+            "id": "node_24257a88-cfe9-4707-bd63-c777eb75edb0",
+            "name": "lib_mem",
+            "kind": "Processor",
+            "parentId": "root",
+            "children": [],
+            "incomingLinks": [],
+            "outgoingLinks": [
+                "link_5eeeaf02-f87f-4a33-9987-3ea30a12f8b4"
+            ],
+            "layout": {
+                "x": 291.0,
+                "y": 232.0,
+                "width": 200.0,
+                "height": 78.0,
+                "closedWidth": 200.0,
+                "closedHeight": 78.0,
+                "openWidth": 200.0,
+                "openHeight": 78.0,
+                "isExpanded": true
+            },
+            "fileLayoutStrategyId": "direct-file-system-homomorphism",
+            "text": {
+                "initialization": "",
+                "initializationLanguageId": "",
+                "source": "$GLOBAL['count']=0;",
+                "sourceLanguageId": "",
+                "specification": "",
+                "specificationLanguageId": "markdown",
+                "tests": "",
+                "testsLanguageId": "json",
+                "aiInstructions": "",
+                "aiInstructionsLanguageId": "markdown"
+            },
+            "binaryContent": null,
+            "technology": {
+                "languageId": "",
+                "technologyId": "",
+                "compilerId": "",
+                "fileExtension": "",
+                "contentType": ""
+            },
+            "revision": {
+                "name": "",
+                "date": ""
+            },
+            "responsible": null,
+            "modified": {
+                "date": "2026-09-07T06:19:41.156839787Z",
+                "user": "devlin"
+            },
+            "ports": [
+                {
+                    "id": "output_out",
+                    "name": "out",
+                    "direction": "Output",
+                    "dataType": "",
+                    "metadata": {}
+                }
+            ],
+            "link": null,
+            "typeDefinition": null,
+            "diagnostics": [],
+            "metadata": {},
+            "pluginData": {},
+            "nameDetail": ""
+        },
+        {
+            "id": "node_aea59c3c-d022-40db-bc70-4dcfceb152d4",
+            "name": "sink",
+            "kind": "Processor",
+            "parentId": "root",
+            "children": [],
+            "incomingLinks": [
+                "link_40038e2a-1a1f-4653-947a-30cc135f6e2e"
+            ],
+            "outgoingLinks": [],
+            "layout": {
+                "x": 757.0,
+                "y": 512.0,
+                "width": 200.0,
+                "height": 78.0,
+                "closedWidth": 200.0,
+                "closedHeight": 78.0,
+                "openWidth": 200.0,
+                "openHeight": 78.0,
+                "isExpanded": true
+            },
+            "fileLayoutStrategyId": "none",
+            "text": {
+                "initialization": "",
+                "initializationLanguageId": "",
+                "source": "$item = array_shift($tick);\necho $item",
+                "sourceLanguageId": "",
+                "specification": "",
+                "specificationLanguageId": "markdown",
+                "tests": "",
+                "testsLanguageId": "json",
+                "aiInstructions": "",
+                "aiInstructionsLanguageId": "markdown"
+            },
+            "binaryContent": null,
+            "technology": {
+                "languageId": "",
+                "technologyId": "",
+                "compilerId": "",
+                "fileExtension": "",
+                "contentType": ""
+            },
+            "revision": {
+                "name": "",
+                "date": ""
+            },
+            "responsible": null,
+            "modified": {
+                "date": "2026-09-07T06:18:37.612885669Z",
+                "user": "devlin"
+            },
+            "ports": [
+                {
+                    "id": "input_in",
+                    "name": "in",
+                    "direction": "Input",
+                    "dataType": "",
+                    "metadata": {}
+                }
+            ],
+            "link": null,
+            "typeDefinition": null,
+            "diagnostics": [],
+            "metadata": {},
+            "pluginData": {},
+            "nameDetail": ""
+        },
+        {
+            "id": "link_40038e2a-1a1f-4653-947a-30cc135f6e2e",
+            "name": "tick",
+            "kind": "Link",
+            "parentId": "root",
+            "children": [],
+            "incomingLinks": [],
+            "outgoingLinks": [],
+            "layout": {
+                "x": 0.0,
+                "y": 0.0,
+                "width": 200.0,
+                "height": 70.0,
+                "closedWidth": 200.0,
+                "closedHeight": 70.0,
+                "openWidth": 200.0,
+                "openHeight": 70.0,
+                "isExpanded": true
+            },
+            "fileLayoutStrategyId": "none",
+            "text": {
+                "initialization": "",
+                "initializationLanguageId": "",
+                "source": "",
+                "sourceLanguageId": "",
+                "specification": "",
+                "specificationLanguageId": "markdown",
+                "tests": "",
+                "testsLanguageId": "json",
+                "aiInstructions": "",
+                "aiInstructionsLanguageId": "markdown"
+            },
+            "binaryContent": null,
+            "technology": {
+                "languageId": "",
+                "technologyId": "",
+                "compilerId": "",
+                "fileExtension": "",
+                "contentType": ""
+            },
+            "revision": {
+                "name": "",
+                "date": ""
+            },
+            "responsible": null,
+            "modified": {
+                "date": "2026-09-07T06:18:03.489330342Z",
+                "user": "devlin"
+            },
+            "ports": [],
+            "link": {
+                "sourceNodeId": "node_fc43a3be-2347-4a0f-8dd7-63adfb30d86f",
+                "sourcePortName": "out",
+                "targetNodeId": "node_aea59c3c-d022-40db-bc70-4dcfceb152d4",
+                "targetPortName": "in",
+                "transportKind": "in-process",
+                "typeName": "",
+                "payloadDefinition": "",
+                "typeDefinitionId": "",
+                "compositeBoundaryIds": [],
+                "interactionKind": "data"
+            },
+            "typeDefinition": null,
+            "diagnostics": [],
+            "metadata": {},
+            "pluginData": {},
+            "nameDetail": ""
+        },
+        {
+            "id": "link_5eeeaf02-f87f-4a33-9987-3ea30a12f8b4",
+            "name": "lib_mem -> ticker",
+            "kind": "Link",
+            "parentId": "root",
+            "children": [],
+            "incomingLinks": [],
+            "outgoingLinks": [],
+            "layout": {
+                "x": 0.0,
+                "y": 0.0,
+                "width": 200.0,
+                "height": 70.0,
+                "closedWidth": 200.0,
+                "closedHeight": 70.0,
+                "openWidth": 200.0,
+                "openHeight": 70.0,
+                "isExpanded": true
+            },
+            "fileLayoutStrategyId": "none",
+            "text": {
+                "initialization": "",
+                "initializationLanguageId": "",
+                "source": "",
+                "sourceLanguageId": "",
+                "specification": "",
+                "specificationLanguageId": "markdown",
+                "tests": "",
+                "testsLanguageId": "json",
+                "aiInstructions": "",
+                "aiInstructionsLanguageId": "markdown"
+            },
+            "binaryContent": null,
+            "technology": {
+                "languageId": "",
+                "technologyId": "",
+                "compilerId": "",
+                "fileExtension": "",
+                "contentType": ""
+            },
+            "revision": {
+                "name": "",
+                "date": ""
+            },
+            "responsible": null,
+            "modified": {
+                "date": "2026-09-07T06:19:11.092258907Z",
+                "user": "devlin"
+            },
+            "ports": [],
+            "link": {
+                "sourceNodeId": "node_24257a88-cfe9-4707-bd63-c777eb75edb0",
+                "sourcePortName": "out",
+                "targetNodeId": "node_fc43a3be-2347-4a0f-8dd7-63adfb30d86f",
+                "targetPortName": "in",
+                "transportKind": "in-process",
+                "typeName": "",
+                "payloadDefinition": "",
+                "typeDefinitionId": "",
+                "compositeBoundaryIds": [],
+                "interactionKind": "lib"
+            },
+            "typeDefinition": null,
+            "diagnostics": [],
+            "metadata": {},
+            "pluginData": {},
+            "nameDetail": ""
+        }
+    ],
+    "metadata": {},
+    "masterRevision": {
+        "name": "",
+        "date": ""
+    }
+}

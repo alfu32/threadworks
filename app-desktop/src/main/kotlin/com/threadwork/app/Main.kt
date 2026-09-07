@@ -11,11 +11,6 @@ import com.threadwork.compiler.naivekotlin.NaiveKotlinCompiler
 import com.threadwork.compiler.php.PhpCompiler
 import com.threadwork.compiler.quickjs.QuickJsCompiler
 import com.threadwork.core.diagnostics.DiagnosticSeverity
-import com.threadwork.core.model.NodeId
-import com.threadwork.core.model.NodeKind
-import com.threadwork.core.model.NodePort
-import com.threadwork.core.model.PortDirection
-import com.threadwork.core.model.TechnologyMetadata
 import com.threadwork.core.model.effectiveTechnologyId
 import com.threadwork.core.model.projectName
 import com.threadwork.core.model.rootNode
@@ -23,17 +18,16 @@ import com.threadwork.core.validation.DocumentValidator
 import com.threadwork.app.ui.defaultPluginsFolder
 import com.threadwork.app.ui.launchDesktopApp
 import com.threadwork.app.ui.loadCompilerPlugins
-import com.threadwork.storage.InMemoryDocumentRepository
 import com.threadwork.storage.KotlinxJsonDocumentStore
-import com.threadwork.storage.newDocument
 import java.nio.file.Path
 import kotlin.io.path.createDirectories
 
 fun main(args: Array<String>) {
     when (args.firstOrNull()) {
         null, "help", "--help", "-h" -> printHelp()
-        "desktop" -> launchDesktopApp(parseDesktopPluginsFolder(args.drop(1)))
-        "new" -> createSample(args)
+        "desktop" -> parseDesktopArguments(args.drop(1)).let { desktop ->
+            launchDesktopApp(desktop.pluginsFolder, desktop.initialFile)
+        }
         "validate" -> validate(args)
         "compile" -> compile(args)
         else -> {
@@ -49,46 +43,28 @@ private fun printHelp() {
         Threadwork CLI
 
         Commands:
-          new <file.orch>                     Create a sample document
+          desktop [--plugins <dir>] [file.orch]
+                                              Open a project in the graphical editor; create it when missing
           validate <file.orch> [--plugins <dir>]
                                               Validate document references and compiler plugins
           compile <file.orch> <dir> [--plugins <dir>]
                                               Export with the first matching compiler plugin
-          desktop [--plugins <dir>]           Open the graphical desktop editor
         """.trimIndent(),
     )
 }
 
-private fun parseDesktopPluginsFolder(args: List<String>): Path? {
-    if (args.isEmpty()) return null
+private data class DesktopArguments(
+    val pluginsFolder: Path?,
+    val initialFile: Path?,
+)
+
+private fun parseDesktopArguments(args: List<String>): DesktopArguments {
     val index = args.indexOfFirst { it == "--plugins" || it == "--plugins-dir" }
-    if (index < 0) error("Usage: desktop [--plugins <dir>]")
-    return args.getOrNull(index + 1)?.let(Path::of) ?: error("Usage: desktop [--plugins <dir>]")
-}
-
-private fun createSample(args: Array<String>) {
-    val file = args.getOrNull(1)?.let(Path::of) ?: error("Usage: new <file.orch>")
-    val repository = InMemoryDocumentRepository(newDocument("Sample Threadwork Project"))
-    val root = repository.getDocument().rootNodeId
-    val producer = repository.createNode(root, "Producer", NodeKind.Processor)
-    repository.addPort(producer.id, NodePort("out", "items", PortDirection.Output))
-    repository.updateNodeTechnology(producer.id, kotlinTechnology())
-    repository.updateNodeText(
-        producer.id,
-        producer.text.copy(declaration = "context.outputs.getOrPut(\"items\") { mutableListOf() }.add(\"hello\")"),
-    )
-
-    val consumer = repository.createNode(root, "Consumer", NodeKind.Processor)
-    repository.addPort(consumer.id, NodePort("in", "items", PortDirection.Input))
-    repository.updateNodeTechnology(consumer.id, kotlinTechnology())
-    repository.updateNodeText(
-        consumer.id,
-        consumer.text.copy(declaration = "println(context.inputs[\"items\"] ?: emptyList<Any?>())"),
-    )
-
-    repository.createLink(root, "Producer.items -> Consumer.items", producer.id, "items", consumer.id, "items")
-    KotlinxJsonDocumentStore().save(repository.getDocument(), file)
-    println("Created ${file.toAbsolutePath()}")
+    val pluginsFolder = if (index < 0) null else args.getOrNull(index + 1)?.let(Path::of)
+        ?: error("Usage: desktop [--plugins <dir>] [file.orch]")
+    val positionals = positionalArgs(args)
+    require(positionals.size <= 1) { "Usage: desktop [--plugins <dir>] [file.orch]" }
+    return DesktopArguments(pluginsFolder, positionals.singleOrNull()?.let(Path::of))
 }
 
 private fun validate(args: Array<String>) {
@@ -162,11 +138,3 @@ private fun positionalArgs(args: List<String>): List<String> {
     }
     return result
 }
-
-private fun kotlinTechnology() = TechnologyMetadata(
-    languageId = "kotlin",
-    technologyId = "kotlin-jvm",
-    compilerId = "naive-kotlin",
-    fileExtension = "kt",
-    contentType = "text/x-kotlin",
-)
