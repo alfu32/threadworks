@@ -28,7 +28,7 @@ fun {{ link.transportSymbol }}(
 ) {
     if (a.isNotEmpty()) {
         b.addLast(a.removeFirst())
-        generated.threadworkRecordTransit()
+        threadworkRunner.recordTransit()
     }
 }
 {% endif %}

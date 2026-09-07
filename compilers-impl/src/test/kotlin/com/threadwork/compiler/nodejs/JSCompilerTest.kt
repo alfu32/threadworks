@@ -179,15 +179,13 @@ class JSCompilerTest {
         assertTrue(generated.contains("init_reader_") && generated.contains("run_reader_"))
         assertTrue(generated.contains("init_writer_") && generated.contains("run_writer_"))
         assertTrue(generated.contains("transport_record_pipe1(record_pipe1_a_port, record_pipe1_b_port);"))
-        assertTrue(generated.contains("threadworkRecordTransit()"))
+        assertTrue(generated.contains("threadworkRunner.recordTransit()"))
         assertFalse(generated.contains("if (!threadworkIsRunning()) return;"))
-        assertTrue(generated.contains("threadworkNetworkHasRecentTransit()"))
-        assertTrue(generated.contains("function threadworkGetShutdownSignal()"))
+        assertTrue(generated.contains("threadworkRunner.hasRecentTransit()"))
+        assertTrue(generated.contains("class ThreadworkRunner"))
 
         val intelligence = JSCompiler().codeIntelligence(repository.getDocument(), source)
-        assertTrue(intelligence.symbols.any { it.name == "threadworkShutdownRequest" })
-        assertTrue(intelligence.symbols.any { it.name == "threadworkGetShutdownSignal" })
-        assertTrue(intelligence.symbols.any { it.name == "threadworkIsRunning" })
+        assertTrue(intelligence.symbols.any { it.name == "threadworkRunner" && it.members.any { member -> member.name == "shutdownRequest()" } })
     }
 
     @Test
@@ -243,7 +241,7 @@ class JSCompilerTest {
                     if (generatedPage() !== "Hello World") {
                       throw new Error("Runnable capability did not return the compiled provider.");
                     }
-                    threadworkShutdownRequest();
+                    threadworkRunner.shutdownRequest();
                 """.trimIndent(),
             ),
         )

@@ -14,12 +14,12 @@ function threadworkRun() {
   const context = createRuntimeContext();
   {{ initializerSymbol }}(context);
 
-  while (threadworkIsRunning()) {
+  while (threadworkRunner.isRunning()) {
     {{ runSymbol }}(context);
   }
 
-  threadworkNetworkShutdownBegin(10);
-  while (threadworkNetworkHasRecentTransit()) {
+  threadworkRunner.beginShutdownDrain(10);
+  while (threadworkRunner.hasRecentTransit()) {
     {{ runSymbol }}(context);
   }
 }

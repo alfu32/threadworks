@@ -68,10 +68,8 @@ class NaiveKotlinCompilerTest {
         assertTrue(source.contains("fun run_producer_"))
         assertTrue(source.contains("fun run_consumer_"))
         assertTrue(source.contains("fun main()"))
-        assertTrue(source.contains("fun threadworkGetShutdownSignal(): Int"))
-        assertTrue(source.contains("fun threadworkIsRunning(): Boolean"))
-        assertTrue(source.contains("threadworkNetworkHasRecentTransit()"))
-        assertTrue(source.contains("threadworkRecordTransit()"))
+        assertTrue(source.contains("class ThreadworkRunner"))
+        assertTrue(source.contains("threadworkRunner.hasRecentTransit()"))
     }
 
     @Test
@@ -128,7 +126,7 @@ class NaiveKotlinCompilerTest {
         val phpFiles = PhpCompiler().store(phpRepository.getDocument(), phpRepository.requireNode(phpRoot))
 
         assertTrue(phpFiles.any { it.path == "PHP_Sample/composer.json" })
-        assertTrue(phpFiles.any { it.path == "PHP_Sample/PHP_Sample.php" && it.content.contains("function PHP_Sample") })
+        assertTrue(phpFiles.any { it.path == "nodes/PHP_Sample.php" && it.content.contains("function run_php_sample_") })
     }
 
     @Test

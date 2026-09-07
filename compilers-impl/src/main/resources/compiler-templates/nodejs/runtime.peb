@@ -1,72 +1,69 @@
-{# Shared execution state: modeled nodes decide whether shutdown state stops emission. #}
-const threadworkRuntimeKey = Symbol.for("threadwork.runtime");
-const threadworkRuntime = globalThis[threadworkRuntimeKey] ??= {
-  running: true,
-  shutdownSignal: 0,
-  transit: 0,
-  shutdownPreviousTransit: 0,
-  shutdownIdleTicks: 0,
-  shutdownRemainingTicks: 0,
-};
+{# Shared execution state for one generated Node.js application. #}
+class ThreadworkRunner {
+  constructor() {
+    this.running = true;
+    this.shutdownSignal = 0;
+    this.transit = 0;
+    this.shutdownPreviousTransit = 0;
+    this.shutdownIdleTicks = 0;
+    this.shutdownRemainingTicks = 0;
+  }
+
+  /** Record SIGINT/SIGTERM shutdown state for modeled code to inspect. */
+  installShutdownHandlers() {
+    const requestShutdown = (signalNumber) => {
+      this.shutdownSignal = signalNumber;
+      this.shutdownRequest();
+    };
+    process.once("SIGINT", () => requestShutdown(2));
+    process.once("SIGTERM", () => requestShutdown(15));
+  }
+
+  /** Request shutdown; modeled nodes decide whether they continue emitting packets. */
+  shutdownRequest() {
+    this.running = false;
+  }
+
+  /** Return the last SIGINT or SIGTERM number received by the runtime, or zero. */
+  getShutdownSignal() {
+    return this.shutdownSignal || 0;
+  }
+
+  /** Return the requested running state for modeled code to inspect. */
+  isRunning() {
+    return this.running;
+  }
+
+  /** Increment the count of packets completed by modeled transports. */
+  recordTransit() {
+    this.transit += 1;
+  }
+
+  /** Start the bounded idle window used to drain residual network traffic. */
+  beginShutdownDrain(idleTicks) {
+    this.shutdownPreviousTransit = this.transit;
+    this.shutdownIdleTicks = idleTicks;
+    this.shutdownRemainingTicks = idleTicks;
+  }
+
+  /** Return true while transport activity or the idle drain window remains. */
+  hasRecentTransit() {
+    if (this.transit !== this.shutdownPreviousTransit) {
+      this.shutdownPreviousTransit = this.transit;
+      this.shutdownRemainingTicks = this.shutdownIdleTicks;
+      return true;
+    }
+    if (this.shutdownRemainingTicks === 0) return false;
+    this.shutdownRemainingTicks -= 1;
+    return true;
+  }
+}
+
+const threadworkRunnerKey = Symbol.for("threadwork.runner");
+const threadworkRunner = globalThis[threadworkRunnerKey] ??= new ThreadworkRunner();
+globalThis.threadworkRunner ??= threadworkRunner;
 
 /** Create the shared context passed to generated Node.js nodes. */
 function createRuntimeContext() {
   return { imports: Object.create(null) };
 }
-
-/** Record SIGINT/SIGTERM shutdown state for modeled code to inspect. */
-function threadworkInstallShutdownHandlers() {
-  const requestShutdown = (signalNumber) => {
-    threadworkRuntime.shutdownSignal = signalNumber;
-    threadworkRuntime.running = false;
-  };
-  process.once("SIGINT", () => requestShutdown(2));
-  process.once("SIGTERM", () => requestShutdown(15));
-}
-
-/** Request shutdown; modeled nodes decide whether they continue emitting packets. */
-function threadworkShutdownRequest() {
-  threadworkRuntime.running = false;
-}
-
-/** Return the last SIGINT or SIGTERM number received by the runtime, or zero. */
-function threadworkGetShutdownSignal() {
-  return threadworkRuntime.shutdownSignal || 0;
-}
-
-/** Return the requested running state for modeled code to inspect. */
-function threadworkIsRunning() {
-  return threadworkRuntime.running;
-}
-
-/** Increment the count of packets completed by modeled transports. */
-function threadworkRecordTransit() {
-  threadworkRuntime.transit += 1;
-}
-
-/** Start the bounded idle window used to drain residual network traffic. */
-function threadworkNetworkShutdownBegin(idleTicks) {
-  threadworkRuntime.shutdownPreviousTransit = threadworkRuntime.transit;
-  threadworkRuntime.shutdownIdleTicks = idleTicks;
-  threadworkRuntime.shutdownRemainingTicks = idleTicks;
-}
-
-/** Return true while transport activity or the idle drain window remains. */
-function threadworkNetworkHasRecentTransit() {
-  if (threadworkRuntime.transit !== threadworkRuntime.shutdownPreviousTransit) {
-    threadworkRuntime.shutdownPreviousTransit = threadworkRuntime.transit;
-    threadworkRuntime.shutdownRemainingTicks = threadworkRuntime.shutdownIdleTicks;
-    return true;
-  }
-  if (threadworkRuntime.shutdownRemainingTicks === 0) return false;
-  threadworkRuntime.shutdownRemainingTicks -= 1;
-  return true;
-}
-
-// Delegated child modules resolve runtime helpers through the shared global.
-globalThis.threadworkShutdownRequest ??= threadworkShutdownRequest;
-globalThis.threadworkGetShutdownSignal ??= threadworkGetShutdownSignal;
-globalThis.threadworkIsRunning ??= threadworkIsRunning;
-globalThis.threadworkRecordTransit ??= threadworkRecordTransit;
-globalThis.threadworkNetworkShutdownBegin ??= threadworkNetworkShutdownBegin;
-globalThis.threadworkNetworkHasRecentTransit ??= threadworkNetworkHasRecentTransit;

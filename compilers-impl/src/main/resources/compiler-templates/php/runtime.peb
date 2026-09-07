@@ -1,11 +1,88 @@
-{# Shared execution state: modeled nodes decide whether shutdown state stops emission. #}
-if (!isset($GLOBALS['threadwork_running'])) {
-    $GLOBALS['threadwork_running'] = true;
-    $GLOBALS['threadwork_shutdown_signal'] = 0;
-    $GLOBALS['threadwork_transit'] = 0;
-    $GLOBALS['threadwork_shutdown_previous_transit'] = 0;
-    $GLOBALS['threadwork_shutdown_idle_ticks'] = 0;
-    $GLOBALS['threadwork_shutdown_remaining_ticks'] = 0;
+{# Shared execution state for one generated PHP application. #}
+if (!class_exists('ThreadworkRunner')) {
+final class ThreadworkRunner
+{
+    private bool $running = true;
+    private int $shutdownSignal = 0;
+    private int $transit = 0;
+    private int $shutdownPreviousTransit = 0;
+    private int $shutdownIdleTicks = 0;
+    private int $shutdownRemainingTicks = 0;
+
+    /** @brief Request shutdown; modeled nodes decide whether they continue emitting packets. */
+    public function shutdownRequest(): void
+    {
+        $this->running = false;
+    }
+
+    /** @brief Return the last SIGINT or SIGTERM number received by the runtime, or zero. */
+    public function getShutdownSignal(): int
+    {
+        return $this->shutdownSignal;
+    }
+
+    /** @brief Return the requested running state for modeled code to inspect. */
+    public function isRunning(): bool
+    {
+        return $this->running;
+    }
+
+    /** @brief Increment the count of packets completed by modeled transports. */
+    public function recordTransit(): void
+    {
+        $this->transit++;
+    }
+
+    /** @brief Start the bounded idle window used to drain residual network traffic. */
+    public function beginShutdownDrain(int $idleTicks): void
+    {
+        $this->shutdownPreviousTransit = $this->transit;
+        $this->shutdownIdleTicks = $idleTicks;
+        $this->shutdownRemainingTicks = $idleTicks;
+    }
+
+    /** @brief Return true while transport activity or the idle drain window remains. */
+    public function hasRecentTransit(): bool
+    {
+        printf(
+            "[ThreadworkRunner::hasRecentTransit] transit=%d previous=%d remaining=%d\n",
+            $this->transit,
+            $this->shutdownPreviousTransit,
+            $this->shutdownRemainingTicks
+        );
+        if ($this->transit !== $this->shutdownPreviousTransit) {
+            $this->shutdownPreviousTransit = $this->transit;
+            $this->shutdownRemainingTicks = $this->shutdownIdleTicks;
+            return true;
+        }
+        if ($this->shutdownRemainingTicks === 0) return false;
+        $this->shutdownRemainingTicks--;
+        return true;
+    }
+
+    /** @brief Install SIGINT and SIGTERM handlers when PCNTL is available. */
+    public function installShutdownHandlers(): void
+    {
+        if (!function_exists('pcntl_signal')) return;
+        pcntl_async_signals(true);
+        $handleSignal = function (int $signal): void {
+            $this->shutdownSignal = $signal;
+            $this->shutdownRequest();
+        };
+        pcntl_signal(SIGINT, $handleSignal);
+        pcntl_signal(SIGTERM, $handleSignal);
+    }
+}
+}
+
+$GLOBALS['threadwork_runner'] ??= new ThreadworkRunner();
+
+if (!function_exists('threadwork_runner')) {
+/** @brief Return the generated application's Threadwork runner. */
+function threadwork_runner(): ThreadworkRunner
+{
+    return $GLOBALS['threadwork_runner'];
+}
 }
 
 if (!function_exists('createRuntimeContext')) {
@@ -13,69 +90,5 @@ if (!function_exists('createRuntimeContext')) {
 function createRuntimeContext(): array
 {
     return ['imports' => []];
-}
-
-/** @brief Request shutdown; modeled nodes decide whether they continue emitting packets. */
-function threadwork_shutdown_request(): void
-{
-    $GLOBALS['threadwork_running'] = false;
-}
-
-/** @brief Return the last OS shutdown signal received by the runtime, or zero. */
-function threadwork_get_shutdown_signal(): int
-{
-    return (int) ($GLOBALS['threadwork_shutdown_signal'] ?? 0);
-}
-
-/** @brief Return whether the runtime is still accepting normal work. */
-function threadwork_is_running(): bool
-{
-    return (bool) ($GLOBALS['threadwork_running'] ?? false);
-}
-
-/** @brief Increment the count of packets completed by modeled transports. */
-function threadwork_record_transit(): void
-{
-    $GLOBALS['threadwork_transit']++;
-}
-
-/** @brief Start the bounded idle window used to drain residual network traffic. */
-function threadwork_network_shutdown_begin(int $idleTicks): void
-{
-    $GLOBALS['threadwork_shutdown_previous_transit'] = $GLOBALS['threadwork_transit'];
-    $GLOBALS['threadwork_shutdown_idle_ticks'] = $idleTicks;
-    $GLOBALS['threadwork_shutdown_remaining_ticks'] = $idleTicks;
-}
-
-/** @brief Return true while transport activity or the idle drain window remains. */
-function threadwork_network_has_recent_transit(): bool
-{
-    printf(
-        "[threadwork_network_has_recent_transit] transit=%llu previous=%llu remaining=%u\n",
-        GLOBALS['threadwork_transit'],
-        GLOBALS['threadwork_shutdown_previous_transit'],
-        GLOBALS['threadwork_shutdown_remaining_ticks']
-    );
-    if ($GLOBALS['threadwork_transit'] !== $GLOBALS['threadwork_shutdown_previous_transit']) {
-        $GLOBALS['threadwork_shutdown_previous_transit'] = $GLOBALS['threadwork_transit'];
-        $GLOBALS['threadwork_shutdown_remaining_ticks'] = $GLOBALS['threadwork_shutdown_idle_ticks'];
-        return true;
-    }
-    if ($GLOBALS['threadwork_shutdown_remaining_ticks'] === 0) return false;
-    $GLOBALS['threadwork_shutdown_remaining_ticks']--;
-    return true;
-}
-
-/** @brief Install SIGINT and SIGTERM handlers when PCNTL is available. */
-function threadwork_install_shutdown_handlers(): void
-{
-    if (!function_exists('pcntl_signal')) return;
-    pcntl_async_signals(true);
-    $handleSignal = static function (int $signal): void {
-        $GLOBALS['threadwork_shutdown_signal'] = $signal;
-        threadwork_shutdown_request();
-    };
-    pcntl_signal(SIGINT, $handleSignal);
-    pcntl_signal(SIGTERM, $handleSignal);
 }
 }

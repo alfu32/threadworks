@@ -1,59 +1,63 @@
-{# Project runtime context and shutdown-aware transport accounting. #}package generated
+{# Project runtime classes and transport accounting. #}package generated
 
-/** Shared context passed to generated Kotlin nodes. */
+/** Shared endpoint context passed to generated Kotlin nodes. */
 class RuntimeContext {
     val imports: MutableMap<String, Any?> = mutableMapOf()
 }
 
-@Volatile
-var threadworkRunning = true
+/** Execution state for one generated Kotlin application. */
+class ThreadworkRunner {
+    @Volatile
+    private var running = true
 
-/** Last OS shutdown signal known to this JVM runtime, or zero when unavailable. */
-@Volatile
-var threadworkShutdownSignal = 0
+    @Volatile
+    private var shutdownSignal = 0
 
-var threadworkTransit = 0UL
-private var threadworkShutdownPreviousTransit = 0UL
-private var threadworkShutdownIdleTicks = 0U
-private var threadworkShutdownRemainingTicks = 0U
+    private var transit = 0UL
+    private var shutdownPreviousTransit = 0UL
+    private var shutdownIdleTicks = 0U
+    private var shutdownRemainingTicks = 0U
 
-/** Install a JVM shutdown hook that records requested shutdown state. */
-fun threadworkInstallShutdownHook() {
-    Runtime.getRuntime().addShutdownHook(Thread { threadworkRunning = false })
-}
+    /** Install a JVM shutdown hook that records requested shutdown state. */
+    fun installShutdownHook() {
+        Runtime.getRuntime().addShutdownHook(Thread { shutdownRequest() })
+    }
 
-/** Stop generators while already queued packets continue to drain. */
-/** Request shutdown; modeled nodes decide whether they continue emitting packets. */
-fun threadworkShutdownRequest() {
-    threadworkRunning = false
-}
+    /** Request shutdown; modeled nodes decide whether they continue emitting packets. */
+    fun shutdownRequest() {
+        running = false
+    }
 
-/** Return the last OS shutdown signal known to the runtime, or zero. */
-fun threadworkGetShutdownSignal(): Int = threadworkShutdownSignal
+    /** Return the last OS shutdown signal known to the runtime, or zero. */
+    fun getShutdownSignal(): Int = shutdownSignal
 
-/** Return whether modeled code should continue normal work. */
-fun threadworkIsRunning(): Boolean = threadworkRunning
+    /** Return the requested running state for modeled code to inspect. */
+    fun isRunning(): Boolean = running
 
-/** Increment the count of packets completed by modeled transports. */
-fun threadworkRecordTransit() {
-    threadworkTransit++
-}
+    /** Increment the count of packets completed by modeled transports. */
+    fun recordTransit() {
+        transit++
+    }
 
-/** Start the bounded idle window used to drain residual network traffic. */
-fun threadworkNetworkShutdownBegin(idleTicks: UInt) {
-    threadworkShutdownPreviousTransit = threadworkTransit
-    threadworkShutdownIdleTicks = idleTicks
-    threadworkShutdownRemainingTicks = idleTicks
-}
+    /** Start the bounded idle window used to drain residual network traffic. */
+    fun beginShutdownDrain(idleTicks: UInt) {
+        shutdownPreviousTransit = transit
+        shutdownIdleTicks = idleTicks
+        shutdownRemainingTicks = idleTicks
+    }
 
-/** Return true while transport activity or the idle drain window remains. */
-fun threadworkNetworkHasRecentTransit(): Boolean {
-    if (threadworkTransit != threadworkShutdownPreviousTransit) {
-        threadworkShutdownPreviousTransit = threadworkTransit
-        threadworkShutdownRemainingTicks = threadworkShutdownIdleTicks
+    /** Return true while transport activity or the idle drain window remains. */
+    fun hasRecentTransit(): Boolean {
+        if (transit != shutdownPreviousTransit) {
+            shutdownPreviousTransit = transit
+            shutdownRemainingTicks = shutdownIdleTicks
+            return true
+        }
+        if (shutdownRemainingTicks == 0U) return false
+        shutdownRemainingTicks--
         return true
     }
-    if (threadworkShutdownRemainingTicks == 0U) return false
-    threadworkShutdownRemainingTicks--
-    return true
 }
+
+/** Global execution state for the generated application. */
+val threadworkRunner = ThreadworkRunner()

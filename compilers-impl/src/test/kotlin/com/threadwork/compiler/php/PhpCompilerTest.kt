@@ -167,8 +167,8 @@ class PhpCompilerTest {
         assertTrue(generated.contains("init_read_file_") && generated.contains("run_read_file_"))
         assertTrue(generated.contains("init_write_file_") && generated.contains("run_write_file_"))
         assertTrue(generated.contains("transport_input_record1(\$input_record1_a_port, \$input_record1_b_port);"))
-        assertTrue(generated.contains("threadwork_record_transit()"))
-        assertTrue(generated.contains("threadwork_network_has_recent_transit()"))
+        assertTrue(generated.contains("threadwork_runner()->recordTransit()"))
+        assertTrue(generated.contains("threadwork_runner()->hasRecentTransit()"))
     }
 
     @Test
@@ -226,16 +226,12 @@ class PhpCompilerTest {
             it.name == "\$context" && it.kind == CompilerCodeSymbolKind.RuntimeSymbol
         })
         assertTrue(intelligence.symbols.any {
-            it.name == "threadwork_get_shutdown_signal" && it.kind == CompilerCodeSymbolKind.RuntimeSymbol
+            it.name == "threadwork_runner" &&
+                it.kind == CompilerCodeSymbolKind.RuntimeSymbol &&
+                it.members.any { member -> member.name == "getShutdownSignal()" }
         })
         assertTrue(intelligence.symbols.none {
             it.name == "\$GLOBALS['threadwork_running']" && it.kind == CompilerCodeSymbolKind.RuntimeSymbol
-        })
-        assertTrue(intelligence.symbols.any {
-            it.name == "threadwork_is_running" && it.kind == CompilerCodeSymbolKind.RuntimeSymbol
-        })
-        assertTrue(intelligence.symbols.any {
-            it.name == "threadwork_network_has_recent_transit" && it.kind == CompilerCodeSymbolKind.RuntimeSymbol
         })
         assertTrue(
             compiler.generatedFunctionHeader(

@@ -2,6 +2,7 @@ package com.threadwork.compiler.php
 
 import com.threadwork.compiler.api.CompilerOptions
 import com.threadwork.compiler.api.CompilerCodeIntelligence
+import com.threadwork.compiler.api.CompilerCodeMember
 import com.threadwork.compiler.api.CompilerCodeSymbol
 import com.threadwork.compiler.api.CompilerCodeSymbolKind
 import com.threadwork.compiler.api.CompilerTechnology
@@ -179,6 +180,15 @@ class PhpCompiler : TemplateSetCompiler() {
             CompilerCodeSymbolKind.SourceCapability,
             CompilerCodeSymbolKind.RunnableCapability,
         )
+        val PHP_RUNNER_METHODS = listOf(
+            CompilerCodeMember("shutdownRequest()", "void", "Request shutdown. Modeled nodes decide whether to stop emitting packets."),
+            CompilerCodeMember("getShutdownSignal()", "int", "Return the last SIGINT or SIGTERM number, or zero."),
+            CompilerCodeMember("isRunning()", "bool", "Return the requested running state."),
+            CompilerCodeMember("recordTransit()", "void", "Record a completed modeled transport."),
+            CompilerCodeMember("beginShutdownDrain(int \$idleTicks)", "void", "Begin bounded idle-window draining."),
+            CompilerCodeMember("hasRecentTransit()", "bool", "Return whether transit or the drain window remains."),
+            CompilerCodeMember("installShutdownHandlers()", "void", "Install PCNTL SIGINT and SIGTERM handlers when available."),
+        )
         val runtimeSymbols = listOf(
             CompilerCodeSymbol(
                 name = "\$context",
@@ -188,60 +198,20 @@ class PhpCompiler : TemplateSetCompiler() {
                 documentation = "Execution context supplied to every generated PHP node function.",
             ),
             CompilerCodeSymbol(
-                name = "\$GLOBALS['threadwork_transit']",
+                name = "ThreadworkRunner",
                 kind = CompilerCodeSymbolKind.RuntimeSymbol,
-                typeName = "int",
-                detail = "PHP runtime completed transport count",
-                documentation = "Incremented after each non-empty modeled data-link transport completes.",
+                typeName = "class ThreadworkRunner",
+                detail = "application execution state",
+                documentation = "Owns shutdown state, the last catchable OS signal, transport accounting, and the drain window.",
+                members = PHP_RUNNER_METHODS,
             ),
             CompilerCodeSymbol(
-                name = "threadwork_shutdown_request",
+                name = "threadwork_runner",
                 kind = CompilerCodeSymbolKind.RuntimeSymbol,
-                typeName = "void threadwork_shutdown_request()",
-                detail = "request application shutdown",
-                documentation = "Sets the runtime shutdown state. Modeled nodes decide whether that state stops their own packet emission.",
-            ),
-            CompilerCodeSymbol(
-                name = "threadwork_get_shutdown_signal",
-                kind = CompilerCodeSymbolKind.RuntimeSymbol,
-                typeName = "int threadwork_get_shutdown_signal()",
-                detail = "read the last OS shutdown signal",
-                documentation = "Returns the last SIGINT or SIGTERM number received by the runtime, or zero when no OS shutdown signal has been received. It does not consume the value.",
-            ),
-            CompilerCodeSymbol(
-                name = "threadwork_is_running",
-                kind = CompilerCodeSymbolKind.RuntimeSymbol,
-                typeName = "bool threadwork_is_running()",
-                detail = "read the requested running state",
-                documentation = "Returns false after a shutdown request or catchable OS shutdown signal. Modeled generators decide whether that state stops their own emission.",
-            ),
-            CompilerCodeSymbol(
-                name = "threadwork_record_transit",
-                kind = CompilerCodeSymbolKind.RuntimeSymbol,
-                typeName = "void threadwork_record_transit()",
-                detail = "record completed link transport",
-                documentation = "Increments the runtime transport counter after a packet reaches the target link buffer.",
-            ),
-            CompilerCodeSymbol(
-                name = "threadwork_network_shutdown_begin",
-                kind = CompilerCodeSymbolKind.RuntimeSymbol,
-                typeName = "void threadwork_network_shutdown_begin(int \$idleTicks)",
-                detail = "begin network drain monitoring",
-                documentation = "Begins a bounded idle-window check for residual modeled link traffic.",
-            ),
-            CompilerCodeSymbol(
-                name = "threadwork_network_has_recent_transit",
-                kind = CompilerCodeSymbolKind.RuntimeSymbol,
-                typeName = "bool threadwork_network_has_recent_transit()",
-                detail = "continue network drain while traffic is recent",
-                documentation = "Returns true while modeled link transports are still active or the configured idle window has not elapsed.",
-            ),
-            CompilerCodeSymbol(
-                name = "threadwork_install_shutdown_handlers",
-                kind = CompilerCodeSymbolKind.RuntimeSymbol,
-                typeName = "void threadwork_install_shutdown_handlers()",
-                detail = "install SIGINT and SIGTERM shutdown handling",
-                documentation = "Installs PHP PCNTL signal handlers when the extension is available; the generated runtime remains valid when it is unavailable.",
+                typeName = "ThreadworkRunner threadwork_runner()",
+                detail = "global application runner",
+                documentation = "Returns the generated application's singleton runner. Call its methods to inspect or request shutdown.",
+                members = PHP_RUNNER_METHODS,
             ),
         )
         val PHP_IDENTIFIER = Regex("[A-Za-z_][A-Za-z0-9_]*")

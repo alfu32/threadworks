@@ -3,6 +3,7 @@ package com.threadwork.compiler.naivekotlin
 import com.threadwork.compiler.api.CompilerOptions
 import com.threadwork.compiler.api.CompilerTechnology
 import com.threadwork.compiler.api.CompilerCodeIntelligence
+import com.threadwork.compiler.api.CompilerCodeMember
 import com.threadwork.compiler.api.CompilerCodeSymbol
 import com.threadwork.compiler.api.CompilerCodeSymbolKind
 import com.threadwork.compiler.api.defaultCodeIntelligence
@@ -44,9 +45,8 @@ class NaiveKotlinCompiler : TemplateSetCompiler() {
     override fun codeIntelligence(document: ThreadworkDocument, node: Node): CompilerCodeIntelligence {
         val defaults = defaultCodeIntelligence(document, node)
         val runtimeSymbols = listOf(
-            runtimeSymbol("threadworkShutdownRequest", "request application shutdown"),
-            runtimeSymbol("threadworkGetShutdownSignal", "read the last OS shutdown signal, or zero"),
-            runtimeSymbol("threadworkIsRunning", "read the requested running state"),
+            runtimeSymbol("ThreadworkRunner", "Kotlin application execution state", RUNNER_METHODS),
+            runtimeSymbol("generated.threadworkRunner", "global Kotlin application runner", RUNNER_METHODS),
         )
         return defaults.copy(
             symbols = (defaults.symbols + runtimeSymbols).distinctBy { it.name to it.kind },
@@ -56,15 +56,29 @@ class NaiveKotlinCompiler : TemplateSetCompiler() {
     override fun templatesFor(document: ThreadworkDocument, options: CompilerOptions): CompilerTemplateSet =
         TEMPLATES
 
-    private fun runtimeSymbol(name: String, detail: String): CompilerCodeSymbol =
+    private fun runtimeSymbol(
+        name: String,
+        detail: String,
+        members: List<CompilerCodeMember> = emptyList(),
+    ): CompilerCodeSymbol =
         CompilerCodeSymbol(
             name = name,
             kind = CompilerCodeSymbolKind.RuntimeSymbol,
             detail = detail,
             documentation = "Kotlin/JVM Threadwork runtime helper. JVM shutdown hooks do not expose a portable OS signal number, so the getter returns zero.",
+            members = members,
         )
 
     private companion object {
+        val RUNNER_METHODS = listOf(
+            CompilerCodeMember("shutdownRequest()", "Unit", "Request shutdown."),
+            CompilerCodeMember("getShutdownSignal()", "Int", "Return zero; JVM hooks do not expose a portable signal number."),
+            CompilerCodeMember("isRunning()", "Boolean", "Return the requested running state."),
+            CompilerCodeMember("recordTransit()", "Unit", "Record a completed modeled transport."),
+            CompilerCodeMember("beginShutdownDrain(idleTicks: UInt)", "Unit", "Begin bounded idle-window draining."),
+            CompilerCodeMember("hasRecentTransit()", "Boolean", "Return whether transit or the drain window remains."),
+            CompilerCodeMember("installShutdownHook()", "Unit", "Install the JVM shutdown hook."),
+        )
         val TEMPLATES = CompilerTemplateSetLoader.load("/compiler-templates/kotlin/compiler.properties")
     }
 }

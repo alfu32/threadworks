@@ -3,6 +3,7 @@ package com.threadwork.compiler.quickjs
 import com.threadwork.compiler.api.CompilerOptions
 import com.threadwork.compiler.api.CompilerTechnology
 import com.threadwork.compiler.api.CompilerCodeIntelligence
+import com.threadwork.compiler.api.CompilerCodeMember
 import com.threadwork.compiler.api.CompilerCodeSymbol
 import com.threadwork.compiler.api.CompilerCodeSymbolKind
 import com.threadwork.compiler.api.SingleFileLayoutStrategy
@@ -37,12 +38,8 @@ class QuickJsCompiler : TemplateSetCompiler() {
         val defaults = defaultCodeIntelligence(document, node)
         val runtimeSymbols = listOf(
             runtimeSymbol("createRuntimeContext", "create QuickJS execution context"),
-            runtimeSymbol("threadworkShutdownRequest", "request application shutdown"),
-            runtimeSymbol("threadworkGetShutdownSignal", "read the last OS shutdown signal, or zero"),
-            runtimeSymbol("threadworkIsRunning", "read the requested running state"),
-            runtimeSymbol("threadworkRecordTransit", "record one completed transport"),
-            runtimeSymbol("threadworkNetworkShutdownBegin", "begin bounded network draining"),
-            runtimeSymbol("threadworkNetworkHasRecentTransit", "test for recent transport activity"),
+            runtimeSymbol("ThreadworkRunner", "QuickJS application execution state", RUNNER_METHODS),
+            runtimeSymbol("threadworkRunner", "global QuickJS application runner", RUNNER_METHODS),
         )
         return defaults.copy(
             symbols = (defaults.symbols + runtimeSymbols).distinctBy { it.name to it.kind },
@@ -59,19 +56,32 @@ class QuickJsCompiler : TemplateSetCompiler() {
         )
     }
 
-    private fun runtimeSymbol(name: String, detail: String): CompilerCodeSymbol =
+    private fun runtimeSymbol(
+        name: String,
+        detail: String,
+        members: List<CompilerCodeMember> = emptyList(),
+    ): CompilerCodeSymbol =
         CompilerCodeSymbol(
             name = name,
             kind = CompilerCodeSymbolKind.RuntimeSymbol,
             detail = detail,
-            documentation = if (name == "threadworkGetShutdownSignal") {
-                "QuickJS does not expose OS signal numbers to this generated script; this helper returns zero."
+            documentation = if (name == "threadworkRunner" || name == "ThreadworkRunner") {
+                "QuickJS does not expose OS signal numbers to this generated script, so getShutdownSignal() returns zero."
             } else {
                 "QuickJS Threadwork runtime helper."
             },
+            members = members,
         )
 
     private companion object {
+        val RUNNER_METHODS = listOf(
+            CompilerCodeMember("shutdownRequest()", "void", "Request shutdown."),
+            CompilerCodeMember("getShutdownSignal()", "number", "Return zero; QuickJS does not expose OS signal numbers."),
+            CompilerCodeMember("isRunning()", "boolean", "Return the requested running state."),
+            CompilerCodeMember("recordTransit()", "void", "Record a completed modeled transport."),
+            CompilerCodeMember("beginShutdownDrain(idleTicks)", "void", "Begin bounded idle-window draining."),
+            CompilerCodeMember("hasRecentTransit()", "boolean", "Return whether transit or the drain window remains."),
+        )
         val TEMPLATES = CompilerTemplateSetLoader.load("/compiler-templates/quickjs/compiler.properties")
     }
 }

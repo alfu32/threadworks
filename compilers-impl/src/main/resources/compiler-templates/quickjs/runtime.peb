@@ -1,54 +1,59 @@
-{# QuickJS has no Node process/module APIs; runtime state is kept on the global object. #}
-const threadworkRuntimeKey = Symbol.for("threadwork.runtime");
-const threadworkRuntime = globalThis[threadworkRuntimeKey] ??= {
-  running: true,
-  shutdownSignal: 0,
-  transit: 0,
-  shutdownPreviousTransit: 0,
-  shutdownIdleTicks: 0,
-  shutdownRemainingTicks: 0,
-};
+{# QuickJS runtime state for one generated application. #}
+class ThreadworkRunner {
+  constructor() {
+    this.running = true;
+    this.shutdownSignal = 0;
+    this.transit = 0;
+    this.shutdownPreviousTransit = 0;
+    this.shutdownIdleTicks = 0;
+    this.shutdownRemainingTicks = 0;
+  }
+
+  /** Request shutdown; modeled nodes decide whether they continue emitting packets. */
+  shutdownRequest() {
+    this.running = false;
+  }
+
+  /** Return the last OS shutdown signal observed by this runtime, or zero. */
+  getShutdownSignal() {
+    return this.shutdownSignal || 0;
+  }
+
+  /** Return the requested running state for modeled code to inspect. */
+  isRunning() {
+    return this.running;
+  }
+
+  /** Increment the count of packets completed by modeled transports. */
+  recordTransit() {
+    this.transit += 1;
+  }
+
+  /** Start the bounded idle window used to drain residual network traffic. */
+  beginShutdownDrain(idleTicks) {
+    this.shutdownPreviousTransit = this.transit;
+    this.shutdownIdleTicks = idleTicks;
+    this.shutdownRemainingTicks = idleTicks;
+  }
+
+  /** Return true while transport activity or the idle drain window remains. */
+  hasRecentTransit() {
+    if (this.transit !== this.shutdownPreviousTransit) {
+      this.shutdownPreviousTransit = this.transit;
+      this.shutdownRemainingTicks = this.shutdownIdleTicks;
+      return true;
+    }
+    if (this.shutdownRemainingTicks === 0) return false;
+    this.shutdownRemainingTicks -= 1;
+    return true;
+  }
+}
+
+const threadworkRunnerKey = Symbol.for("threadwork.runner");
+const threadworkRunner = globalThis[threadworkRunnerKey] ??= new ThreadworkRunner();
+globalThis.threadworkRunner ??= threadworkRunner;
 
 /** Create the shared context passed to generated QuickJS nodes. */
 function createRuntimeContext() {
   return { imports: Object.create(null) };
-}
-
-/** Request shutdown; modeled nodes decide whether they continue emitting packets. */
-function threadworkShutdownRequest() {
-  threadworkRuntime.running = false;
-}
-
-/** Return the last OS shutdown signal observed by this runtime, or zero. */
-function threadworkGetShutdownSignal() {
-  return threadworkRuntime.shutdownSignal || 0;
-}
-
-/** Return whether generator ingress is still open. */
-function threadworkIsRunning() {
-  return threadworkRuntime.running;
-}
-
-/** Increment the count of packets completed by modeled transports. */
-function threadworkRecordTransit() {
-  threadworkRuntime.transit += 1;
-}
-
-/** Start the bounded idle window used to drain residual network traffic. */
-function threadworkNetworkShutdownBegin(idleTicks) {
-  threadworkRuntime.shutdownPreviousTransit = threadworkRuntime.transit;
-  threadworkRuntime.shutdownIdleTicks = idleTicks;
-  threadworkRuntime.shutdownRemainingTicks = idleTicks;
-}
-
-/** Return true while transport activity or the idle drain window remains. */
-function threadworkNetworkHasRecentTransit() {
-  if (threadworkRuntime.transit !== threadworkRuntime.shutdownPreviousTransit) {
-    threadworkRuntime.shutdownPreviousTransit = threadworkRuntime.transit;
-    threadworkRuntime.shutdownRemainingTicks = threadworkRuntime.shutdownIdleTicks;
-    return true;
-  }
-  if (threadworkRuntime.shutdownRemainingTicks === 0) return false;
-  threadworkRuntime.shutdownRemainingTicks -= 1;
-  return true;
 }
