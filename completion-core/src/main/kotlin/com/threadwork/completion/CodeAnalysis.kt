@@ -45,6 +45,11 @@ data class CodeSymbolId(val declaration: CodeLocation)
 data class CodeReference(val symbol: CodeSymbolId, val location: CodeLocation)
 data class CodeScope(val location: CodeLocation, val parent: CodeLocation?, val ownerType: String? = null)
 
+data class CodeHoverInfo(
+    val title: String,
+    val body: String,
+)
+
 interface CodeAnalysis {
     fun scopes(): AnalysisResult<List<CodeScope>> = AnalysisResult.Unsupported
     fun declarations(): AnalysisResult<List<DeclarationSymbol>> = AnalysisResult.Unsupported
@@ -53,6 +58,7 @@ interface CodeAnalysis {
     fun members(expression: String, offset: Int): AnalysisResult<List<CodeMember>> = AnalysisResult.Unsupported
     fun definition(offset: Int): AnalysisResult<CodeLocation?> = AnalysisResult.Unsupported
     fun references(symbol: CodeSymbolId): AnalysisResult<List<CodeReference>> = AnalysisResult.Unsupported
+    fun hover(offset: Int): AnalysisResult<CodeHoverInfo?> = AnalysisResult.Unsupported
 }
 
 data class CodeAnalysisContext(
@@ -86,6 +92,7 @@ class CompositeCodeAnalysis(private val providers: List<CodeAnalysis>) : CodeAna
     override fun members(expression: String, offset: Int) = query { it.members(expression, offset) }
     override fun definition(offset: Int) = query { it.definition(offset) }
     override fun references(symbol: CodeSymbolId) = query { it.references(symbol) }
+    override fun hover(offset: Int) = query { it.hover(offset) }
 }
 
 class LegacyCodeAnalysisProvider(private val service: NodeCompletionService) : CodeAnalysisProvider {

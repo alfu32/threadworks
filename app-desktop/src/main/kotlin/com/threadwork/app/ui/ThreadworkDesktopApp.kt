@@ -38,6 +38,8 @@ import com.threadwork.compiler.quickjs.QuickJsCompiler
 import com.threadwork.core.diagnostics.DiagnosticSeverity
 import com.threadwork.core.diagnostics.Diagnostic
 import com.threadwork.completion.ModelAwareCompletionService
+import com.threadwork.completion.AnalysisResult
+import com.threadwork.completion.CompletionRequest
 import com.threadwork.core.classification.LinkClassifier
 import com.threadwork.core.classification.LinkStereotype
 import com.threadwork.core.classification.NodeStereotype
@@ -69,7 +71,6 @@ import com.threadwork.core.model.effectiveTechnologyId
 import com.threadwork.core.model.effectiveTextLanguageId
 import com.threadwork.core.model.getElementById
 import com.threadwork.core.model.linkTypeDisplayName
-import com.threadwork.core.model.linksUsingType
 import com.threadwork.core.model.projectName
 import com.threadwork.core.model.rootNode
 import com.threadwork.core.model.typeDisplayName
@@ -7706,6 +7707,23 @@ private class NodeTextEditor(
     private fun typeHoverInfo(request: EditorHoverRequest): EditorHoverInfo? {
         val document = repository.getDocument()
         val node = document.getElementById(NodeId(request.nodeId)) ?: return null
+        val analysisRequest = CompletionRequest(
+            nodeId = node.id,
+            textSection = request.textSection,
+            languageId = request.languageId,
+            technologyId = request.technologyId,
+            cursorOffset = request.cursorOffset,
+            fullText = request.fullText,
+            currentLine = request.symbol,
+            prefix = request.symbol,
+        )
+        val analysisHover = completionService.analysis(analysisRequest).hover(request.cursorOffset)
+        if (analysisHover is AnalysisResult.Available) {
+            val hover = analysisHover.value
+            if (hover != null) {
+                return EditorHoverInfo(hover.title, hover.body.ifBlank { "No declaration details are available." })
+            }
+        }
         val compiler = compilerCapabilityResolver.compilerFor(document, node.id) ?: return null
         val type = compiler.typeInformation(document, node, request.symbol) ?: return null
         val fields = type.fields.takeIf { it.isNotEmpty() }

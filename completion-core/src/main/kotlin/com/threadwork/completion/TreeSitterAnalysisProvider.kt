@@ -95,6 +95,7 @@ class TreeSitterAnalysisProvider : CodeAnalysisProvider {
             override fun members(expression: String, offset: Int) = delegate.members(expression, offset)
             override fun definition(offset: Int) = delegate.definition(offset)
             override fun references(symbol: CodeSymbolId) = delegate.references(symbol)
+            override fun hover(offset: Int) = delegate.hover(offset)
         }
     }
 
@@ -143,6 +144,7 @@ class TreeSitterAnalysisProvider : CodeAnalysisProvider {
         override fun members(expression: String, offset: Int) = AnalysisResult.Unavailable(reason)
         override fun definition(offset: Int) = AnalysisResult.Unavailable(reason)
         override fun references(symbol: CodeSymbolId) = AnalysisResult.Unavailable(reason)
+        override fun hover(offset: Int) = AnalysisResult.Unavailable(reason)
     }
 
     companion object {

@@ -971,6 +971,8 @@ class GridCodeEditorAdapter : JPanel(), CodeEditorAdapter {
                 languageId = languageId,
                 technologyId = technology.technologyId,
                 symbol = symbol,
+                cursorOffset = lines.take(position.line).sumOf { it.length + 1 } + position.column,
+                fullText = lines.joinToString("\n"),
             ),
         )
         repaint()

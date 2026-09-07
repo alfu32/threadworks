@@ -127,6 +127,58 @@ internal class ParsedCodeAnalysis(
         },
     )
 
+    override fun hover(offset: Int): AnalysisResult<CodeHoverInfo?> {
+        val identifier = active.identifiers.filter { offset in it.range }.minByOrNull { it.range.end - it.range.start }
+            ?: return AnalysisResult.Available(null)
+        val location = (definition(offset) as? AnalysisResult.Available)?.value
+        val binding = location?.let { target -> allBindings.firstOrNull { it.location == target } }
+        if (binding != null) {
+            val displayType = binding.typeName.ifBlank { bindingType(binding, offset).typename() }
+            val title = when (binding.kind) {
+                DeclarationSymbolKind.Function -> binding.header
+                DeclarationSymbolKind.Class,
+                DeclarationSymbolKind.Interface,
+                DeclarationSymbolKind.Struct,
+                DeclarationSymbolKind.Enum,
+                DeclarationSymbolKind.TypeAlias -> "${binding.kind.name.lowercase()} ${binding.name}"
+                else -> "$displayType ${binding.name}"
+            }
+            val extra = when {
+                binding.isType -> membersOf(binding.name, offset).joinToString("\n") { member ->
+                    "${member.name}: ${member.type.typename()}"
+                }
+                binding.callable -> binding.typeName.takeIf(String::isNotBlank)?.let { "returns: $it" }.orEmpty()
+                else -> displayType.takeIf { it != "unknown" }?.let { "type: $it" }.orEmpty()
+            }
+            return AnalysisResult.Available(CodeHoverInfo(title, extra))
+        }
+
+        val name = active.text(identifier)
+        val compilerSymbol = compiler.symbols.firstOrNull { it.name == name }
+        if (compilerSymbol != null) {
+            val members = compilerSymbol.members.joinToString("\n") { member ->
+                member.name + member.detail.takeIf(String::isNotBlank)?.let { " - $it" }.orEmpty()
+            }
+            return AnalysisResult.Available(CodeHoverInfo(
+                compilerSymbol.name,
+                listOfNotNull(compilerSymbol.documentation.takeIf(String::isNotBlank), compilerSymbol.detail.takeIf(String::isNotBlank), members.takeIf(String::isNotBlank)).joinToString("\n"),
+            ))
+        }
+        val compilerType = compiler.types.firstOrNull { it.name == name }
+        return AnalysisResult.Available(compilerType?.let { type ->
+            CodeHoverInfo(
+                type.name,
+                listOfNotNull(type.documentation.takeIf(String::isNotBlank), type.declaration.takeIf(String::isNotBlank), type.fields.joinToString("\n") { "${it.name}: ${it.typeName}" }.takeIf(String::isNotBlank)).joinToString("\n"),
+            )
+        })
+    }
+
+    private fun CodeType.typename(): String = when (this) {
+        CodeType.Unknown -> "unknown"
+        is CodeType.Named -> name
+        is CodeType.Ambiguous -> candidates.joinToString(" | ")
+    }
+
     private fun normalizeType(name: String): String = name.trim().removePrefix("const ").removePrefix("struct ")
         .removePrefix("class ").trim().trimEnd('*', '&', '?', ' ').removePrefix("*").trim()
 }

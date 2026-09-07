@@ -57,7 +57,7 @@ internal class SourceSymbols(
         if (value.isEmpty() || bindings.any { it.location.range == name.range }) return
         val bodyStart = declaration.field("body")?.range?.start ?: declaration.range.end
         bindings += SourceBinding(value, kind, CodeLocation(nodeId, section, name.range), scope, typeName,
-            text(initializer), source.substring(declaration.range.start, bodyStart).trim().lineSequence().first(), ownerType)
+            text(initializer), source.substring(declaration.range.start, bodyStart).trim().replace(Regex("\\s+"), " "), ownerType)
     }
 
     private fun visit(node: SyntaxNode, scope: CodeRange, ownerType: String?, parent: SyntaxNode?) {

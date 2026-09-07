@@ -25,6 +25,8 @@ data class EditorHoverRequest(
     val languageId: String,
     val technologyId: String,
     val symbol: String,
+    val cursorOffset: Int = 0,
+    val fullText: String = "",
 )
 
 data class EditorHoverInfo(

@@ -1460,7 +1460,7 @@
             "text": {
                 "initialization": "",
                 "initializationLanguageId": "",
-                "source": "time_t now = time(NULL);\nstruct tm time_info;\nchar timestamp[32];\n\n// should raise a compilation error // some_nonexisten_function==!!\n\n\nPacket packet = {\n    .timestamp = timestamp,\n    .uuid = NULL,\n    .random_word = NULL,\n    .random_word_length = 0\n};\n\nif (now != (time_t)-1 &&\n    localtime_r(&now, &time_info) != NULL &&\n    tm__strftime(\n        timestamp,\n        sizeof(timestamp),\n        \"%Y-%m-%dT%H:%M:%S%z\",\n        &time_info\n    ) > 0) {\n    packet.isok = true;\n} else {\n    timestamp[0] = '\\0';\n}\n\npacket.timestamp = strdup(timestamp);\n\nprintf(\"read_time.timestamp:%s\\n\",packet.timestamp != NULL ? packet.timestamp : \"null\");\n\npush(ip_time, &packet);\n",
+                "source": "time_t now = time(NULL);\nstruct tm time_info;\nchar timestamp[32];\n\n// should raise a compilation error // some_nonexisten_function==!!\n\n\nPacket packet = {\n    .timestamp = timestamp,\n    .uuid = NULL,\n    .random_word = NULL,\n    .random_word_length = 0\n};\n\nif (now != (time_t)-1 &&\n    localtime_r(&now, &time_info) != NULL &&\n    tm__strftime(\n        timestamp,\n        sizeof(timestamp),\n        \"%Y-%m-%dT%H:%M:%S%z\",\n        &time_info\n    ) > 0) {\n    packet.isok = true;\n} else {\n    timestamp[0] = '\\0';\n}\n\n\n\npacket.timestamp = strdup(timestamp);\n\nprintf(\"read_time.timestamp:%s\\n\",packet.timestamp != NULL ? packet.timestamp : \"null\");\n\npush(ip_time, &packet);\n",
                 "sourceLanguageId": "c",
                 "specification": "reads system time and puts it in a Packet and then pushes it into the ip_time output",
                 "specificationLanguageId": "markdown",
@@ -1483,7 +1483,7 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-05T19:16:59.098595580Z",
+                "date": "2026-09-07T17:44:35.882172578Z",
                 "user": "devlin"
             },
             "ports": [

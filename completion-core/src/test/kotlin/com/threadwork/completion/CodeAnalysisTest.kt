@@ -75,6 +75,21 @@ class CodeAnalysisTest {
         assertEquals(listOf("id", "timestamp"), members.map { it.name })
     }
 
+    @Test
+    fun `hover describes variables types and function signatures`() {
+        val source = "struct Packet { int id; };\nPacket packet;\nint send(long id, Packet value) { return id; }\npacket.<caret>"
+        val ctx = context("c", source)
+        val analysis = parser.analyze(ctx)
+        val variable = assertIs<AnalysisResult.Available<CodeHoverInfo?>>(analysis.hover(ctx.request.fullText.indexOf("packet."))).value
+        assertNotNull(variable)
+        assertEquals("Packet packet", variable.title)
+
+        val functionOffset = ctx.request.fullText.indexOf("send")
+        val function = assertIs<AnalysisResult.Available<CodeHoverInfo?>>(analysis.hover(functionOffset)).value
+        assertNotNull(function)
+        assertTrue("int send(long id, Packet value)" in function.title)
+    }
+
     private fun context(language: String, code: String, compiler: CompilerCodeIntelligence = CompilerCodeIntelligence()): CodeAnalysisContext {
         val repository = InMemoryDocumentRepository(newDocument("analysis"))
         val root = repository.getDocument().rootNodeId
