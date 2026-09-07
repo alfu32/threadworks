@@ -35,6 +35,9 @@ data class CompilerCodeMember(
     val name: String,
     val detail: String = "",
     val documentation: String = "",
+    /** Field type or method return type; empty when the legacy provider does not know. */
+    val typeName: String = "",
+    val isMethod: Boolean = '(' in name,
 )
 
 data class CompilerCodeSymbol(
@@ -121,6 +124,7 @@ fun defaultCodeIntelligence(
         val itemMembers = type.fields.map { field ->
             CompilerCodeMember(
                 name = "$argumentName.${field.name}",
+                typeName = field.typeName,
                 detail = "${field.typeName}${if (field.isReference) " reference" else ""}",
                 documentation = "Field '${field.name}' of ${type.name}.",
             )
@@ -143,6 +147,7 @@ fun defaultCodeIntelligence(
             members = type.fields.map { field ->
                 CompilerCodeMember(
                     name = "${type.name}.${field.name}",
+                    typeName = field.typeName,
                     detail = field.typeName,
                     documentation = "Field '${field.name}' of ${type.name}.",
                 )

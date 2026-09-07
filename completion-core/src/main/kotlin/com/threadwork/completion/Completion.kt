@@ -27,6 +27,7 @@ data class CompletionSuggestion(
     val detail: String = "",
     val documentation: String = "",
     val sourcePluginId: String? = null,
+    val replacementRange: CodeRange? = null,
 )
 
 enum class CompletionSuggestionKind {
@@ -62,6 +63,8 @@ interface NodeCompletionService {
     fun getSuggestions(request: CompletionRequest): List<CompletionSuggestion>
 
     fun getDeclarationSymbols(request: CompletionRequest): List<DeclarationSymbol> = emptyList()
+
+    fun analysis(request: CompletionRequest): CodeAnalysis = object : CodeAnalysis {}
 }
 
 interface TechnologyCompletionProvider {
@@ -69,7 +72,7 @@ interface TechnologyCompletionProvider {
     fun getSuggestions(node: Node, document: ThreadworkDocument, request: CompletionRequest): List<CompletionSuggestion>
 }
 
-class ModelAwareCompletionService(
+class LegacyNodeCompletionService(
     private val documentProvider: () -> ThreadworkDocument,
     private val compilerProvider: (ThreadworkDocument, Node) -> CompilerPlugin? = { _, _ -> null },
     private val technologyProviders: List<TechnologyCompletionProvider> = listOf(

@@ -561,9 +561,12 @@ class GridCodeEditorAdapter : JPanel(), CodeEditorAdapter {
     private fun applyCompletion(suggestion: CompletionSuggestion) {
         val currentCaret = caret
         val prefix = currentPrefix()
-        val start = BufferPosition(currentCaret.line, (currentCaret.column - prefix.length).coerceAtLeast(0))
+        val range = suggestion.replacementRange
+        val start = range?.let { positionFromOffset(getText(), it.start) }
+            ?: BufferPosition(currentCaret.line, (currentCaret.column - prefix.length).coerceAtLeast(0))
+        val end = range?.let { positionFromOffset(getText(), it.end) } ?: currentCaret
         cursors.clear()
-        cursors += CaretState(caret = currentCaret, anchor = start)
+        cursors += CaretState(caret = end, anchor = start)
         edit { insertTextAtCursors(suggestion.insertText) }
         hideCompletions()
     }
