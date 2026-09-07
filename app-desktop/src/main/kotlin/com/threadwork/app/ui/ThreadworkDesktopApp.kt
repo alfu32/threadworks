@@ -110,8 +110,6 @@ import java.awt.datatransfer.StringSelection
 import java.awt.datatransfer.Transferable
 import java.awt.event.FocusAdapter
 import java.awt.event.FocusEvent
-import java.awt.event.ComponentAdapter
-import java.awt.event.ComponentEvent
 import java.awt.event.InputEvent
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
@@ -542,16 +540,15 @@ class ThreadworkDesktopApp(
             add(projectPanels, BorderLayout.CENTER)
             add(statusBar, BorderLayout.SOUTH)
         }
-        return JLayeredPane().apply {
+        return object : JLayeredPane() {
+            override fun doLayout() {
+                content.setBounds(0, 0, width, height)
+                notifications.reposition()
+            }
+        }.apply {
             layout = null
             add(content, JLayeredPane.DEFAULT_LAYER)
             notifications.install(this, statusBar)
-            addComponentListener(object : ComponentAdapter() {
-                override fun componentResized(event: ComponentEvent) {
-                    content.setBounds(0, 0, width, height)
-                    notifications.reposition()
-                }
-            })
         }
     }
 
