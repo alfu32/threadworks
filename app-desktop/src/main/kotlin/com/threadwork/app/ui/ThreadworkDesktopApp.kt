@@ -1404,13 +1404,6 @@ class ThreadworkDesktopApp(
 
     private fun persistNativeDiagnostics(nodeId: NodeId, details: List<EmbeddedDiagnostic>) {
         val mappedDetails = details
-            .map { detail ->
-                if (detail.diagnostic.nodeId == null) {
-                    detail.copy(diagnostic = detail.diagnostic.copy(nodeId = nodeId))
-                } else {
-                    detail
-                }
-            }
         val affectedNodeIds = mappedDetails.mapNotNull { it.diagnostic.nodeId }.toSet() + nodeId
         val diagnosticsByNode = affectedNodeIds.associateWith { affectedNodeId ->
             mappedDetails
@@ -1421,7 +1414,7 @@ class ThreadworkDesktopApp(
             repository.updateNodeDiagnostics(affectedNodeId, diagnostics)
         }
         nativeDiagnosticDetails = nativeDiagnosticDetails
-            .filterNot { it.diagnostic.nodeId in affectedNodeIds }
+            .filterNot { it.diagnostic.nodeId == null || it.diagnostic.nodeId in affectedNodeIds }
             .plus(mappedDetails)
         editorTabs.applyNativeDiagnostics(
             diagnosticsByNode.entries.associate { (affectedNodeId, diagnostics) ->

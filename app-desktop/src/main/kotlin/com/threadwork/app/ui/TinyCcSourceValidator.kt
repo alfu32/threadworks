@@ -52,6 +52,12 @@ internal object TinyCcSourceValidator : EmbeddedSourceValidator {
                 }
                 if (pass.exitCode == 0) return diagnostics.values.toList()
 
+                // Never edit generated control flow to recover from a runtime or
+                // assembly error: removing a condition creates spurious brace errors.
+                if (passDiagnostics.any { it.diagnostic.severity == DiagnosticSeverity.Error && it.diagnostic.textSection == null }) {
+                    return diagnostics.values.toList()
+                }
+
                 val newlySuppressed = passDiagnostics
                     .filter { it.diagnostic.severity == DiagnosticSeverity.Error }
                     .mapNotNull(EmbeddedDiagnostic::generatedLine)
@@ -142,18 +148,14 @@ internal object TinyCcSourceValidator : EmbeddedSourceValidator {
         }.toList()
 
     private fun fallbackDiagnostic(file: GeneratedFile, messages: List<String>): EmbeddedDiagnostic {
-        val location = file.sourceMap.entries.firstOrNull()
         return EmbeddedDiagnostic(
             diagnostic = Diagnostic(
                 severity = DiagnosticSeverity.Error,
                 message = messages.joinToString(" ").ifBlank { "TinyCC could not validate generated C source." },
-                nodeId = location?.nodeId,
-                textSection = location?.textSection,
-                line = location?.sourceLine,
                 sourcePluginId = "tinycc",
             ),
             generatedPath = file.path,
-            generatedLine = location?.generatedLine,
+            generatedLine = null,
             generatedColumn = null,
         )
     }

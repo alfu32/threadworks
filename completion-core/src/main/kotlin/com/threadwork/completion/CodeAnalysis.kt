@@ -65,6 +65,7 @@ data class CodeAnalysisContext(
     val document: ThreadworkDocument,
     val request: CompletionRequest,
     val compiler: CompilerCodeIntelligence,
+    val sourceProvider: () -> List<com.threadwork.compiler.api.CompilerAnalysisSource> = { emptyList() },
 )
 
 fun interface CodeAnalysisProvider {
@@ -117,7 +118,8 @@ class ModelAwareCompletionService(
     override fun analysis(request: CompletionRequest): CodeAnalysis {
         val document = documentProvider()
         val node = document.nodes[request.nodeId] ?: return object : CodeAnalysis {}
-        val compilerIntelligence = compilerProvider(document, node)?.codeIntelligence(document, node) ?: CompilerCodeIntelligence()
+        val plugin = compilerProvider(document, node)
+        val compilerIntelligence = plugin?.codeIntelligence(document, node) ?: CompilerCodeIntelligence()
         val external = externalIndexCatalog.intelligence(request.languageId, request.technologyId)
         val context = CodeAnalysisContext(
             document,
@@ -126,6 +128,7 @@ class ModelAwareCompletionService(
                 symbols = (compilerIntelligence.symbols + external.symbols).distinctBy { it.name to it.kind },
                 types = (compilerIntelligence.types + external.types).distinctBy { it.name },
             ),
+            sourceProvider = { plugin?.analysisSources(document, node).orEmpty() },
         )
         val advanced = if (node.stereotype(document) == NodeStereotype.CompilerTemplate) emptyList() else analysisProviders.map { it.analyze(context) }
         return CompositeCodeAnalysis(advanced + compilerAnalysis.analyze(context) + fallback.analyze(context))
@@ -158,7 +161,7 @@ class ModelAwareCompletionService(
         val primary = (analysis.completions() as? AnalysisResult.Available)?.value.orEmpty()
         // Model/compiler names remain additive; source-local names come from the selected analyzer.
         val modeled = legacy.getSuggestions(request).filter { it.kind != CompletionSuggestionKind.UserSymbol }
-        return (modeled + primary).distinctBy { it.insertText }
+        return (primary + modeled).distinctBy { it.insertText }
     }
 }
 

@@ -135,17 +135,7 @@
             ],
             "link": null,
             "typeDefinition": null,
-            "diagnostics": [
-                {
-                    "severity": "Error",
-                    "message": "field name expected",
-                    "nodeId": "node_904556ea-a897-47f9-a733-8e0e005e062f",
-                    "textSection": null,
-                    "line": null,
-                    "column": null,
-                    "sourcePluginId": "tinycc"
-                }
-            ],
+            "diagnostics": [],
             "metadata": {},
             "pluginData": {},
             "nameDetail": ""
@@ -177,7 +167,7 @@
             "text": {
                 "initialization": "",
                 "initializationLanguageId": "",
-                "source": "\nprintf(\"timestamp.read:%lld\\n\", (long long)(bstate.id));\n\n// pattern set the speed of the show\nusleep(100000);\n\n// pattern shutdown when shutdown requested through signal\nint signal;\nthreadwork_runner__get_shutdown_signal(&threadwork_runner,&signal);\nint is_running;\nthreadwork_runner__is_running(&threadwork_runner,&is_running);\nif(signal == 2 || !is_running){\n    return THREADWORK_OK;\n}\nprintf(\"signal:%d,is_running:%d\\n\", signal,is_running);\n\n// pattern request/signal shutdown when internal condition has been reached\nif(bstate.id > 1){\n    threadwork_runner__shutdown_request(&threadwork_runner);\n    return THREADWORK_OK;\n}\nblpi__setbstate(bstate.id+1,bstate.timestamp);\n// main operation\n\nprintf(\"timestamp.sent:%lld\\n\", (long long)(bstate.id));\n\npush(clock, &bstate);\n\nbean bb;\n\nbb.",
+                "source": "\nprintf(\"timestamp.read:%lld\\n\", (long long)(bstate.id));\n\n// pattern set the speed of the show\nusleep(100000);\n\n// pattern shutdown when shutdown requested through signal\nint signal;\nthreadwork_runner__get_shutdown_signal(&threadwork_runner,&signal);\nint is_running;\nthreadwork_runner__is_running(&threadwork_runner,&is_running);\nif(signal == 2 || !is_running){\n    return THREADWORK_OK;\n}\nprintf(\"signal:%d,is_running:%d\\n\", signal,is_running);\n\n// pattern request/signal shutdown when internal condition has been reached\nif(bstate.id > 1){\n    threadwork_runner__shutdown_request(&threadwork_runner);\n    return THREADWORK_OK;\n}\nblpi__setbstate(bstate.id+1,bstate.timestamp);\n// main operation\n\nprintf(\"timestamp.sent:%lld\\n\", (long long)(bstate.id));\n\npush(clock, &bstate);\n\nbean bb;\n\nbb.id=6;",
                 "sourceLanguageId": "",
                 "specification": "",
                 "specificationLanguageId": "markdown",
@@ -200,7 +190,7 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-07T17:32:40.045766532Z",
+                "date": "2026-09-07T22:36:20.887536472Z",
                 "user": "devlin"
             },
             "ports": [
@@ -221,17 +211,7 @@
             ],
             "link": null,
             "typeDefinition": null,
-            "diagnostics": [
-                {
-                    "severity": "Error",
-                    "message": "field name expected",
-                    "nodeId": "node_0feec713-8eaa-4bd5-8ea0-b02515bf358a",
-                    "textSection": null,
-                    "line": null,
-                    "column": null,
-                    "sourcePluginId": "tinycc"
-                }
-            ],
+            "diagnostics": [],
             "metadata": {},
             "pluginData": {},
             "nameDetail": ""
@@ -513,17 +493,7 @@
             ],
             "link": null,
             "typeDefinition": null,
-            "diagnostics": [
-                {
-                    "severity": "Error",
-                    "message": "field name expected",
-                    "nodeId": "node_e9ea318e-27c5-45a4-8bf4-65ced6c66dcd",
-                    "textSection": null,
-                    "line": null,
-                    "column": null,
-                    "sourcePluginId": "tinycc"
-                }
-            ],
+            "diagnostics": [],
             "metadata": {},
             "pluginData": {},
             "nameDetail": ""

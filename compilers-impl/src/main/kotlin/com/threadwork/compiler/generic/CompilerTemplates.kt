@@ -17,6 +17,7 @@ import com.threadwork.compiler.api.ANY_LANGUAGE_ID
 import com.threadwork.compiler.api.CompilerTechnology
 import com.threadwork.compiler.api.CompilerCodeSymbol
 import com.threadwork.compiler.api.CompilerCodeSymbolKind
+import com.threadwork.compiler.api.CompilerAnalysisSource
 import com.threadwork.compiler.api.compilerArgumentName
 import com.threadwork.core.classification.LinkClassifier
 import com.threadwork.core.classification.LinkStereotype
@@ -28,6 +29,7 @@ import com.threadwork.core.model.NodeKind
 import com.threadwork.core.model.NodeTextSection
 import com.threadwork.core.model.TechnologyMetadata
 import com.threadwork.core.model.effectiveLanguageId
+import com.threadwork.core.model.effectiveLayoutStrategyId
 import com.threadwork.core.model.effectiveTechnologyId
 import com.threadwork.core.model.getElementById
 import com.threadwork.core.model.projectName
@@ -267,6 +269,41 @@ abstract class TemplateSetCompiler : StructuredCompiler() {
 
     override fun getStaticFiles(document: ThreadworkDocument, options: CompilerOptions): List<String> =
         templatesFor(document, options).staticFileNames.toList()
+
+    override fun analysisSources(document: ThreadworkDocument, node: Node): List<CompilerAnalysisSource> {
+        val root = generateSequence(node) { current ->
+            current.parentId?.let(document::getElementById)?.takeIf {
+                document.effectiveTechnologyId(it.id) == document.effectiveTechnologyId(node.id) &&
+                    document.effectiveLayoutStrategyId(it.id) == document.effectiveLayoutStrategyId(node.id)
+            }
+        }.last()
+        val options = CompilerOptions(scopeNodeIds = setOf(root.id))
+        val templates = templatesFor(document, options)
+        val context = NodeCompilerContext(
+            compiler = this,
+            document = document,
+            node = root,
+            options = options,
+            projectName = document.projectName(),
+            layoutStrategy = templates.defaultLayoutStrategy,
+            extension = templates.fileExtension,
+            childArtifacts = emptyList(),
+            linkArtifacts = emptyList(),
+        )
+        val language = document.effectiveLanguageId(node.id)
+        val runtime = templates.template(CompilerTemplateRoles.RuntimeSupport)
+        if (runtime != null) {
+            return listOf(CompilerAnalysisSource(
+                "$id/runtime", language, render(runtime, context),
+            ))
+        }
+        return templates.projectFiles.filter { it.elementKind == GeneratedElementKind.Runtime }.mapIndexed { index, file ->
+            CompilerAnalysisSource(
+                "$id/runtime/$index", language,
+                renderer.render(file.contentTemplate, projectTemplateContext(document, options, context.projectName)),
+            )
+        }
+    }
 
     override fun generatedEntitySymbols(document: ThreadworkDocument, node: Node): List<CompilerCodeSymbol> {
         if (node.isLink || node.stereotype(document) == NodeStereotype.ServiceLibrary) return emptyList()

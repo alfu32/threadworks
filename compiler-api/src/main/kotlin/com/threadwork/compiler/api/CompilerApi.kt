@@ -68,6 +68,9 @@ interface CompilerPlugin : FsStorage {
     fun codeIntelligence(document: ThreadworkDocument, node: Node): CompilerCodeIntelligence =
         defaultCodeIntelligence(document, node)
 
+    /** Generated support sources visible to this node, without compiling user code. */
+    fun analysisSources(document: ThreadworkDocument, node: Node): List<CompilerAnalysisSource> = emptyList()
+
     /**
      * Callable or otherwise directly addressable names emitted for [node].
      * Composite editors use these names to refer to their direct children

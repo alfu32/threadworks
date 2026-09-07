@@ -8,8 +8,29 @@ import com.threadwork.core.model.NodeTextSection
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import kotlin.test.assertNull
 
 class TinyCcSourceValidatorTest {
+    @Test
+    fun `unmapped assembly failures are not suppressed or attributed to the first node`() {
+        val file = GeneratedFile(
+            path = "generated.c",
+            content = "int worker(void) { return 0; }\nint main(void) {\nwhile (missing_running) {\nworker();\n}\nreturn 0;\n}",
+            originNodeId = NodeId("worker"),
+            reason = "test",
+            sourceMap = GeneratedSourceMap(listOf(
+                GeneratedSourceMapEntry(1, NodeId("worker"), NodeTextSection.Declaration, 1),
+            )),
+        )
+        val diagnostics = TinyCcSourceValidator.validateDetailed(file)
+        assertTrue(diagnostics.any { it.diagnostic.message.contains("missing_running") })
+        assertTrue(diagnostics.none { it.diagnostic.message.contains("declaration expected") })
+        diagnostics.forEach {
+            assertNull(it.diagnostic.nodeId)
+            assertNull(it.diagnostic.line)
+        }
+    }
+
     @Test
     fun `TinyCC diagnostics map generated C lines to editable node source`() {
         val file = GeneratedFile(

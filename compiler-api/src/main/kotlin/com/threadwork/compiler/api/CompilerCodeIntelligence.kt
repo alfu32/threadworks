@@ -65,6 +65,13 @@ data class CompilerTypeInformation(
     val fields: List<CompilerTypeFieldInfo> = emptyList(),
 )
 
+/** A generated source unit, not an editable node or an editor-coordinate source map. */
+data class CompilerAnalysisSource(
+    val id: String,
+    val languageId: String,
+    val content: String,
+)
+
 data class CompilerCodeIntelligence(
     val symbols: List<CompilerCodeSymbol> = emptyList(),
     val types: List<CompilerTypeInformation> = emptyList(),

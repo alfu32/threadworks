@@ -1,6 +1,7 @@
 package com.threadwork.completion
 
 import com.threadwork.core.model.NodeTextSection
+import com.threadwork.core.model.NodeId
 import com.threadwork.core.model.effectiveTextLanguageId
 import com.threadwork.core.model.effectiveTechnologyId
 import com.threadwork.core.model.effectiveLayoutStrategyId
@@ -133,7 +134,14 @@ class TreeSitterAnalysisProvider : CodeAnalysisProvider {
                 )
             }
             .toList()
-        return ParsedCodeAnalysis(context, active, companions, if (prose) source.length else request.cursorOffset)
+        // Runtime units have no editor coordinates. Keep them separate from node sources.
+        val runtime = context.sourceProvider().filter { analysisLanguage(it.languageId) == language }.map { unit ->
+            SourceSymbols(
+                NodeId("compiler-source:${unit.id}"), unit.id, NodeTextSection.Declaration,
+                language, unit.content, syntax(language, unit.content),
+            )
+        }
+        return ParsedCodeAnalysis(context, active, companions, if (prose) source.length else request.cursorOffset, runtime)
     }
 
     private fun failed(reason: String) = object : CodeAnalysis {

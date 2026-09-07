@@ -12,6 +12,7 @@ internal data class SourceBinding(
     val initializer: String,
     val header: String,
     val ownerType: String? = null,
+    val documentation: String = "",
 ) {
     val callable: Boolean get() = kind == DeclarationSymbolKind.Function
     val isType: Boolean get() = kind in setOf(DeclarationSymbolKind.Class, DeclarationSymbolKind.Struct, DeclarationSymbolKind.Interface, DeclarationSymbolKind.TypeAlias, DeclarationSymbolKind.Enum)
@@ -29,6 +30,7 @@ internal class SourceSymbols(
     val identifiers = mutableListOf<SyntaxNode>()
     private val whole = CodeRange(0, source.length)
     val scopes = mutableListOf(CodeScope(CodeLocation(nodeId, section, whole), null))
+    private val comments = root.descendants().filter { it.kind.contains("comment") }.toList()
 
     init { visit(root, whole, null, null) }
 
@@ -56,8 +58,11 @@ internal class SourceSymbols(
         val value = text(name).trim()
         if (value.isEmpty() || bindings.any { it.location.range == name.range }) return
         val bodyStart = declaration.field("body")?.range?.start ?: declaration.range.end
+        val comment = comments.lastOrNull { it.range.end <= declaration.range.start }
+            ?.takeIf { source.substring(it.range.end, declaration.range.start).isBlank() }
         bindings += SourceBinding(value, kind, CodeLocation(nodeId, section, name.range), scope, typeName,
-            text(initializer), source.substring(declaration.range.start, bodyStart).trim().replace(Regex("\\s+"), " "), ownerType)
+            text(initializer), source.substring(declaration.range.start, bodyStart).trim().replace(Regex("\\s+"), " "), ownerType,
+            text(comment))
     }
 
     private fun visit(node: SyntaxNode, scope: CodeRange, ownerType: String?, parent: SyntaxNode?) {
@@ -100,6 +105,7 @@ internal class SourceSymbols(
             "declaration", "field_declaration", "type_definition" -> {
                 val typeNode = node.field("type")
                 val declarators = node.children.filter { it.first == "declarator" }.map { it.second }
+                if (node.kind == "type_definition") childOwner = text(identifier(declarators.firstOrNull())).ifBlank { ownerType }
                 if (language == "go" && node.kind == "field_declaration") {
                     node.children.filter { it.first == "name" }.forEach { (_, name) ->
                         add(name, node, scope, DeclarationSymbolKind.Variable, type(typeNode), ownerType = ownerType)
@@ -108,12 +114,17 @@ internal class SourceSymbols(
                 declarators.forEach { declarator ->
                     val name = identifier(declarator)
                     val function = declarator.descendants().any { it.kind == "function_declarator" }
-                    val typeName = type(typeNode) + if (declarator.descendants().any { it.kind == "pointer_declarator" }) "*" else ""
+                    val baseType = if (typeNode?.kind == "struct_specifier") {
+                        text(typeNode.field("name")).ifBlank { text(name) }
+                    } else type(typeNode)
+                    val typeName = baseType + if (declarator.descendants().any { it.kind == "pointer_declarator" }) "*" else ""
                     add(name, node, scope,
                         if (node.kind == "type_definition") DeclarationSymbolKind.TypeAlias else if (function) DeclarationSymbolKind.Function else DeclarationSymbolKind.Variable,
                         typeName, declarator.field("value"), ownerType)
                 }
             }
+            "enumerator" -> add(node.field("name"), node, scope, DeclarationSymbolKind.Constant, "int", node.field("value"))
+            "preproc_def", "preproc_function_def" -> add(node.field("name"), node, scope, DeclarationSymbolKind.Constant)
             "variable_declarator" -> {
                 add(identifier(node.field("name")), node, scope, DeclarationSymbolKind.Variable,
                     type(parent?.field("type")), node.field("value"), ownerType)
@@ -124,7 +135,8 @@ internal class SourceSymbols(
                 val name = identifier(node.field("name") ?: node.field("declarator"))
                     ?: node.nodes().firstOrNull { it.kind in identifierKinds }
                 val typeNode = node.field("type") ?: node.nodes().firstOrNull { it.kind in setOf("user_type", "nullable_type") }
-                add(name, node, scope, DeclarationSymbolKind.Variable, type(typeNode), node.field("value"), ownerType)
+                val pointer = node.field("declarator")?.descendants()?.any { it.kind == "pointer_declarator" } == true
+                add(name, node, scope, DeclarationSymbolKind.Variable, type(typeNode) + if (pointer) "*" else "", node.field("value"), ownerType)
             }
             "property_declaration" -> {
                 // Kotlin declares name/type inside variable_declaration; PHP uses property_element.

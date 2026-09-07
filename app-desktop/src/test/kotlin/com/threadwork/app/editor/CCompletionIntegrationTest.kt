@@ -1,7 +1,13 @@
 package com.threadwork.app.editor
 
 import com.threadwork.compiler.c.CCompiler
+import com.threadwork.compiler.php.PhpCompiler
+import com.threadwork.compiler.quickjs.QuickJsCompiler
+import com.threadwork.compiler.naivekotlin.NaiveKotlinCompiler
 import com.threadwork.completion.CompletionRequest
+import com.threadwork.completion.AnalysisResult
+import com.threadwork.completion.CodeHoverInfo
+import com.threadwork.completion.CodeLocation
 import com.threadwork.completion.ModelAwareCompletionService
 import com.threadwork.core.model.NodeKind
 import com.threadwork.core.model.NodeTextSection
@@ -13,8 +19,87 @@ import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import kotlin.test.assertIs
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 class CCompletionIntegrationTest {
+    @Test
+    fun `shared runtime indexing preserves object oriented runner completions`() {
+        val compilers = listOf(PhpCompiler(), QuickJsCompiler(), NaiveKotlinCompiler())
+        for (compiler in compilers) {
+            val technology = compiler.providedTechnologies.first()
+            val repository = InMemoryDocumentRepository(newDocument("runtime-intelligence"))
+            val root = repository.getDocument().rootNodeId
+            repository.updateNodeTechnology(root, TechnologyMetadata(
+                languageId = technology.languageId, technologyId = technology.technologyId, compilerId = compiler.id,
+            ))
+            val worker = repository.createNode(root, "worker", NodeKind.Processor)
+            val service = ModelAwareCompletionService(repository::getDocument, { _, _ -> compiler })
+            val source = if (compiler is PhpCompiler) "threadwork_runner()->" else "threadworkRunner."
+            val request = CompletionRequest(worker.id, NodeTextSection.Declaration, technology.languageId,
+                technology.technologyId, source.length, source, source, "")
+            val labels = service.getSuggestions(request).map { it.label }
+            assertTrue("shutdownRequest" in labels, "${compiler.id}: $labels")
+            assertTrue("getShutdownSignal" in labels, "${compiler.id}: $labels")
+            assertTrue("isRunning" in labels, "${compiler.id}: $labels")
+        }
+    }
+
+    @Test
+    fun `runtime source supplies completions fields and signatures without editor locations`() {
+        val repository = InMemoryDocumentRepository(newDocument("runtime-intelligence"))
+        val root = repository.getDocument().rootNodeId
+        repository.updateNodeTechnology(root, TechnologyMetadata(languageId = "c", technologyId = "c-native", compilerId = "c-compiler"))
+        val worker = repository.createNode(root, "worker", NodeKind.Processor)
+        val compiler = CCompiler()
+        val service = ModelAwareCompletionService(repository::getDocument, { _, _ -> compiler })
+        fun request(source: String, prefix: String = "") = CompletionRequest(
+            worker.id, NodeTextSection.Declaration, "c", "c-native", source.length, source, source.substringAfterLast('\n'), prefix,
+        )
+
+        val suggestions = service.getSuggestions(request("threadwork_", "threadwork_"))
+        for (name in listOf("threadwork_runner", "threadwork_context", "threadwork_runner_t", "threadwork_runner__init",
+            "threadwork_runner__destroy", "threadwork_runner__install_shutdown_signal_handlers", "threadwork_runner__record_transit",
+            "threadwork_runner__begin_shutdown_drain", "threadwork_runner__has_recent_transit", "threadwork_buffer_push")) {
+            assertTrue(suggestions.any { it.label == name }, "Missing $name: ${suggestions.map { it.label }}")
+        }
+        assertTrue(service.getSuggestions(request("THREADWORK_", "THREADWORK_")).any { it.label == "THREADWORK_OK" })
+        for (source in listOf("threadwork_runner.", "threadwork_runner_t *runner;\nrunner->")) {
+            val fields = service.getSuggestions(request(source)).map { it.label }
+            assertTrue("running" in fields, fields.toString())
+            assertTrue("shutdown_signal" in fields, fields.toString())
+            assertTrue("transit" in fields, fields.toString())
+        }
+        val source = "threadwork_runner__get_shutdown_signal(&threadwork_runner, &signal);"
+        val analysis = service.analysis(request(source))
+        val hover = assertIs<AnalysisResult.Available<CodeHoverInfo?>>(analysis.hover(5)).value
+        assertNotNull(hover)
+        assertTrue(hover.title.contains("threadwork_error_t threadwork_runner__get_shutdown_signal("), hover.title)
+        assertTrue(hover.title.contains("threadwork_runner_t *this"), hover.title)
+        assertTrue(hover.body.contains("@brief"), hover.body)
+        assertNull(assertIs<AnalysisResult.Available<CodeLocation?>>(analysis.definition(5)).value)
+        assertFalse(suggestions.any { it.label == "recent_transit" || it.label == "this" })
+    }
+
+    @Test
+    fun `runtime override edits invalidate runtime completion index`() {
+        val repository = InMemoryDocumentRepository(newDocument("runtime-override"))
+        val root = repository.getDocument().rootNodeId
+        repository.updateNodeTechnology(root, TechnologyMetadata(languageId = "c", technologyId = "c-native", compilerId = "c-compiler"))
+        val worker = repository.createNode(root, "worker", NodeKind.Processor)
+        val override = repository.createNode(root, "@RuntimeSupport", NodeKind.Processor)
+        val service = ModelAwareCompletionService(repository::getDocument, { _, _ -> CCompiler() })
+        fun labels(): List<String> = service.getSuggestions(CompletionRequest(
+            worker.id, NodeTextSection.Declaration, "c", "c-native", 10, "threadwork_", "threadwork_", "threadwork_",
+        )).map { it.label }
+        repository.updateNodeText(override.id, override.text.copy(declaration = "int threadwork_custom_one(void) { return 1; }"))
+        assertTrue("threadwork_custom_one" in labels())
+        repository.updateNodeText(override.id, override.text.copy(declaration = "int threadwork_custom_two(void) { return 2; }"))
+        assertTrue("threadwork_custom_two" in labels())
+        assertFalse("threadwork_custom_one" in labels())
+    }
+
     @Test
     fun `composite completion exposes direct child C lifecycle functions`() {
         val repository = InMemoryDocumentRepository(newDocument("ticker"))
