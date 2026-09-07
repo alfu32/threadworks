@@ -73,6 +73,7 @@ import com.threadwork.core.model.linksUsingType
 import com.threadwork.core.model.projectName
 import com.threadwork.core.model.rootNode
 import com.threadwork.core.model.typeDisplayName
+import com.threadwork.core.model.linksUsingType
 import com.threadwork.core.model.typeNodes
 import com.threadwork.storage.DocumentRepository
 import com.threadwork.storage.InMemoryDocumentRepository
@@ -3351,10 +3352,22 @@ class GraphCanvas(
     private fun requiredTypeHeight(node: Node): Double {
         if (!node.isType) return 0.0
         val fields = typeFieldLabels(node)
-        if (fields.isEmpty()) return TERMINAL_NODE_BASE_HEIGHT.toDouble()
-        val firstBaseline = TERMINAL_TYPE_FIELD_BASELINE +
-            if (technologyLabel(node) == null) 0 else TERMINAL_TEXT_LINE_HEIGHT
-        return (firstBaseline + (fields.size - 1) * TERMINAL_TEXT_LINE_HEIGHT + TERMINAL_BOTTOM_PADDING).toDouble()
+        val fieldHeight = if (fields.isEmpty()) {
+            TERMINAL_NODE_BASE_HEIGHT.toDouble()
+        } else {
+            val firstBaseline = TERMINAL_TYPE_FIELD_BASELINE +
+                if (technologyLabel(node) == null) 0 else TERMINAL_TEXT_LINE_HEIGHT
+            (firstBaseline + (fields.size - 1) * TERMINAL_TEXT_LINE_HEIGHT + TERMINAL_BOTTOM_PADDING).toDouble()
+        }
+        val usageCount = repository.getDocument().linksUsingType(node.id).count(::isVisibleLink)
+        val usageHeight = if (usageCount == 0) {
+            0.0
+        } else {
+            // Type-usage annotations are drawn in 32px rows, starting 10px
+            // below the box top and occupying a 24px label.
+            (10 + 24 + (usageCount - 1) * 32 + 10).toDouble()
+        }
+        return max(fieldHeight, usageHeight)
     }
 
     private fun typeFieldLabels(node: Node): List<String> =

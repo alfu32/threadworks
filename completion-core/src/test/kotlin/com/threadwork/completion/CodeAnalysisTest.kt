@@ -43,6 +43,38 @@ class CodeAnalysisTest {
         }
     }
 
+    @Test
+    fun `same-scope library globals are available to dependent source`() {
+        val repository = InMemoryDocumentRepository(newDocument("library-globals"))
+        val root = repository.getDocument().rootNodeId
+        repository.updateNodeTechnology(root, TechnologyMetadata(languageId = "c", technologyId = "native-c"))
+        val library = repository.createNode(root, "bean_lib", NodeKind.Processor)
+        val worker = repository.createNode(root, "worker", NodeKind.Processor)
+        repository.updateNodeText(library.id, repository.requireNode(library.id).text.copy(
+            declaration = "bean bstate = (bean){0, 0};\nint set_bstate(long long id) { bstate.id = id; }",
+        ))
+        val source = "bstate.<caret>"
+        val cursor = source.indexOf("<caret>")
+        val code = source.replace("<caret>", "")
+        repository.updateNodeText(worker.id, repository.requireNode(worker.id).text.copy(declaration = code))
+        val request = CompletionRequest(worker.id, NodeTextSection.Declaration, "c", "native-c", cursor, code, "", "")
+
+        val analysis = parser.analyze(CodeAnalysisContext(
+            repository.getDocument(),
+            request,
+            CompilerCodeIntelligence(types = listOf(
+                CompilerTypeInformation("bean", "c", "", fields = listOf(
+                    CompilerTypeFieldInfo("id", "number", false),
+                    CompilerTypeFieldInfo("timestamp", "number", false),
+                )),
+            )),
+        ))
+        val type = assertIs<AnalysisResult.Available<CodeType>>(analysis.typeOf("bstate", cursor)).value
+        assertEquals("bean", assertIs<CodeType.Named>(type).name)
+        val members = assertIs<AnalysisResult.Available<List<CodeMember>>>(analysis.members("bstate", cursor)).value
+        assertEquals(listOf("id", "timestamp"), members.map { it.name })
+    }
+
     private fun context(language: String, code: String, compiler: CompilerCodeIntelligence = CompilerCodeIntelligence()): CodeAnalysisContext {
         val repository = InMemoryDocumentRepository(newDocument("analysis"))
         val root = repository.getDocument().rootNodeId

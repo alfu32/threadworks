@@ -4,6 +4,8 @@ import com.threadwork.core.model.NodeTextSection
 import com.threadwork.core.model.effectiveTextLanguageId
 import com.threadwork.core.model.effectiveTechnologyId
 import com.threadwork.core.model.effectiveLayoutStrategyId
+import com.threadwork.core.classification.NodeStereotype
+import com.threadwork.core.classification.stereotype
 import org.treesitter.TSInputEncoding
 import org.treesitter.TSLanguage
 import org.treesitter.TSNode
@@ -115,8 +117,9 @@ class TreeSitterAnalysisProvider : CodeAnalysisProvider {
                     !candidate.isLink &&
                     candidate.text.declaration.isNotBlank() &&
                     analysisLanguage(document.effectiveTextLanguageId(candidate.id, NodeTextSection.Declaration)) == language &&
-                    document.effectiveTechnologyId(candidate.id) == document.effectiveTechnologyId(node.id) &&
-                    document.effectiveLayoutStrategyId(candidate.id) == document.effectiveLayoutStrategyId(node.id)
+                    (candidate.stereotype(document) == NodeStereotype.ServiceLibrary ||
+                        (document.effectiveTechnologyId(candidate.id) == document.effectiveTechnologyId(node.id) &&
+                            document.effectiveLayoutStrategyId(candidate.id) == document.effectiveLayoutStrategyId(node.id)))
             }
             .map { candidate ->
                 SourceSymbols(
