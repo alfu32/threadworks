@@ -11,8 +11,8 @@ import javax.swing.BoxLayout
 import javax.swing.JButton
 import javax.swing.JComponent
 import javax.swing.JLabel
+import javax.swing.JLayeredPane
 import javax.swing.JPanel
-import javax.swing.JPopupMenu
 import javax.swing.JScrollPane
 import javax.swing.JTextArea
 import javax.swing.JToggleButton
@@ -36,10 +36,7 @@ data class DesktopNotification(
     val details: String = "",
 )
 
-/**
- * Keeps application notifications until explicitly dismissed while presenting
- * them as a small floating queue anchored to the status bar.
- */
+/** Keeps notifications until dismissed while drawing the queue over the app's layout. */
 class DesktopNotificationQueue {
     private val notifications = mutableListOf<DesktopNotification>()
     private val cards = JPanel().apply {
@@ -50,68 +47,89 @@ class DesktopNotificationQueue {
     private val scrollPane = JScrollPane(cards).apply {
         border = BorderFactory.createEmptyBorder()
         isOpaque = false
+        background = Color(0, 0, 0, 0)
         viewport.isOpaque = false
+        viewport.background = Color(0, 0, 0, 0)
         horizontalScrollBarPolicy = JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED
         verticalScrollBarPolicy = JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED
     }
-    private val popup = JPopupMenu().apply {
-        layout = BorderLayout()
+    private val overlay = JPanel(BorderLayout()).apply {
         isOpaque = false
+        background = Color(0, 0, 0, 0)
         border = BorderFactory.createEmptyBorder()
         add(scrollPane, BorderLayout.CENTER)
     }
+    private var host: JLayeredPane? = null
+    private var statusBar: JComponent? = null
     private val autoHideTimer = Timer(AUTO_HIDE_DELAY_MS) {
-        popup.isVisible = false
+        overlay.isVisible = false
     }.apply {
         isRepeats = false
     }
 
-    fun publish(notification: DesktopNotification, anchor: JComponent) {
+    fun install(host: JLayeredPane, statusBar: JComponent) {
+        this.host = host
+        this.statusBar = statusBar
+        overlay.isVisible = false
+        host.add(overlay, JLayeredPane.POPUP_LAYER)
+    }
+
+    fun publish(notification: DesktopNotification) {
         notifications += notification
-        show(anchor, autoHide = true)
+        show(autoHide = true)
     }
 
-    fun toggle(anchor: JComponent) {
-        if (popup.isVisible) {
+    fun toggle() {
+        if (overlay.isVisible) {
             autoHideTimer.stop()
-            popup.isVisible = false
+            overlay.isVisible = false
         } else {
-            show(anchor, autoHide = false)
+            show(autoHide = false)
         }
     }
 
-    private fun show(anchor: JComponent, autoHide: Boolean) {
+    fun reposition() {
+        val currentHost = host ?: return
+        if (!overlay.isVisible) return
+        val preferred = overlay.preferredSize
+        overlay.setBounds(
+            (currentHost.width - preferred.width - OVERLAY_MARGIN).coerceAtLeast(0),
+            (currentHost.height - (statusBar?.height ?: 0) - preferred.height - OVERLAY_MARGIN).coerceAtLeast(0),
+            preferred.width,
+            preferred.height,
+        )
+        currentHost.repaint()
+    }
+
+    private fun show(autoHide: Boolean) {
         if (notifications.isEmpty()) return
-        rebuild(anchor)
-        popup.pack()
-        popup.show(anchor, anchor.width - popup.preferredSize.width, -popup.preferredSize.height - 4)
-        if (autoHide) {
-            autoHideTimer.restart()
-        } else {
-            autoHideTimer.stop()
-        }
+        rebuild()
+        overlay.isVisible = true
+        reposition()
+        if (autoHide) autoHideTimer.restart() else autoHideTimer.stop()
     }
 
-    private fun rebuild(anchor: JComponent) {
+    private fun rebuild() {
         cards.removeAll()
         notifications.forEachIndexed { index, notification ->
-            cards.add(notificationCard(notification, anchor))
+            cards.add(notificationCard(notification))
             if (index != notifications.lastIndex) cards.add(javax.swing.Box.createVerticalStrut(CARD_GAP))
         }
         cards.revalidate()
         cards.repaint()
-        updatePopupSize()
+        updateOverlaySize()
     }
 
-    private fun updatePopupSize() {
+    private fun updateOverlaySize() {
         val preferred = cards.preferredSize
         scrollPane.preferredSize = Dimension(
             preferred.width.coerceIn(MIN_WIDTH, MAX_WIDTH),
             preferred.height.coerceAtMost(MAX_HEIGHT),
         )
+        overlay.revalidate()
     }
 
-    private fun notificationCard(notification: DesktopNotification, anchor: JComponent): JComponent = JPanel(BorderLayout(8, 0)).apply {
+    private fun notificationCard(notification: DesktopNotification): JComponent = JPanel(BorderLayout(8, 0)).apply {
         background = UIManager.getColor("Panel.background") ?: Color.WHITE
         border = BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder((UIManager.getColor("Component.borderColor") ?: Color.GRAY).darker()),
@@ -152,23 +170,23 @@ class DesktopNotificationQueue {
                     details.isVisible = isSelected
                     text = if (isSelected) "hide" else "details"
                     content.revalidate()
-                    updatePopupSize()
-                    popup.pack()
+                    updateOverlaySize()
+                    reposition()
                 }
             }
             content.add(details, BorderLayout.CENTER)
             add(JPanel(FlowLayout(FlowLayout.RIGHT, 2, 0)).apply {
                 isOpaque = false
                 add(detailToggle)
-                add(dismissButton(notification, anchor))
+                add(dismissButton(notification))
             }, BorderLayout.EAST)
         } else {
-            add(dismissButton(notification, anchor), BorderLayout.EAST)
+            add(dismissButton(notification), BorderLayout.EAST)
         }
         add(content, BorderLayout.CENTER)
     }
 
-    private fun dismissButton(notification: DesktopNotification, anchor: JComponent): JButton = JButton("[x]").apply {
+    private fun dismissButton(notification: DesktopNotification): JButton = JButton("[x]").apply {
         toolTipText = "Dismiss notification"
         margin = java.awt.Insets(0, 4, 0, 4)
         font = ThreadworkFonts.designerFont(11f)
@@ -176,10 +194,10 @@ class DesktopNotificationQueue {
             notifications.remove(notification)
             if (notifications.isEmpty()) {
                 autoHideTimer.stop()
-                popup.isVisible = false
+                overlay.isVisible = false
             } else {
-                rebuild(anchor)
-                popup.pack()
+                rebuild()
+                reposition()
             }
         }
     }
@@ -190,5 +208,6 @@ class DesktopNotificationQueue {
         const val MIN_WIDTH = 320
         const val MAX_WIDTH = 560
         const val MAX_HEIGHT = 360
+        const val OVERLAY_MARGIN = 10
     }
 }

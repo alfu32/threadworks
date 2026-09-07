@@ -110,6 +110,8 @@ import java.awt.datatransfer.StringSelection
 import java.awt.datatransfer.Transferable
 import java.awt.event.FocusAdapter
 import java.awt.event.FocusEvent
+import java.awt.event.ComponentAdapter
+import java.awt.event.ComponentEvent
 import java.awt.event.InputEvent
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
@@ -160,6 +162,7 @@ import javax.swing.DropMode
 import javax.swing.Icon
 import javax.swing.JFrame
 import javax.swing.JLabel
+import javax.swing.JLayeredPane
 import javax.swing.JComboBox
 import javax.swing.JList
 import javax.swing.JMenu
@@ -368,7 +371,7 @@ class ThreadworkDesktopApp(
     private val notificationToggle = JButton("?").apply {
         toolTipText = "Show notifications"
         margin = java.awt.Insets(0, 6, 0, 6)
-        addActionListener { notifications.toggle(this) }
+        addActionListener { notifications.toggle() }
     }
     private val statusRight = JPanel(FlowLayout(FlowLayout.RIGHT, 6, 2)).apply {
         add(nativeDiagnosticStatus)
@@ -534,10 +537,21 @@ class ThreadworkDesktopApp(
                 addTab(tab.title, tab.createPanel())
             }
         }
-        return JPanel(BorderLayout()).apply {
+        val content = JPanel(BorderLayout()).apply {
             add(toolbar, BorderLayout.NORTH)
             add(projectPanels, BorderLayout.CENTER)
             add(statusBar, BorderLayout.SOUTH)
+        }
+        return JLayeredPane().apply {
+            layout = null
+            add(content, JLayeredPane.DEFAULT_LAYER)
+            notifications.install(this, statusBar)
+            addComponentListener(object : ComponentAdapter() {
+                override fun componentResized(event: ComponentEvent) {
+                    content.setBounds(0, 0, width, height)
+                    notifications.reposition()
+                }
+            })
         }
     }
 
@@ -1642,7 +1656,6 @@ class ThreadworkDesktopApp(
                         .sorted()
                         .joinToString("\n") { " - $it" },
                 ),
-                notificationToggle,
             )
         }.onFailure {
             JOptionPane.showMessageDialog(frame, it.message ?: "Compilation failed.", "Compile", JOptionPane.ERROR_MESSAGE)
