@@ -15,6 +15,7 @@ import com.threadwork.app.ai.AiSupportTask
 import com.threadwork.Version
 import com.threadwork.compiler.api.CompilerOptions
 import com.threadwork.compiler.api.writeSourceMapBeside
+import com.threadwork.compiler.api.sourceMapVirtualFile
 import com.threadwork.compiler.api.CompilerPlugin
 import com.threadwork.compiler.api.CompilerCodeSymbolKind
 import com.threadwork.compiler.api.GeneratedFile
@@ -331,6 +332,7 @@ class ThreadworkDesktopApp(
     private val nativeValidationTimer = Timer(700) { runEmbeddedValidation() }.apply {
         isRepeats = false
     }
+    private val notifications = DesktopNotificationQueue()
     private val status = JLabel("Status and Messages").apply {
         border = BorderFactory.createEmptyBorder(3, 8, 3, 8)
     }
@@ -363,10 +365,16 @@ class ThreadworkDesktopApp(
         minimumSize = preferredSize
         maximumSize = preferredSize
     }
+    private val notificationToggle = JButton("?").apply {
+        toolTipText = "Show notifications"
+        margin = java.awt.Insets(0, 6, 0, 6)
+        addActionListener { notifications.toggle(this) }
+    }
     private val statusRight = JPanel(FlowLayout(FlowLayout.RIGHT, 6, 2)).apply {
         add(nativeDiagnosticStatus)
         add(tileProgress)
         add(resourceStatus)
+        add(notificationToggle)
     }
     private val statusBar = JPanel(BorderLayout()).apply {
         add(status, BorderLayout.CENTER)
@@ -1626,19 +1634,44 @@ class ThreadworkDesktopApp(
         }.onSuccess {
             val scope = if (scopedSelection.isEmpty()) "project" else "${scopedSelection.size} selected entities"
             status.text = "Compiled $scope with ${compiler.displayName} to ${output.toAbsolutePath()}"
-            JOptionPane.showMessageDialog(
-                frame,
-                if (singleFile) {
-                    "Generated ${output.toAbsolutePath()}"
-                } else {
-                    "Generated ${generatedProject.files.size} files in ${output.toAbsolutePath()}"
-                },
-                "Compile",
-                JOptionPane.INFORMATION_MESSAGE,
+            notifications.publish(
+                DesktopNotification(
+                    type = DesktopNotificationType.Success,
+                    title = "generated ${generatedNotificationNodeName(document, scopedSelection)}",
+                    details = generatedOutputPaths(generatedProject, output, singleFile)
+                        .sorted()
+                        .joinToString("\n") { " - $it" },
+                ),
+                notificationToggle,
             )
         }.onFailure {
             JOptionPane.showMessageDialog(frame, it.message ?: "Compilation failed.", "Compile", JOptionPane.ERROR_MESSAGE)
             status.text = "Compilation failed: ${it.message}"
+        }
+    }
+
+    private fun generatedNotificationNodeName(document: ThreadworkDocument, scopedSelection: Set<NodeId>): String =
+        scopedSelection.singleOrNull()
+            ?.let(document.nodes::get)
+            ?.name
+            ?.takeIf(String::isNotBlank)
+            ?: document.projectName()
+
+    private fun generatedOutputPaths(
+        generatedProject: com.threadwork.compiler.api.GeneratedProject,
+        output: Path,
+        singleFile: Boolean,
+    ): List<String> = if (singleFile) {
+        buildList {
+            add(output.fileName.toString())
+            generatedProject.files.single().sourceMapVirtualFile()?.let { add("${output.fileName}.map.json") }
+        }
+    } else {
+        generatedProject.files.flatMap { file ->
+            buildList {
+                add(file.path)
+                file.sourceMapVirtualFile()?.let { add(it.path) }
+            }
         }
     }
 
