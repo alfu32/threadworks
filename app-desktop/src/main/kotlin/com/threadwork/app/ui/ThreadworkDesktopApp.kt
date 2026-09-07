@@ -160,7 +160,6 @@ import javax.swing.DropMode
 import javax.swing.Icon
 import javax.swing.JFrame
 import javax.swing.JLabel
-import javax.swing.JLayeredPane
 import javax.swing.JComboBox
 import javax.swing.JList
 import javax.swing.JMenu
@@ -369,7 +368,7 @@ class ThreadworkDesktopApp(
     private val notificationToggle = JButton("?").apply {
         toolTipText = "Show notifications"
         margin = java.awt.Insets(0, 6, 0, 6)
-        addActionListener { notifications.toggle() }
+        addActionListener { notifications.toggle(this) }
     }
     private val statusRight = JPanel(FlowLayout(FlowLayout.RIGHT, 6, 2)).apply {
         add(nativeDiagnosticStatus)
@@ -540,16 +539,7 @@ class ThreadworkDesktopApp(
             add(projectPanels, BorderLayout.CENTER)
             add(statusBar, BorderLayout.SOUTH)
         }
-        return object : JLayeredPane() {
-            override fun doLayout() {
-                content.setBounds(0, 0, width, height)
-                notifications.reposition()
-            }
-        }.apply {
-            layout = null
-            add(content, JLayeredPane.DEFAULT_LAYER)
-            notifications.install(this, statusBar)
-        }
+        return content
     }
 
     private fun menuBar() = JMenuBar().apply {
@@ -1653,6 +1643,7 @@ class ThreadworkDesktopApp(
                         .sorted()
                         .joinToString("\n") { " - $it" },
                 ),
+                notificationToggle,
             )
         }.onFailure {
             JOptionPane.showMessageDialog(frame, it.message ?: "Compilation failed.", "Compile", JOptionPane.ERROR_MESSAGE)

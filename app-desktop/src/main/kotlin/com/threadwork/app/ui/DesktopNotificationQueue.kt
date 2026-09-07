@@ -6,17 +6,19 @@ import java.awt.Color
 import java.awt.Dimension
 import java.awt.FlowLayout
 import java.awt.Font
+import java.awt.Window
 import javax.swing.BorderFactory
 import javax.swing.BoxLayout
 import javax.swing.JButton
 import javax.swing.JComponent
 import javax.swing.JLabel
-import javax.swing.JLayeredPane
 import javax.swing.JPanel
 import javax.swing.JScrollPane
 import javax.swing.JTextArea
 import javax.swing.JToggleButton
+import javax.swing.JWindow
 import javax.swing.SwingConstants
+import javax.swing.SwingUtilities
 import javax.swing.Timer
 import javax.swing.UIManager
 
@@ -36,7 +38,7 @@ data class DesktopNotification(
     val details: String = "",
 )
 
-/** Keeps notifications until dismissed while drawing the queue over the app's layout. */
+/** Keeps notifications until dismissed in an owner-bound transparent native window. */
 class DesktopNotificationQueue {
     private val notifications = mutableListOf<DesktopNotification>()
     private val cards = JPanel().apply {
@@ -47,66 +49,76 @@ class DesktopNotificationQueue {
     private val scrollPane = JScrollPane(cards).apply {
         border = BorderFactory.createEmptyBorder()
         isOpaque = false
-        background = Color(0, 0, 0, 0)
+        background = TRANSPARENT
         viewport.isOpaque = false
-        viewport.background = Color(0, 0, 0, 0)
+        viewport.background = TRANSPARENT
         horizontalScrollBarPolicy = JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED
         verticalScrollBarPolicy = JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED
     }
     private val overlay = JPanel(BorderLayout()).apply {
         isOpaque = false
-        background = Color(0, 0, 0, 0)
+        background = TRANSPARENT
         border = BorderFactory.createEmptyBorder()
         add(scrollPane, BorderLayout.CENTER)
     }
-    private var host: JLayeredPane? = null
-    private var statusBar: JComponent? = null
+    private var window: JWindow? = null
+    private var anchor: JComponent? = null
     private val autoHideTimer = Timer(AUTO_HIDE_DELAY_MS) {
-        overlay.isVisible = false
+        window?.isVisible = false
     }.apply {
         isRepeats = false
     }
 
-    fun install(host: JLayeredPane, statusBar: JComponent) {
-        this.host = host
-        this.statusBar = statusBar
-        overlay.isVisible = false
-        host.add(overlay, JLayeredPane.POPUP_LAYER)
-    }
-
-    fun publish(notification: DesktopNotification) {
+    fun publish(notification: DesktopNotification, anchor: JComponent) {
         notifications += notification
+        this.anchor = anchor
         show(autoHide = true)
     }
 
-    fun toggle() {
-        if (overlay.isVisible) {
+    fun toggle(anchor: JComponent) {
+        this.anchor = anchor
+        if (window?.isVisible == true) {
             autoHideTimer.stop()
-            overlay.isVisible = false
+            window?.isVisible = false
         } else {
             show(autoHide = false)
         }
     }
 
-    fun reposition() {
-        val currentHost = host ?: return
-        if (!overlay.isVisible) return
-        val preferred = overlay.preferredSize
-        overlay.setBounds(
-            (currentHost.width - preferred.width - OVERLAY_MARGIN).coerceAtLeast(0),
-            (currentHost.height - (statusBar?.height ?: 0) - preferred.height - OVERLAY_MARGIN).coerceAtLeast(0),
-            preferred.width,
-            preferred.height,
-        )
-        currentHost.repaint()
-    }
-
     private fun show(autoHide: Boolean) {
         if (notifications.isEmpty()) return
+        val currentAnchor = anchor ?: return
         rebuild()
-        overlay.isVisible = true
-        reposition()
+        val currentWindow = windowFor(currentAnchor)
+        currentWindow.pack()
+        position(currentWindow, currentAnchor)
+        currentWindow.isVisible = true
         if (autoHide) autoHideTimer.restart() else autoHideTimer.stop()
+    }
+
+    private fun windowFor(anchor: JComponent): JWindow {
+        val owner = SwingUtilities.getWindowAncestor(anchor)
+        val existing = window
+        if (existing != null && existing.owner === owner) return existing
+        existing?.dispose()
+        return JWindow(owner).also { newWindow ->
+            newWindow.background = TRANSPARENT
+            newWindow.rootPane.isOpaque = false
+            newWindow.contentPane = JPanel(BorderLayout()).apply {
+                isOpaque = false
+                background = TRANSPARENT
+                add(overlay, BorderLayout.CENTER)
+            }
+            window = newWindow
+        }
+    }
+
+    private fun position(window: Window, anchor: JComponent) {
+        val location = anchor.locationOnScreen
+        window.setLocation(
+            location.x + anchor.width - window.width,
+            location.y - window.height - OVERLAY_GAP,
+        )
     }
 
     private fun rebuild() {
@@ -117,16 +129,11 @@ class DesktopNotificationQueue {
         }
         cards.revalidate()
         cards.repaint()
-        updateOverlaySize()
-    }
-
-    private fun updateOverlaySize() {
         val preferred = cards.preferredSize
         scrollPane.preferredSize = Dimension(
             preferred.width.coerceIn(MIN_WIDTH, MAX_WIDTH),
             preferred.height.coerceAtMost(MAX_HEIGHT),
         )
-        overlay.revalidate()
     }
 
     private fun notificationCard(notification: DesktopNotification): JComponent = JPanel(BorderLayout(8, 0)).apply {
@@ -170,8 +177,8 @@ class DesktopNotificationQueue {
                     details.isVisible = isSelected
                     text = if (isSelected) "hide" else "details"
                     content.revalidate()
-                    updateOverlaySize()
-                    reposition()
+                    window?.pack()
+                    anchor?.let { currentAnchor -> window?.let { position(it, currentAnchor) } }
                 }
             }
             content.add(details, BorderLayout.CENTER)
@@ -194,10 +201,9 @@ class DesktopNotificationQueue {
             notifications.remove(notification)
             if (notifications.isEmpty()) {
                 autoHideTimer.stop()
-                overlay.isVisible = false
+                window?.isVisible = false
             } else {
-                rebuild()
-                reposition()
+                show(autoHide = false)
             }
         }
     }
@@ -208,6 +214,7 @@ class DesktopNotificationQueue {
         const val MIN_WIDTH = 320
         const val MAX_WIDTH = 560
         const val MAX_HEIGHT = 360
-        const val OVERLAY_MARGIN = 10
+        const val OVERLAY_GAP = 4
+        val TRANSPARENT = Color(0, 0, 0, 0)
     }
 }
