@@ -72,8 +72,7 @@ internal class WorkflowArchetypesPanel(
         }
         add(
             JSplitPane(JSplitPane.HORIZONTAL_SPLIT, left, previewCanvas).apply {
-                resizeWeight = 0.22
-                ThreadworkUiSettings.rememberDividerLocation(this, "archetypes.divider", 300)
+                ThreadworkUiSettings.rememberLeadingPanelWidth(this, "archetypes.library.width", 300)
             },
             BorderLayout.CENTER,
         )

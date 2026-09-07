@@ -508,8 +508,7 @@ class ThreadworkDesktopApp(
             labeledPanel("Entity Hierarchy Tree", JScrollPane(hierarchyTree)),
             canvas,
         ).apply {
-            resizeWeight = 0.16
-            ThreadworkUiSettings.rememberDividerLocation(this, "designer.hierarchy.divider")
+            ThreadworkUiSettings.rememberLeadingPanelWidth(this, "designer.hierarchy.width", 300)
         }
 
         val selectedAndHierarchy = JSplitPane(
@@ -525,12 +524,10 @@ class ThreadworkDesktopApp(
             editorTabs,
             labeledPanel("Inspector", JScrollPane(inspector)),
         ).apply {
-            resizeWeight = 0.78
-            ThreadworkUiSettings.rememberDividerLocation(this, "editor.inspector.divider")
+            ThreadworkUiSettings.rememberTrailingPanelWidth(this, "editor.inspector.width", 420)
         }
         val detailsEditor = JSplitPane(JSplitPane.HORIZONTAL_SPLIT, selectedAndHierarchy, editorAndInspector).apply {
-            resizeWeight = 0.18
-            ThreadworkUiSettings.rememberDividerLocation(this, "editor.hierarchy.divider")
+            ThreadworkUiSettings.rememberLeadingPanelWidth(this, "editor.hierarchy.width", 420)
         }
 
         projectPanels = JTabbedPane().apply {
