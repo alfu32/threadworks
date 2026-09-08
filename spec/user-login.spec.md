@@ -40,8 +40,8 @@ The normalized profile image is cached under
 
 The displayed and audit user designator uses the first available value:
 
-1. `username@provider`
-2. `full name@provider`
+1. username
+2. full name
 3. email address
 4. current operating-system user
 

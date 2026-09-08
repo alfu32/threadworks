@@ -22,12 +22,12 @@ class UserIdentityTest {
         val expiration = Instant.parse("2026-09-15T00:00:00Z")
 
         assertEquals(
-            "octocat@github",
+            "octocat",
             UserIdentity(OAuthProvider.GITHUB, "cat@example.test", "octocat", "The Octocat", expiresAt = expiration)
                 .designator("local"),
         )
         assertEquals(
-            "Ada Lovelace@google",
+            "Ada Lovelace",
             UserIdentity(OAuthProvider.GOOGLE, "ada@example.test", fullName = "Ada Lovelace", expiresAt = expiration)
                 .designator("local"),
         )
@@ -77,9 +77,9 @@ class UserIdentityTest {
 
     @Test
     fun `generated avatar derives initials and md5 color from designator`() {
-        assertEquals("AG", avatarInitials("alice@github"))
-        assertEquals(Color(0x61, 0x38, 0x07), avatarBaseColor("alice@github"))
-        assertEquals(28, userAvatarIcon("alice@github", null, 28).iconWidth)
+        assertEquals("AL", avatarInitials("alice"))
+        assertEquals(Color(0x63, 0x84, 0xe2), avatarBaseColor("alice"))
+        assertEquals(28, userAvatarIcon("alice", null, 28).iconWidth)
     }
 
     @Test

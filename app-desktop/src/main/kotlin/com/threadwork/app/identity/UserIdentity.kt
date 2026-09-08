@@ -36,8 +36,8 @@ data class UserIdentity(
 
 fun UserIdentity?.designator(systemUser: String = System.getProperty("user.name").orEmpty()): String = when {
     this == null -> systemUser.ifBlank { "local user" }
-    username.isNotBlank() -> "$username@${provider.id}"
-    fullName.isNotBlank() -> "$fullName@${provider.id}"
+    username.isNotBlank() -> username
+    fullName.isNotBlank() -> fullName
     emailAddress.isNotBlank() -> emailAddress
     else -> systemUser.ifBlank { "local user" }
 }
