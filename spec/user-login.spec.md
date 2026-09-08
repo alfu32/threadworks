@@ -49,4 +49,6 @@ The title bar places the designator immediately left of a circular profile
 medallion at its extreme right. When no profile image exists, the medallion
 uses initials from the designator. Its border and initials use the RGB color
 formed by the first six hexadecimal digits of the designator's MD5 digest;
-the circle uses a contrasting black or white fill.
+the circle uses a contrasting black or white fill. Activating the medallion
+opens a menu whose summary presents the designator, full name, email address,
+provider, and login expiration before the sign-in and sign-out actions.

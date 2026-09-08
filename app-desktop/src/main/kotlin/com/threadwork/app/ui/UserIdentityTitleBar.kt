@@ -10,9 +10,12 @@ import com.threadwork.app.identity.userAvatarIcon
 import java.awt.Component
 import java.awt.Dimension
 import java.awt.FlowLayout
+import java.awt.Font
 import java.util.concurrent.ExecutionException
 import javax.swing.BorderFactory
+import javax.swing.BoxLayout
 import javax.swing.JButton
+import javax.swing.JComponent
 import javax.swing.JLabel
 import javax.swing.JMenuItem
 import javax.swing.JOptionPane
@@ -61,28 +64,22 @@ internal class UserIdentityTitleBar(
         val designator = identity.designator()
         designatorLabel.text = designator
         avatarButton.icon = userAvatarIcon(designator, identityStore.avatarImage(), 28)
-        avatarButton.toolTipText = identity?.let {
-            buildString {
-                append("<html><b>")
-                append(escapeHtml(designator))
-                append("</b><br>")
-                if (it.fullName.isNotBlank()) append("${escapeHtml(it.fullName)}<br>")
-                if (it.emailAddress.isNotBlank()) append("${escapeHtml(it.emailAddress)}<br>")
-                append("${it.provider.label}; login expires ${it.expiresAt}</html>")
-            }
-        } ?: "Local system identity"
+        avatarButton.toolTipText = "User identity"
         revalidate()
         repaint()
     }
 
     private fun showIdentityMenu() {
+        val identity = identityStore.load()
         JPopupMenu().apply {
+            add(identitySummary(identity))
+            addSeparator()
             OAuthProvider.entries.forEach { provider ->
                 add(JMenuItem("Sign in with ${provider.label}").apply {
                     addActionListener { signIn(provider) }
                 })
             }
-            if (identityStore.load() != null) {
+            if (identity != null) {
                 addSeparator()
                 add(JMenuItem("Sign out").apply {
                     addActionListener {
@@ -123,9 +120,32 @@ internal class UserIdentityTitleBar(
         }.execute()
     }
 
-    private fun escapeHtml(value: String): String =
-        value.replace("&", "&amp;")
-            .replace("<", "&lt;")
-            .replace(">", "&gt;")
-            .replace("\"", "&quot;")
+    private fun identitySummary(identity: UserIdentity?): JComponent = JPanel().apply {
+        layout = BoxLayout(this, BoxLayout.Y_AXIS)
+        border = BorderFactory.createEmptyBorder(8, 10, 8, 16)
+        isOpaque = false
+
+        val designator = identity.designator()
+        add(JLabel(designator).apply {
+            alignmentX = Component.LEFT_ALIGNMENT
+            font = font.deriveFont(Font.BOLD)
+        })
+        if (identity == null) {
+            add(summaryDetail("Local system identity"))
+        } else {
+            identity.fullName.takeIf { it.isNotBlank() && it != designator }?.let {
+                add(summaryDetail(it))
+            }
+            identity.emailAddress.takeIf(String::isNotBlank)?.let {
+                add(summaryDetail(it))
+            }
+            add(summaryDetail(identity.provider.label))
+            add(summaryDetail("Login expires ${identity.expiresAt}"))
+        }
+    }
+
+    private fun summaryDetail(value: String): JLabel = JLabel(value).apply {
+        alignmentX = Component.LEFT_ALIGNMENT
+        font = font.deriveFont(font.size2D - 1f)
+    }
 }
