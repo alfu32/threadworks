@@ -51,6 +51,12 @@ The canvas uses an in-memory 512 px LRU tile cache, zoom buckets, a separate scr
 
 The built-in grid code editor provides multiple cursors and selections, configurable space indentation, syntax highlighting, model-aware completion, keyboard navigation, and integrated undo/redo. A CodeMirror bridge remains as an adapter boundary, but the grid editor is the active dependency-free implementation.
 
+### User identity
+
+The title-bar profile medallion supports Google, GitHub, and Microsoft OAuth sign-in. Identity details are shared through user preferences and expire after one week; access and refresh tokens remain in memory only.
+
+Configure OAuth application registrations with `THREADWORK_GOOGLE_CLIENT_ID`, `THREADWORK_GITHUB_CLIENT_ID`, or `THREADWORK_MICROSOFT_CLIENT_ID`. GitHub also requires `THREADWORK_GITHUB_CLIENT_SECRET`. Equivalent JVM properties use `threadwork.oauth.<provider>.clientId` and `threadwork.oauth.<provider>.clientSecret`.
+
 ### Sheets and export
 
 Sheet preview supports automatic or explicit A4 through A0 portrait/landscape formats plus A3/A2/A1/A0 roll formats. Scale choices range from `1:1` upward; scaling enlarges the represented sheet rather than the entities. Selection controls the export scope, with selected composites including their descendants.

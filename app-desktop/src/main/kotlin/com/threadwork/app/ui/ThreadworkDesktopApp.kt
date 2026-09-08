@@ -12,6 +12,7 @@ import com.threadwork.app.ai.AiPromptRequest
 import com.threadwork.app.ai.AiPromptResponse
 import com.threadwork.app.ai.AiSupportProviders
 import com.threadwork.app.ai.AiSupportTask
+import com.threadwork.app.identity.ThreadworkUserIdentity
 import com.threadwork.Version
 import com.threadwork.compiler.api.CompilerOptions
 import com.threadwork.compiler.api.writeSourceMapBeside
@@ -231,7 +232,10 @@ private data class DocumentationPageMetadata(
 )
 
 class ThreadworkDesktopApp(
-    private val repository: DocumentRepository = InMemoryDocumentRepository(newDocument("Untitled Threadwork")),
+    private val repository: DocumentRepository = InMemoryDocumentRepository(
+        newDocument("Untitled Threadwork"),
+        modifiedUserProvider = ThreadworkUserIdentity::designator,
+    ),
     private val store: KotlinxJsonDocumentStore = KotlinxJsonDocumentStore(),
     private val pluginsFolder: Path = defaultPluginsFolder(),
     private val uiPlugins: List<ThreadworkDesktopPlugin> = loadDesktopPlugins(pluginsFolder),
@@ -398,6 +402,7 @@ class ThreadworkDesktopApp(
     private lateinit var projectPanels: JTabbedPane
     private lateinit var archetypesPanel: WorkflowArchetypesPanel
     private lateinit var projectManagementPanel: ProjectManagementPanel
+    private lateinit var userIdentityTitleBar: UserIdentityTitleBar
     private val modeButtons = mutableMapOf<CanvasMode, JToggleButton>()
     private var sheetButton: JToggleButton? = null
     private val commands = linkedMapOf<String, AppCommand>()
@@ -642,6 +647,9 @@ class ThreadworkDesktopApp(
             add(commandItem("help.about"))
         })
         add(currentFileLabel)
+        add(Box.createHorizontalGlue())
+        userIdentityTitleBar = UserIdentityTitleBar(frame) { message -> status.text = message }
+        add(userIdentityTitleBar)
     }
 
     private fun installKeyBindings(component: JComponent) {

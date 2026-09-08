@@ -84,7 +84,9 @@
             "diagnostics": [],
             "metadata": {},
             "pluginData": {},
-            "nameDetail": ""
+            "nameDetail": "",
+            "status": null,
+            "statusChanges": []
         },
         {
             "id": "node_24257a88-cfe9-4707-bd63-c777eb75edb0",
@@ -99,7 +101,7 @@
             ],
             "layout": {
                 "x": -206.0,
-                "y": 213.0,
+                "y": 209.0,
                 "width": 200.0,
                 "height": 108.0,
                 "closedWidth": 200.0,
@@ -135,7 +137,7 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-07T16:28:12.886868199Z",
+                "date": "2026-09-08T14:54:59.900284801Z",
                 "user": "devlin"
             },
             "ports": [
@@ -152,7 +154,22 @@
             "diagnostics": [],
             "metadata": {},
             "pluginData": {},
-            "nameDetail": ""
+            "nameDetail": "",
+            "status": "IMPLEMENTATION",
+            "statusChanges": [
+                {
+                    "userId": "devlin",
+                    "changedDate": "2026-09-08T14:51:52.655962833Z",
+                    "initStatus": null,
+                    "endStatus": "BUSINESS"
+                },
+                {
+                    "userId": "devlin",
+                    "changedDate": "2026-09-08T14:54:59.900209479Z",
+                    "initStatus": "BUSINESS",
+                    "endStatus": "IMPLEMENTATION"
+                }
+            ]
         },
         {
             "id": "node_f6279658-075b-44d9-a93e-b1e12d47c19c",
@@ -166,8 +183,8 @@
                 "link_f3a46c55-d830-419a-817e-f0a54a9339e0"
             ],
             "layout": {
-                "x": 821.0,
-                "y": 203.0,
+                "x": 986.0,
+                "y": 209.0,
                 "width": 200.0,
                 "height": 108.0,
                 "closedWidth": 200.0,
@@ -203,7 +220,7 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-07T13:29:27.554973049Z",
+                "date": "2026-09-08T14:55:03.573944789Z",
                 "user": "devlin"
             },
             "ports": [
@@ -220,7 +237,22 @@
             "diagnostics": [],
             "metadata": {},
             "pluginData": {},
-            "nameDetail": ""
+            "nameDetail": "",
+            "status": "IMPLEMENTATION",
+            "statusChanges": [
+                {
+                    "userId": "devlin",
+                    "changedDate": "2026-09-08T14:52:37.928056841Z",
+                    "initStatus": null,
+                    "endStatus": "BUSINESS"
+                },
+                {
+                    "userId": "devlin",
+                    "changedDate": "2026-09-08T14:55:03.573870693Z",
+                    "initStatus": "BUSINESS",
+                    "endStatus": "IMPLEMENTATION"
+                }
+            ]
         },
         {
             "id": "node_c4771abb-1184-417a-9157-23f77a5a0aa5",
@@ -275,7 +307,7 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-07T20:07:09.263207907Z",
+                "date": "2026-09-08T14:52:57.038621960Z",
                 "user": "devlin"
             },
             "ports": [
@@ -299,7 +331,16 @@
             "diagnostics": [],
             "metadata": {},
             "pluginData": {},
-            "nameDetail": ""
+            "nameDetail": "",
+            "status": "IMPLEMENTATION",
+            "statusChanges": [
+                {
+                    "userId": "devlin",
+                    "changedDate": "2026-09-08T14:52:57.038357313Z",
+                    "initStatus": null,
+                    "endStatus": "IMPLEMENTATION"
+                }
+            ]
         },
         {
             "id": "node_b120f8cf-1386-48bd-a894-ed420ee7b97e",
@@ -351,7 +392,7 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-07T20:01:34.166425196Z",
+                "date": "2026-09-08T14:53:15.169085671Z",
                 "user": "devlin"
             },
             "ports": [
@@ -375,7 +416,16 @@
             "diagnostics": [],
             "metadata": {},
             "pluginData": {},
-            "nameDetail": ""
+            "nameDetail": "",
+            "status": "IMPLEMENTATION",
+            "statusChanges": [
+                {
+                    "userId": "devlin",
+                    "changedDate": "2026-09-08T14:53:15.168982116Z",
+                    "initStatus": null,
+                    "endStatus": "IMPLEMENTATION"
+                }
+            ]
         },
         {
             "id": "node_4432ce6f-4306-4ff7-8490-c2887bf451fc",
@@ -425,7 +475,7 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-07T20:07:09.263207907Z",
+                "date": "2026-09-08T14:54:51.887644419Z",
                 "user": "devlin"
             },
             "ports": [
@@ -442,7 +492,22 @@
             "diagnostics": [],
             "metadata": {},
             "pluginData": {},
-            "nameDetail": ""
+            "nameDetail": "",
+            "status": "IMPLEMENTATION",
+            "statusChanges": [
+                {
+                    "userId": "devlin",
+                    "changedDate": "2026-09-08T14:52:26.821978678Z",
+                    "initStatus": null,
+                    "endStatus": "BUSINESS"
+                },
+                {
+                    "userId": "devlin",
+                    "changedDate": "2026-09-08T14:54:51.887564143Z",
+                    "initStatus": "BUSINESS",
+                    "endStatus": "IMPLEMENTATION"
+                }
+            ]
         },
         {
             "id": "node_e116763d-a5ee-4a7a-9ee9-8ccc1bc3ef6b",
@@ -492,7 +557,7 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-07T13:31:11.786013195Z",
+                "date": "2026-09-08T14:55:11.738173661Z",
                 "user": "devlin"
             },
             "ports": [
@@ -509,7 +574,28 @@
             "diagnostics": [],
             "metadata": {},
             "pluginData": {},
-            "nameDetail": ""
+            "nameDetail": "",
+            "status": "IMPLEMENTATION",
+            "statusChanges": [
+                {
+                    "userId": "devlin",
+                    "changedDate": "2026-09-08T14:52:04.477808774Z",
+                    "initStatus": null,
+                    "endStatus": "BUSINESS"
+                },
+                {
+                    "userId": "devlin",
+                    "changedDate": "2026-09-08T14:54:56.197515083Z",
+                    "initStatus": "BUSINESS",
+                    "endStatus": "FUNCTIONAL"
+                },
+                {
+                    "userId": "devlin",
+                    "changedDate": "2026-09-08T14:55:11.737933051Z",
+                    "initStatus": "FUNCTIONAL",
+                    "endStatus": "IMPLEMENTATION"
+                }
+            ]
         },
         {
             "id": "node_df8b7ff5-b0d7-4fe5-8e6c-eada1a42d0e5",
@@ -527,8 +613,8 @@
                 "link_c45a18d4-b741-462e-af71-75a182c0de9a"
             ],
             "layout": {
-                "x": 1374.0,
-                "y": 524.0,
+                "x": 1373.0,
+                "y": 520.0,
                 "width": 200.0,
                 "height": 198.0,
                 "closedWidth": 200.0,
@@ -564,7 +650,7 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-07T13:36:55.907911003Z",
+                "date": "2026-09-08T14:53:30.430064857Z",
                 "user": "devlin"
             },
             "ports": [
@@ -588,11 +674,20 @@
             "diagnostics": [],
             "metadata": {},
             "pluginData": {},
-            "nameDetail": ""
+            "nameDetail": "",
+            "status": "IMPLEMENTATION",
+            "statusChanges": [
+                {
+                    "userId": "devlin",
+                    "changedDate": "2026-09-08T14:53:30.429984723Z",
+                    "initStatus": null,
+                    "endStatus": "IMPLEMENTATION"
+                }
+            ]
         },
         {
             "id": "link_b3a9576f-e2b9-4548-9b02-2438fda8b78e",
-            "name": "tcp",
+            "name": "tcpreq",
             "kind": "Link",
             "parentId": "root",
             "children": [],
@@ -636,7 +731,7 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-07T13:35:20.007234345Z",
+                "date": "2026-09-08T15:03:05.063332527Z",
                 "user": "devlin"
             },
             "ports": [],
@@ -656,11 +751,13 @@
             "diagnostics": [],
             "metadata": {},
             "pluginData": {},
-            "nameDetail": ""
+            "nameDetail": "",
+            "status": null,
+            "statusChanges": []
         },
         {
             "id": "link_bad231a8-7d70-4818-a821-3b5669b0b083",
-            "name": "http",
+            "name": "httpreq",
             "kind": "Link",
             "parentId": "root",
             "children": [],
@@ -704,7 +801,7 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-07T13:35:06.331657474Z",
+                "date": "2026-09-08T15:03:14.404596376Z",
                 "user": "devlin"
             },
             "ports": [],
@@ -724,11 +821,13 @@
             "diagnostics": [],
             "metadata": {},
             "pluginData": {},
-            "nameDetail": ""
+            "nameDetail": "",
+            "status": null,
+            "statusChanges": []
         },
         {
             "id": "link_15158725-e92f-4fd6-b765-462646956e26",
-            "name": "route1",
+            "name": "req1",
             "kind": "Link",
             "parentId": "root",
             "children": [],
@@ -772,7 +871,7 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-07T13:36:45.452911488Z",
+                "date": "2026-09-08T15:03:50.195158434Z",
                 "user": "devlin"
             },
             "ports": [],
@@ -794,11 +893,13 @@
             "diagnostics": [],
             "metadata": {},
             "pluginData": {},
-            "nameDetail": ""
+            "nameDetail": "",
+            "status": null,
+            "statusChanges": []
         },
         {
             "id": "link_092ff7b9-ab6b-4ca5-9fe6-5029ffc1323f",
-            "name": "route2",
+            "name": "req2",
             "kind": "Link",
             "parentId": "root",
             "children": [],
@@ -842,7 +943,7 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-07T13:36:49.933032618Z",
+                "date": "2026-09-08T15:04:19.281169849Z",
                 "user": "devlin"
             },
             "ports": [],
@@ -864,11 +965,13 @@
             "diagnostics": [],
             "metadata": {},
             "pluginData": {},
-            "nameDetail": ""
+            "nameDetail": "",
+            "status": null,
+            "statusChanges": []
         },
         {
             "id": "link_c45a18d4-b741-462e-af71-75a182c0de9a",
-            "name": "route3",
+            "name": "req3",
             "kind": "Link",
             "parentId": "root",
             "children": [],
@@ -912,7 +1015,7 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-07T13:36:55.907911003Z",
+                "date": "2026-09-08T15:04:07.002519634Z",
                 "user": "devlin"
             },
             "ports": [],
@@ -934,11 +1037,13 @@
             "diagnostics": [],
             "metadata": {},
             "pluginData": {},
-            "nameDetail": ""
+            "nameDetail": "",
+            "status": null,
+            "statusChanges": []
         },
         {
             "id": "link_8b69fa03-f5ad-474f-91d7-0201eee0fcba",
-            "name": "tcp",
+            "name": "tcp1",
             "kind": "Link",
             "parentId": "root",
             "children": [],
@@ -982,7 +1087,7 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-07T13:23:30.576182354Z",
+                "date": "2026-09-08T15:04:48.427808885Z",
                 "user": "devlin"
             },
             "ports": [],
@@ -1002,7 +1107,9 @@
             "diagnostics": [],
             "metadata": {},
             "pluginData": {},
-            "nameDetail": ""
+            "nameDetail": "",
+            "status": null,
+            "statusChanges": []
         },
         {
             "id": "node_37b69371-59f6-4a2c-b4eb-29f7edcdbf8d",
@@ -1057,7 +1164,7 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-07T16:26:56.470154361Z",
+                "date": "2026-09-08T14:53:02.806111631Z",
                 "user": "devlin"
             },
             "ports": [
@@ -1074,7 +1181,16 @@
             "diagnostics": [],
             "metadata": {},
             "pluginData": {},
-            "nameDetail": ""
+            "nameDetail": "",
+            "status": "IMPLEMENTATION",
+            "statusChanges": [
+                {
+                    "userId": "devlin",
+                    "changedDate": "2026-09-08T14:53:02.806040985Z",
+                    "initStatus": null,
+                    "endStatus": "IMPLEMENTATION"
+                }
+            ]
         },
         {
             "id": "link_823f422e-35dd-4223-be9b-1907694c76cc",
@@ -1144,7 +1260,9 @@
             "diagnostics": [],
             "metadata": {},
             "pluginData": {},
-            "nameDetail": ""
+            "nameDetail": "",
+            "status": null,
+            "statusChanges": []
         },
         {
             "id": "link_6d0f78b9-7a10-4621-955d-331d8934c60d",
@@ -1214,7 +1332,9 @@
             "diagnostics": [],
             "metadata": {},
             "pluginData": {},
-            "nameDetail": ""
+            "nameDetail": "",
+            "status": null,
+            "statusChanges": []
         },
         {
             "id": "link_9ad4fc83-a96b-4986-9d39-4364f783cd14",
@@ -1284,11 +1404,13 @@
             "diagnostics": [],
             "metadata": {},
             "pluginData": {},
-            "nameDetail": ""
+            "nameDetail": "",
+            "status": null,
+            "statusChanges": []
         },
         {
             "id": "link_f3a46c55-d830-419a-817e-f0a54a9339e0",
-            "name": "lib_tcp -> responder",
+            "name": "tcp2",
             "kind": "Link",
             "parentId": "root",
             "children": [],
@@ -1332,7 +1454,7 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-07T13:29:27.554973049Z",
+                "date": "2026-09-08T15:04:53.385685104Z",
                 "user": "devlin"
             },
             "ports": [],
@@ -1352,11 +1474,13 @@
             "diagnostics": [],
             "metadata": {},
             "pluginData": {},
-            "nameDetail": ""
+            "nameDetail": "",
+            "status": null,
+            "statusChanges": []
         },
         {
             "id": "link_82d8b8bf-5902-49ef-ae53-9b94238a131c",
-            "name": "lib_http -> http_router",
+            "name": "http_parser",
             "kind": "Link",
             "parentId": "root",
             "children": [],
@@ -1400,7 +1524,7 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-07T13:31:11.786013195Z",
+                "date": "2026-09-08T15:01:17.023617135Z",
                 "user": "devlin"
             },
             "ports": [],
@@ -1420,7 +1544,9 @@
             "diagnostics": [],
             "metadata": {},
             "pluginData": {},
-            "nameDetail": ""
+            "nameDetail": "",
+            "status": null,
+            "statusChanges": []
         },
         {
             "id": "node_c9ef5e41-5a4b-4271-b98a-c6d69d434a6d",
@@ -1431,8 +1557,8 @@
             "incomingLinks": [],
             "outgoingLinks": [],
             "layout": {
-                "x": 1256.0,
-                "y": 174.0,
+                "x": 1631.0,
+                "y": 489.0,
                 "width": 220.0,
                 "height": 268.0,
                 "closedWidth": 220.0,
@@ -1468,7 +1594,7 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-07T13:31:59.052831742Z",
+                "date": "2026-09-08T14:56:50.726423373Z",
                 "user": "devlin"
             },
             "ports": [],
@@ -1476,17 +1602,17 @@
             "typeDefinition": {
                 "fields": [
                     {
-                        "name": "field_1",
+                        "name": "corelation_id",
                         "typeId": "string",
                         "isReference": false
                     },
                     {
-                        "name": "field_2",
+                        "name": "request",
                         "typeId": "string",
                         "isReference": false
                     },
                     {
-                        "name": "field_3",
+                        "name": "response",
                         "typeId": "string",
                         "isReference": false
                     }
@@ -1495,7 +1621,22 @@
             "diagnostics": [],
             "metadata": {},
             "pluginData": {},
-            "nameDetail": ""
+            "nameDetail": "",
+            "status": "IMPLEMENTATION",
+            "statusChanges": [
+                {
+                    "userId": "devlin",
+                    "changedDate": "2026-09-08T14:52:45.594993908Z",
+                    "initStatus": null,
+                    "endStatus": "BUSINESS"
+                },
+                {
+                    "userId": "devlin",
+                    "changedDate": "2026-09-08T14:55:07.994276097Z",
+                    "initStatus": "BUSINESS",
+                    "endStatus": "IMPLEMENTATION"
+                }
+            ]
         },
         {
             "id": "node_6fe0a353-135a-4433-b77b-4521da00d728",
@@ -1547,7 +1688,7 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-07T13:50:13.523452759Z",
+                "date": "2026-09-08T14:55:15.941076907Z",
                 "user": "devlin"
             },
             "ports": [],
@@ -1556,7 +1697,22 @@
             "diagnostics": [],
             "metadata": {},
             "pluginData": {},
-            "nameDetail": ""
+            "nameDetail": "",
+            "status": "IMPLEMENTATION",
+            "statusChanges": [
+                {
+                    "userId": "devlin",
+                    "changedDate": "2026-09-08T14:53:37.044065439Z",
+                    "initStatus": null,
+                    "endStatus": "FUNCTIONAL"
+                },
+                {
+                    "userId": "devlin",
+                    "changedDate": "2026-09-08T14:55:15.941002970Z",
+                    "initStatus": "FUNCTIONAL",
+                    "endStatus": "IMPLEMENTATION"
+                }
+            ]
         },
         {
             "id": "node_f9029721-ad0b-44fd-8b6b-9e7b444ebc5c",
@@ -1608,7 +1764,7 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-07T13:50:08.064943666Z",
+                "date": "2026-09-08T14:53:44.893743186Z",
                 "user": "devlin"
             },
             "ports": [
@@ -1632,7 +1788,16 @@
             "diagnostics": [],
             "metadata": {},
             "pluginData": {},
-            "nameDetail": "/index.html"
+            "nameDetail": "/index.html",
+            "status": "IMPLEMENTATION",
+            "statusChanges": [
+                {
+                    "userId": "devlin",
+                    "changedDate": "2026-09-08T14:53:44.893670329Z",
+                    "initStatus": null,
+                    "endStatus": "IMPLEMENTATION"
+                }
+            ]
         },
         {
             "id": "node_1d35991b-2da3-40c0-9e05-8b906bc5b74c",
@@ -1684,7 +1849,7 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-07T13:50:11.179556519Z",
+                "date": "2026-09-08T14:53:59.534126552Z",
                 "user": "devlin"
             },
             "ports": [
@@ -1708,7 +1873,16 @@
             "diagnostics": [],
             "metadata": {},
             "pluginData": {},
-            "nameDetail": "/user/details"
+            "nameDetail": "/user/details",
+            "status": "IMPLEMENTATION",
+            "statusChanges": [
+                {
+                    "userId": "devlin",
+                    "changedDate": "2026-09-08T14:53:59.534032359Z",
+                    "initStatus": null,
+                    "endStatus": "IMPLEMENTATION"
+                }
+            ]
         },
         {
             "id": "node_b1f4bcc8-d363-4328-9530-b9a155cf531f",
@@ -1760,7 +1934,7 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-07T13:50:13.523452759Z",
+                "date": "2026-09-08T14:53:50.842697576Z",
                 "user": "devlin"
             },
             "ports": [
@@ -1784,7 +1958,16 @@
             "diagnostics": [],
             "metadata": {},
             "pluginData": {},
-            "nameDetail": "/api/users"
+            "nameDetail": "/api/users",
+            "status": "IMPLEMENTATION",
+            "statusChanges": [
+                {
+                    "userId": "devlin",
+                    "changedDate": "2026-09-08T14:53:50.842635854Z",
+                    "initStatus": null,
+                    "endStatus": "IMPLEMENTATION"
+                }
+            ]
         },
         {
             "id": "link_a8ce6267-aa95-4362-84e5-c2929e395f3a",
@@ -1852,11 +2035,13 @@
             "diagnostics": [],
             "metadata": {},
             "pluginData": {},
-            "nameDetail": ""
+            "nameDetail": "",
+            "status": null,
+            "statusChanges": []
         },
         {
             "id": "link_bcb6f8bc-5916-4184-ab74-0a8dfdbff8c5",
-            "name": "lib_mem -> req_rep",
+            "name": "mem0",
             "kind": "Link",
             "parentId": "root",
             "children": [],
@@ -1900,7 +2085,7 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-07T16:26:54.884877100Z",
+                "date": "2026-09-08T15:01:49.697023892Z",
                 "user": "devlin"
             },
             "ports": [],
@@ -1920,11 +2105,13 @@
             "diagnostics": [],
             "metadata": {},
             "pluginData": {},
-            "nameDetail": ""
+            "nameDetail": "",
+            "status": null,
+            "statusChanges": []
         },
         {
             "id": "link_189bb051-11a0-4914-8cdc-aba75c081412",
-            "name": "lib_mem -> responder",
+            "name": "mem1",
             "kind": "Link",
             "parentId": "root",
             "children": [],
@@ -1968,7 +2155,7 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-07T16:26:56.470154361Z",
+                "date": "2026-09-08T15:02:00.756768443Z",
                 "user": "devlin"
             },
             "ports": [],
@@ -1988,11 +2175,13 @@
             "diagnostics": [],
             "metadata": {},
             "pluginData": {},
-            "nameDetail": ""
+            "nameDetail": "",
+            "status": null,
+            "statusChanges": []
         },
         {
             "id": "link_56f247eb-1397-489b-8130-4ddf2d446a15",
-            "name": "lib_args -> req_rep",
+            "name": "args",
             "kind": "Link",
             "parentId": "root",
             "children": [],
@@ -2036,7 +2225,7 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-07T20:07:09.263207907Z",
+                "date": "2026-09-08T15:00:24.480131998Z",
                 "user": "devlin"
             },
             "ports": [],
@@ -2056,7 +2245,9 @@
             "diagnostics": [],
             "metadata": {},
             "pluginData": {},
-            "nameDetail": ""
+            "nameDetail": "",
+            "status": null,
+            "statusChanges": []
         }
     ],
     "metadata": {},
