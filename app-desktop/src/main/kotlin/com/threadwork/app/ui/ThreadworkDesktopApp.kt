@@ -213,7 +213,6 @@ import com.vladsch.flexmark.html.HtmlRenderer
 import com.vladsch.flexmark.parser.Parser
 import com.vladsch.flexmark.util.data.MutableDataSet
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder
-import kotlin.math.atan2
 import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.hypot
@@ -2750,12 +2749,25 @@ class GraphCanvas(
         val tileY: Int,
     )
     private data class PortAnchor(val point: Point, val xDirection: Int)
-    private data class LinkAnchors(val source: PortAnchor, val target: PortAnchor, val sourceNodeId: NodeId, val targetNodeId: NodeId)
+    private data class CompositeBoundaryPort(
+        val boundaryId: NodeId,
+        val point: Point,
+        val side: Int,
+        val exitsBoundary: Boolean,
+    )
+    private data class LinkAnchors(
+        val source: PortAnchor,
+        val target: PortAnchor,
+        val sourceNodeId: NodeId,
+        val targetNodeId: NodeId,
+        val boundaryPorts: List<CompositeBoundaryPort>,
+    )
     private data class LinkRoute(
         val source: Point,
         val target: Point,
         val sourceDirection: Int,
         val targetDirection: Int,
+        val boundaryPorts: List<CompositeBoundaryPort>,
         val points: List<Point>,
     )
     private data class SheetFormat(val id: String, val widthMm: Double, val heightMm: Double, val roll: Boolean = false)
@@ -3379,7 +3391,7 @@ class GraphCanvas(
     }
 
     private fun requiredPortHeight(node: Node, topSpacing: Int = portTopSpacing(node)): Double {
-        val portCount = max(linksOnSide(node, -1).size, linksOnSide(node, 1).size)
+        val portCount = max(portLinksOnSide(node, -1).size, portLinksOnSide(node, 1).size)
         if (portCount == 0) return 0.0
         return (topSpacing + portCount * PORT_SPACING + PORT_BOTTOM_SPACING).toDouble()
     }
@@ -3499,19 +3511,6 @@ class GraphCanvas(
         return countChildren(node)
     }
 
-    private fun linksOnSide(node: Node, side: Int): List<Node> {
-        val document = repository.getDocument()
-        val ids = node.outgoingLinks + node.incomingLinks
-        return ids.distinct().mapNotNull(document.nodes::get)
-            .filter { linkNode ->
-                isVisibleLink(linkNode) && run {
-                    val link = linkNode.link ?: return@run false
-                    val outgoing = link.sourceNodeId == node.id
-                    linkSide(node, linkNode, outgoing) == side
-                }
-            }
-    }
-
     private fun depthOf(node: Node): Int {
         val document = repository.getDocument()
         var depth = 0
@@ -3574,7 +3573,9 @@ class GraphCanvas(
                 if (isDependencyAnnotation(node)) {
                     dependencyAnnotationBounds(node).forEach(::add)
                 } else {
-                    (cachedRoute(node.id) ?: routeLink(node))?.bounds()?.let(::add)
+                    (cachedRoute(node.id) ?: routeLink(node))
+                        ?.let(::renderedRouteBounds)
+                        ?.let(::add)
                 }
             } else if (isVisibleInCanvas(node)) {
                 add(node.layout.rect())
@@ -3774,7 +3775,7 @@ class GraphCanvas(
         cachedRoute(linkNode.id)?.let {
             // Endpoint labels are rendered outside the route itself. Keep a generous
             // model-space margin so long names remain visible at tile boundaries.
-            return it.bounds().apply { grow(320, 80) }.intersects(viewport)
+            return renderedRouteBounds(it)?.apply { grow(320, 80) }?.intersects(viewport) == true
         }
         val link = linkNode.link ?: return false
         val source = repository.getNode(link.sourceNodeId)?.layout?.rect() ?: return false
@@ -4031,7 +4032,9 @@ class GraphCanvas(
                 if (isDependencyAnnotation(node)) {
                     dependencyAnnotationBounds(node).forEach(::add)
                 } else {
-                    routeLink(node)?.points?.forEach { add(Rectangle(it.x - 4, it.y - 4, 8, 8)) }
+                    routeLink(node)?.let { route ->
+                        renderedRoutePoints(route).forEach { add(Rectangle(it.x - 4, it.y - 4, 8, 8)) }
+                    }
                 }
             } else if (node.id != document.rootNodeId) {
                 add(node.layout.rect())
@@ -4391,8 +4394,10 @@ class GraphCanvas(
     }
 
     private fun svgLink(svg: StringBuilder, node: Node) {
-        node.link ?: return
+        val link = node.link ?: return
         val route = routeLink(node) ?: return
+        val renderedPoints = renderedRoutePoints(route)
+        if (renderedPoints.size < 2) return
         val stereotype = LinkClassifier.classify(repository.getDocument(), node)
         val color = hex(linkColor(stereotype, selected = false))
         val strokeWidth = when (stereotype) {
@@ -4404,15 +4409,17 @@ class GraphCanvas(
             else -> 1.5
         }
         val dash = linkDashPattern(stereotype, isBackflow(route))
-        svgPath(svg, route.points, color, strokeWidth, dash)
-        svgArrowAlongRoute(svg, route.points, color)
-        svgPortMarker(svg, route.source, route.sourceDirection, outgoing = true, color = color)
-        svgPortMarker(svg, route.target, route.targetDirection, outgoing = false, color = color)
-        compositeBoundaryIntersections(node, route.points).forEach { point ->
-            val (dx, dy) = routeDirectionAt(route.points, point)
-            svgBoundaryPierceMarker(svg, point, dx, dy, color)
+        svgPath(svg, renderedPoints, color, strokeWidth, dash)
+        svgArrowAlongRoute(svg, renderedPoints, color)
+        val sourceVisible = repository.getNode(link.sourceNodeId)?.let(::isVisibleInCanvas) == true
+        val targetVisible = repository.getNode(link.targetNodeId)?.let(::isVisibleInCanvas) == true
+        if (sourceVisible) svgPortMarker(svg, route.source, route.sourceDirection, outgoing = true, color = color)
+        if (targetVisible) svgPortMarker(svg, route.target, route.targetDirection, outgoing = false, color = color)
+        visibleBoundaryPorts(route).forEach { port ->
+            svgBoundaryPierceMarker(svg, port.point)
+            svgBoundaryLinkLabel(svg, node, port, color)
         }
-        svgEndpointLinkLabels(svg, node, route, color)
+        svgEndpointLinkLabels(svg, node, route, color, sourceVisible, targetVisible)
     }
 
     private fun svgPortMarker(svg: StringBuilder, point: Point, side: Int, outgoing: Boolean, color: String) {
@@ -4425,10 +4432,25 @@ class GraphCanvas(
         )
     }
 
-    private fun svgBoundaryPierceMarker(svg: StringBuilder, point: Point, dx: Int, dy: Int, color: String) {
-        val arrowCenter = boundaryArrowCenter(point, dx, dy)
-        svgDirectionalArrow(svg, arrowCenter, dx, dy, color)
-        svg.appendLine("    <circle cx=\"${point.x}\" cy=\"${point.y}\" r=\"5\" fill=\"#ffffff\" stroke=\"$color\" stroke-width=\"1.5\"/>")
+    private fun svgBoundaryPierceMarker(svg: StringBuilder, point: Point) =
+        svg.appendLine("    <circle cx=\"${point.x}\" cy=\"${point.y}\" r=\"5\" fill=\"#000000\"/>")
+
+    private fun svgBoundaryLinkLabel(
+        svg: StringBuilder,
+        node: Node,
+        port: CompositeBoundaryPort,
+        color: String,
+    ) {
+        val (name, typeName) = linkLabelParts(node)
+        if (name.isBlank() && typeName == null) return
+        val full = name + if (typeName == null) "" else ":$typeName"
+        val width = monospaceTextWidth(full, 8, 0)
+        val x = if (port.side < 0) port.point.x - width - 8 else port.point.x + 8
+        svgText(svg, name, x, port.point.y - 8, 10, color)
+        typeName?.let {
+            val offset = monospaceTextWidth(name, 8, 0)
+            svgText(svg, ":$it", x + offset, port.point.y - 8, 10, "#008c4a")
+        }
     }
 
     private fun svgArrowAlongRoute(svg: StringBuilder, points: List<Point>, color: String) {
@@ -4486,11 +4508,18 @@ class GraphCanvas(
         )
     }
 
-    private fun svgEndpointLinkLabels(svg: StringBuilder, node: Node, route: LinkRoute, color: String) {
+    private fun svgEndpointLinkLabels(
+        svg: StringBuilder,
+        node: Node,
+        route: LinkRoute,
+        color: String,
+        sourceVisible: Boolean,
+        targetVisible: Boolean,
+    ) {
         val (name, typeName) = linkLabelParts(node)
         if (name.isBlank() && typeName == null) return
-        svgEndpointLinkLabel(svg, name, typeName, route.source, route.sourceDirection, color)
-        svgEndpointLinkLabel(svg, name, typeName, route.target, route.targetDirection, color)
+        if (sourceVisible) svgEndpointLinkLabel(svg, name, typeName, route.source, route.sourceDirection, color)
+        if (targetVisible) svgEndpointLinkLabel(svg, name, typeName, route.target, route.targetDirection, color)
     }
 
     private fun svgEndpointLinkLabel(
@@ -4983,8 +5012,10 @@ class GraphCanvas(
     }
 
     private fun drawLink(g2: Graphics2D, node: Node) {
-        node.link ?: return
+        val link = node.link ?: return
         val route = cachedRoute(node.id) ?: routeLink(node) ?: return
+        val renderedPoints = renderedRoutePoints(route)
+        if (renderedPoints.size < 2) return
         val previousStroke = g2.stroke
         val previousFont = g2.font
         val selected = node.id in selection
@@ -4992,22 +5023,79 @@ class GraphCanvas(
         val color = linkColor(stereotype, selected)
         g2.color = color
         g2.stroke = linkStroke(stereotype, selected, isBackflow(route))
-        route.points.zipWithNext().forEach { (a, b) -> g2.drawLine(a.x, a.y, b.x, b.y) }
-        drawArrowAlongRoute(g2, route.points)
+        renderedPoints.zipWithNext().forEach { (a, b) -> g2.drawLine(a.x, a.y, b.x, b.y) }
+        drawArrowAlongRoute(g2, renderedPoints)
         g2.color = color
-        drawPortMarker(g2, route.source, route.sourceDirection, outgoing = true)
-        drawPortMarker(g2, route.target, route.targetDirection, outgoing = false)
-        compositeBoundaryIntersections(node, route.points).forEach { point ->
-            val (dx, dy) = routeDirectionAt(route.points, point)
-            drawBoundaryPierceMarker(g2, point, dx, dy)
+        val sourceVisible = repository.getNode(link.sourceNodeId)?.let(::isVisibleInCanvas) == true
+        val targetVisible = repository.getNode(link.targetNodeId)?.let(::isVisibleInCanvas) == true
+        if (sourceVisible) drawPortMarker(g2, route.source, route.sourceDirection, outgoing = true)
+        if (targetVisible) drawPortMarker(g2, route.target, route.targetDirection, outgoing = false)
+        visibleBoundaryPorts(route).forEach { port ->
+            drawBoundaryPierceMarker(g2, port.point)
+            drawBoundaryLinkLabel(g2, node, port, color)
         }
-        drawEndpointLinkLabels(g2, node, route, color)
+        drawEndpointLinkLabels(g2, node, route, color, sourceVisible, targetVisible)
         g2.font = previousFont
         g2.stroke = previousStroke
     }
 
     private fun cachedRoute(id: NodeId): LinkRoute? =
         routeCache[id]
+
+    internal fun boundaryPortLocations(linkId: NodeId): List<Pair<NodeId, Point>> {
+        val linkNode = repository.getNode(linkId) ?: return emptyList()
+        return routeLink(linkNode)?.boundaryPorts.orEmpty().map { it.boundaryId to Point(it.point) }
+    }
+
+    internal fun renderedLinkPoints(linkId: NodeId): List<Point> {
+        val linkNode = repository.getNode(linkId) ?: return emptyList()
+        val route = routeLink(linkNode) ?: return emptyList()
+        return renderedRoutePoints(route).map(::Point)
+    }
+
+    internal fun isLinkVisible(linkId: NodeId): Boolean =
+        repository.getNode(linkId)?.let(::isVisibleLink) == true
+
+    private fun renderedRoutePoints(route: LinkRoute): List<Point> {
+        var startIndex = 0
+        var endIndex = route.points.lastIndex
+        val document = repository.getDocument()
+        route.boundaryPorts
+            .filter { it.exitsBoundary && document.nodes[it.boundaryId]?.layout?.isExpanded == false }
+            .lastOrNull()
+            ?.point
+            ?.let(route.points::indexOf)
+            ?.takeIf { it >= 0 }
+            ?.let { startIndex = it }
+        route.boundaryPorts
+            .filter { !it.exitsBoundary && document.nodes[it.boundaryId]?.layout?.isExpanded == false }
+            .firstOrNull()
+            ?.point
+            ?.let(route.points::indexOf)
+            ?.takeIf { it >= 0 }
+            ?.let { endIndex = it }
+        if (startIndex >= endIndex) return emptyList()
+        return route.points.subList(startIndex, endIndex + 1)
+    }
+
+    private fun visibleBoundaryPorts(route: LinkRoute): List<CompositeBoundaryPort> =
+        route.boundaryPorts.filter { port ->
+            repository.getNode(port.boundaryId)?.let(::isVisibleInCanvas) == true
+        }
+
+    private fun renderedRouteBounds(route: LinkRoute): Rectangle? =
+        routeBounds(renderedRoutePoints(route))
+
+    private fun routeBounds(points: List<Point>): Rectangle? {
+        if (points.isEmpty()) return null
+        val minX = points.minOf { it.x }
+        val minY = points.minOf { it.y }
+        val maxX = points.maxOf { it.x }
+        val maxY = points.maxOf { it.y }
+        return Rectangle(minX, minY, (maxX - minX).coerceAtLeast(1), (maxY - minY).coerceAtLeast(1)).apply {
+            grow(PORT_STUB_LENGTH, PORT_SPACING)
+        }
+    }
 
     private fun linkLabel(node: Node): String {
         val typeName = repository.getDocument().linkTypeDisplayName(node)
@@ -5045,10 +5133,15 @@ class GraphCanvas(
         }
     }
 
-    private fun isVisibleLink(linkNode: Node): Boolean =
-        linkNode.isLink &&
-            isVisibleInCanvas(linkNode) &&
-            linkEndpointsVisible(linkNode)
+    private fun isVisibleLink(linkNode: Node): Boolean {
+        if (!linkNode.isLink || !isVisibleInCanvas(linkNode)) return false
+        if (linkEndpointsVisible(linkNode)) return true
+        if (isDependencyAnnotation(linkNode)) return false
+        val document = repository.getDocument()
+        return linkNode.link?.compositeBoundaryIds.orEmpty().any { boundaryId ->
+            document.nodes[boundaryId]?.let(::isVisibleInCanvas) == true
+        }
+    }
 
     private fun isVisibleInCanvas(node: Node): Boolean {
         val document = repository.getDocument()
@@ -5123,13 +5216,26 @@ class GraphCanvas(
         g2.stroke = previousStroke
     }
 
-    private fun drawBoundaryPierceMarker(g2: Graphics2D, point: Point, dx: Int, dy: Int) {
-        val color = g2.color
-        drawDirectionalArrow(g2, boundaryArrowCenter(point, dx, dy), dx, dy)
-        g2.color = activePalette[DesignerColorKey.PortFill]
+    private fun drawBoundaryPierceMarker(g2: Graphics2D, point: Point) {
+        val previousColor = g2.color
+        g2.color = Color.BLACK
         g2.fillOval(point.x - 5, point.y - 5, 10, 10)
-        g2.color = color
-        g2.drawOval(point.x - 5, point.y - 5, 10, 10)
+        g2.color = previousColor
+    }
+
+    private fun drawBoundaryLinkLabel(
+        g2: Graphics2D,
+        node: Node,
+        port: CompositeBoundaryPort,
+        color: Color,
+    ) {
+        val (name, typeName) = linkLabelParts(node)
+        if (name.isBlank() && typeName == null) return
+        g2.font = g2.font.deriveFont(10f)
+        val separator = if (typeName == null) "" else ":"
+        val width = g2.fontMetrics.stringWidth(name + separator + typeName.orEmpty())
+        val x = if (port.side < 0) port.point.x - width - 8 else port.point.x + 8
+        drawColoredLinkLabel(g2, name, typeName, x, port.point.y - 8, color)
     }
 
     private fun drawArrowAlongRoute(g2: Graphics2D, points: List<Point>) {
@@ -5376,7 +5482,11 @@ class GraphCanvas(
         return try {
             val anchors = linkAnchors(linkNode) ?: return null
             routeCache[linkNode.id]
-                ?.takeIf { it.source == anchors.source.point && it.target == anchors.target.point }
+                ?.takeIf {
+                    it.source == anchors.source.point &&
+                        it.target == anchors.target.point &&
+                        it.boundaryPorts == anchors.boundaryPorts
+                }
                 ?.let { return it }
             routedRoute(linkNode, anchors, emptyList())
         } finally {
@@ -5390,7 +5500,10 @@ class GraphCanvas(
         val targetNode = repository.getNode(link.targetNodeId) ?: return null
         val source = portAnchor(sourceNode, linkNode, outgoing = true) ?: return null
         val target = portAnchor(targetNode, linkNode, outgoing = false) ?: return null
-        return LinkAnchors(source, target, sourceNode.id, targetNode.id)
+        val boundaryPorts = link.compositeBoundaryIds.mapNotNull { boundaryId ->
+            repository.getNode(boundaryId)?.let { boundary -> boundaryPortAnchor(boundary, linkNode) }
+        }
+        return LinkAnchors(source, target, sourceNode.id, targetNode.id, boundaryPorts)
     }
 
     private fun rebuildRouteCache() {
@@ -5403,7 +5516,7 @@ class GraphCanvas(
                 val anchors = linkAnchors(linkNode) ?: return@forEach
                 val route = routedRoute(linkNode, anchors, routedSegments)
                 nextCache[linkNode.id] = route
-                route.points.zipWithNext().forEach { (a, b) ->
+                renderedRoutePoints(route).zipWithNext().forEach { (a, b) ->
                     routedSegments += RouteSegment(a, b, linkNode.id)
                 }
             }
@@ -5423,23 +5536,54 @@ class GraphCanvas(
         val targetStub = Point(target.point.x + PORT_STUB_LENGTH * target.xDirection, target.point.y)
         val obstacles = routeObstacles(linkNode, anchors.sourceNodeId, anchors.targetNodeId)
         val container = routingContainer(linkNode)
-        val candidates = routeCandidates(sourceStub, targetStub)
-            .map { compact(chamferOrthogonalTurns(it)) }
-            .filter { it.size >= 2 }
-            .filter(::isOctilinearPath)
-            .filter { points -> container == null || points.all { container.containsInclusive(it) } }
-
-        val best = candidates.minWithOrNull(compareBy<List<Point>> {
-            routeCost(it, obstacles, routedSegments, linkNode.id)
-        }.thenBy { routeLength(it) }) ?: listOf(sourceStub, targetStub)
+        val points = mutableListOf(source.point, sourceStub)
+        var cursor = sourceStub
+        anchors.boundaryPorts.forEach { boundaryPort ->
+            val insideStub = Point(
+                boundaryPort.point.x - boundaryPort.side * PORT_STUB_LENGTH,
+                boundaryPort.point.y,
+            )
+            val outsideStub = Point(
+                boundaryPort.point.x + boundaryPort.side * PORT_STUB_LENGTH,
+                boundaryPort.point.y,
+            )
+            val approach = if (boundaryPort.exitsBoundary) insideStub else outsideStub
+            val departure = if (boundaryPort.exitsBoundary) outsideStub else insideStub
+            points += bestRouteBetween(cursor, approach, obstacles, routedSegments, linkNode.id, container)
+            points += boundaryPort.point
+            points += departure
+            cursor = departure
+        }
+        points += bestRouteBetween(cursor, targetStub, obstacles, routedSegments, linkNode.id, container)
+        points += target.point
 
         return LinkRoute(
             source.point,
             target.point,
             source.xDirection,
             target.xDirection,
-            compact(listOf(source.point, sourceStub) + best + listOf(targetStub, target.point)),
+            anchors.boundaryPorts,
+            compact(points),
         )
+    }
+
+    private fun bestRouteBetween(
+        start: Point,
+        end: Point,
+        obstacles: List<Rectangle>,
+        routedSegments: List<RouteSegment>,
+        linkId: NodeId,
+        container: Rectangle?,
+    ): List<Point> {
+        if (start == end) return listOf(start)
+        val candidates = routeCandidates(start, end)
+            .map { compact(chamferOrthogonalTurns(it)) }
+            .filter { it.size >= 2 }
+            .filter(::isOctilinearPath)
+            .filter { points -> container == null || points.all { container.containsInclusive(it) } }
+        return candidates.minWithOrNull(compareBy<List<Point>> {
+            routeCost(it, obstacles, routedSegments, linkId)
+        }.thenBy { routeLength(it) }) ?: listOf(start, end)
     }
 
     private fun routeCandidates(start: Point, end: Point): List<List<Point>> {
@@ -5531,17 +5675,6 @@ class GraphCanvas(
     private fun routeLength(points: List<Point>): Double =
         points.zipWithNext().sumOf { (a, b) -> a.distance(b) }
 
-    private fun LinkRoute.bounds(): Rectangle {
-        if (points.isEmpty()) return Rectangle(source)
-        val minX = points.minOf { it.x }
-        val minY = points.minOf { it.y }
-        val maxX = points.maxOf { it.x }
-        val maxY = points.maxOf { it.y }
-        return Rectangle(minX, minY, (maxX - minX).coerceAtLeast(1), (maxY - minY).coerceAtLeast(1)).apply {
-            grow(PORT_STUB_LENGTH, PORT_SPACING)
-        }
-    }
-
     private fun isOctilinearPath(points: List<Point>): Boolean =
         points.zipWithNext().all { (a, b) ->
             val dx = abs(b.x - a.x)
@@ -5568,72 +5701,6 @@ class GraphCanvas(
                     r.height + ROUTING_OBSTACLE_PADDING * 2,
                 )
             }
-    }
-
-    private fun compositeBoundaryIntersections(linkNode: Node, points: List<Point>): List<Point> {
-        val document = repository.getDocument()
-        return linkNode.link?.compositeBoundaryIds.orEmpty()
-            .mapNotNull(document.nodes::get)
-            .flatMap { boundary ->
-                val rect = boundary.layout.rect()
-                val topLeft = Point(rect.x, rect.y)
-                val topRight = Point(rect.x + rect.width, rect.y)
-                val bottomRight = Point(rect.x + rect.width, rect.y + rect.height)
-                val bottomLeft = Point(rect.x, rect.y + rect.height)
-                val edges = listOf(
-                    topLeft to topRight,
-                    topRight to bottomRight,
-                    bottomRight to bottomLeft,
-                    bottomLeft to topLeft,
-                )
-                points.zipWithNext().flatMap { (start, end) ->
-                    edges.mapNotNull { (edgeStart, edgeEnd) ->
-                        segmentIntersectionPoint(start, end, edgeStart, edgeEnd)
-                    }
-                }
-            }
-            .distinctBy { it.x to it.y }
-    }
-
-    private fun routeDirectionAt(points: List<Point>, point: Point): Pair<Int, Int> {
-        val segment = points.zipWithNext().firstOrNull { (start, end) ->
-            Line2D.ptSegDist(
-                start.x.toDouble(),
-                start.y.toDouble(),
-                end.x.toDouble(),
-                end.y.toDouble(),
-                point.x.toDouble(),
-                point.y.toDouble(),
-            ) <= 1.0
-        } ?: return 1 to 0
-        return (segment.second.x - segment.first.x) to (segment.second.y - segment.first.y)
-    }
-
-    private fun boundaryArrowCenter(point: Point, dx: Int, dy: Int): Point {
-        val length = hypot(dx.toDouble(), dy.toDouble())
-        if (length <= 0.0) return point
-        val distanceToCenter = 15.0
-        return Point(
-            (point.x - dx / length * distanceToCenter).roundToInt(),
-            (point.y - dy / length * distanceToCenter).roundToInt(),
-        )
-    }
-
-    private fun segmentIntersectionPoint(a: Point, b: Point, c: Point, d: Point): Point? {
-        val denominator = (a.x - b.x).toDouble() * (c.y - d.y) -
-            (a.y - b.y).toDouble() * (c.x - d.x)
-        if (abs(denominator) < 0.000001) return null
-        val firstDeterminant = a.x.toDouble() * b.y - a.y.toDouble() * b.x
-        val secondDeterminant = c.x.toDouble() * d.y - c.y.toDouble() * d.x
-        val x = (firstDeterminant * (c.x - d.x) - (a.x - b.x) * secondDeterminant) / denominator
-        val y = (firstDeterminant * (c.y - d.y) - (a.y - b.y) * secondDeterminant) / denominator
-        val epsilon = 0.001
-        if (x < min(a.x, b.x) - epsilon || x > max(a.x, b.x) + epsilon ||
-            y < min(a.y, b.y) - epsilon || y > max(a.y, b.y) + epsilon ||
-            x < min(c.x, d.x) - epsilon || x > max(c.x, d.x) + epsilon ||
-            y < min(c.y, d.y) - epsilon || y > max(c.y, d.y) + epsilon
-        ) return null
-        return Point(x.roundToInt(), y.roundToInt())
     }
 
     private fun routingContainer(linkNode: Node): Rectangle? {
@@ -5678,7 +5745,9 @@ class GraphCanvas(
         document.nodes.values
             .filter { linkNode ->
                 val link = linkNode.link ?: return@filter false
-                link.sourceNodeId in affectedNodes || link.targetNodeId in affectedNodes
+                link.sourceNodeId in affectedNodes ||
+                    link.targetNodeId in affectedNodes ||
+                    link.compositeBoundaryIds.any { it in nodeIds }
             }
             .forEach { routeCache.remove(it.id) }
         scheduleReroute()
@@ -5689,7 +5758,7 @@ class GraphCanvas(
         if (node.isLink) return null
         val r = node.layout.rect()
         val side = linkSide(node, linkNode, outgoing)
-        val sorted = normalLinksOnSide(node, side)
+        val sorted = portLinksOnSide(node, side)
             .sortedWith(compareBy<Node> { portOrderValue(node, it, side) }.thenBy { it.id.value })
         val index = sorted.indexOfFirst { it.id == linkNode.id }.takeIf { it >= 0 } ?: 0
         val x = when {
@@ -5700,6 +5769,26 @@ class GraphCanvas(
         }
         val y = r.y + portTopSpacing(node) + index * PORT_SPACING
         return PortAnchor(Point(x, y), side)
+    }
+
+    private fun boundaryPortAnchor(boundary: Node, linkNode: Node): CompositeBoundaryPort? {
+        if (!boundary.isComposite || boundary.id !in linkNode.link?.compositeBoundaryIds.orEmpty()) return null
+        val side = boundaryPortSide(boundary, linkNode) ?: return null
+        val sorted = portLinksOnSide(boundary, side)
+            .sortedWith(compareBy<Node> { portOrderValue(boundary, it, side) }.thenBy { it.id.value })
+        val index = sorted.indexOfFirst { it.id == linkNode.id }.takeIf { it >= 0 } ?: return null
+        val rect = boundary.layout.rect()
+        val point = Point(
+            if (side < 0) rect.x else rect.x + rect.width,
+            rect.y + portTopSpacing(boundary) + index * PORT_SPACING,
+        )
+        val link = linkNode.link ?: return null
+        return CompositeBoundaryPort(
+            boundaryId = boundary.id,
+            point = point,
+            side = side,
+            exitsBoundary = isDescendantOf(link.sourceNodeId, boundary.id),
+        )
     }
 
     private fun routeDirectionNear(points: List<Point>, point: Point): Int {
@@ -5713,18 +5802,54 @@ class GraphCanvas(
         }
     }
 
-    private fun normalLinksOnSide(node: Node, side: Int): List<Node> {
+    private fun portLinksOnSide(node: Node, side: Int): List<Node> {
         val document = repository.getDocument()
-        val ids = node.outgoingLinks + node.incomingLinks
+        val directIds = node.outgoingLinks + node.incomingLinks
+        val boundaryIds = if (node.isComposite) {
+            document.nodes.values
+                .filter { node.id in it.link?.compositeBoundaryIds.orEmpty() }
+                .map(Node::id)
+        } else {
+            emptyList()
+        }
+        val ids = directIds + boundaryIds
         return ids.distinct().mapNotNull(document.nodes::get)
             .filterNot(::isDependencyAnnotation)
             .filter { linkNode ->
-                isVisibleLink(linkNode) && run {
-                    val link = linkNode.link ?: return@run false
-                    val outgoing = link.sourceNodeId == node.id
-                    linkSide(node, linkNode, outgoing) == side
-                }
+                isVisibleLink(linkNode) && portSide(node, linkNode) == side
             }
+    }
+
+    private fun portSide(node: Node, linkNode: Node): Int? {
+        val link = linkNode.link ?: return null
+        return when {
+            link.sourceNodeId == node.id -> linkSide(node, linkNode, outgoing = true)
+            link.targetNodeId == node.id -> linkSide(node, linkNode, outgoing = false)
+            node.id in link.compositeBoundaryIds -> boundaryPortSide(node, linkNode)
+            else -> null
+        }
+    }
+
+    private fun boundaryPortSide(boundary: Node, linkNode: Node): Int? {
+        val link = linkNode.link ?: return null
+        val sourceInside = isDescendantOf(link.sourceNodeId, boundary.id)
+        val targetInside = isDescendantOf(link.targetNodeId, boundary.id)
+        val (insideNode, outsideNode) = when {
+            sourceInside && !targetInside ->
+                repository.getNode(link.sourceNodeId) to repository.getNode(link.targetNodeId)
+            targetInside && !sourceInside ->
+                repository.getNode(link.targetNodeId) to repository.getNode(link.sourceNodeId)
+            else -> null
+        } ?: return null
+        insideNode ?: return null
+        outsideNode ?: return null
+        val horizontalDirection = outsideNode.layout.center().x - insideNode.layout.center().x
+        return when {
+            horizontalDirection > 0 -> 1
+            horizontalDirection < 0 -> -1
+            outsideNode.layout.center().x >= boundary.layout.center().x -> 1
+            else -> -1
+        }
     }
 
     private fun linkSide(node: Node, linkNode: Node, outgoing: Boolean): Int {
@@ -5734,12 +5859,14 @@ class GraphCanvas(
     }
 
     private fun portOrderValue(node: Node, linkNode: Node, side: Int): Double {
-        val center = node.layout.center()
         val link = linkNode.link ?: return 0.0
-        val outgoing = link.sourceNodeId == node.id
-        val otherPoint = linkedEndpointReferencePoint(linkNode, outgoing, center)
-        val sideRelativeX = ((otherPoint.x - center.x) * side).toDouble().coerceAtLeast(1.0)
-        return atan2((otherPoint.y - center.y).toDouble(), sideRelativeX)
+        val source = repository.getNode(link.sourceNodeId)?.layout?.center() ?: return 0.0
+        val target = repository.getNode(link.targetNodeId)?.layout?.center() ?: return 0.0
+        val edgeX = node.layout.rect().let { if (side < 0) it.x else it.x + it.width }
+        val dx = target.x - source.x
+        if (dx == 0) return (source.y + target.y) / 2.0
+        val ratio = (edgeX - source.x).toDouble() / dx
+        return source.y + (target.y - source.y) * ratio
     }
 
     private fun linkedEndpointReferencePoint(linkNode: Node, outgoingFromNode: Boolean, fallback: Point): Point {
@@ -5755,12 +5882,19 @@ class GraphCanvas(
             acc
         }
 
-    private fun drawEndpointLinkLabels(g2: Graphics2D, node: Node, route: LinkRoute, color: Color) {
+    private fun drawEndpointLinkLabels(
+        g2: Graphics2D,
+        node: Node,
+        route: LinkRoute,
+        color: Color,
+        sourceVisible: Boolean,
+        targetVisible: Boolean,
+    ) {
         val (name, typeName) = linkLabelParts(node)
         if (name.isBlank() && typeName == null) return
         g2.font = g2.font.deriveFont(10f)
-        drawEndpointLinkLabel(g2, name, typeName, route.source, route.sourceDirection, color)
-        drawEndpointLinkLabel(g2, name, typeName, route.target, route.targetDirection, color)
+        if (sourceVisible) drawEndpointLinkLabel(g2, name, typeName, route.source, route.sourceDirection, color)
+        if (targetVisible) drawEndpointLinkLabel(g2, name, typeName, route.target, route.targetDirection, color)
     }
 
     private fun drawEndpointLinkLabel(
@@ -6131,7 +6265,11 @@ class GraphCanvas(
                 if (isDependencyAnnotation(link)) {
                     dependencyAnnotationBounds(link).any { it.contains(point) }
                 } else {
-                    routeLink(link)?.points?.zipWithNext()?.any { (a, b) -> distanceToSegment(point, a, b) <= 8.0 } == true
+                    routeLink(link)?.let { route ->
+                        renderedRoutePoints(route).zipWithNext().any { (a, b) ->
+                            distanceToSegment(point, a, b) <= 8.0
+                        }
+                    } == true
                 }
             }
             ?.id
@@ -6142,11 +6280,12 @@ class GraphCanvas(
             return if (containsOnly) bounds.isNotEmpty() && bounds.all { rect.contains(it) } else bounds.any { rect.intersects(it) }
         }
         val route = routeCache[link.id] ?: routeLink(link) ?: return false
+        val points = renderedRoutePoints(route)
         return if (containsOnly) {
-            route.points.all { rect.contains(it) }
+            points.isNotEmpty() && points.all { rect.contains(it) }
         } else {
-            route.points.any { rect.contains(it) } ||
-                route.points.zipWithNext().any { (a, b) ->
+            points.any { rect.contains(it) } ||
+                points.zipWithNext().any { (a, b) ->
                     rect.intersectsLine(a.x.toDouble(), a.y.toDouble(), b.x.toDouble(), b.y.toDouble())
                 }
         }

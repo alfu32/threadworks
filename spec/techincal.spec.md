@@ -1024,12 +1024,16 @@ Transport and error links are materialized as routed polylines between node
 ports. Input and output ports must be distributed vertically on the left or right
 edge of the node with readable spacing. Port slots start near the top edge and
 progress downward; the required port stack height contributes to the calculated
-node height. A materialized link displays one label, centered on the route, using
-the link node name rather than generic input or output captions. Short links
-between facing ports should use a direct segment instead of a kinked route. Link
-routes should include directional arrow markers at readable intervals, at least
-near the last quarter of the route. Links and port icons are drawn after node and
-composite bodies so internal composite links remain visible.
+node height. Links piercing a composite may cross only its left or right edge.
+Their direct endpoint line determines the side and vertical order. Their boundary
+ports share the composite's normal top-down port rows, ordered by the line's
+intersection with the chosen side. Each crossing is rendered as
+a black dot with the link label outside the composite. Collapsing a composite
+hides only the portions of a route inside that composite, preserving all external
+segments. Short links between facing ports should use a direct segment instead of
+a kinked route. Link routes should include directional arrow markers at readable
+intervals, at least near the last quarter of the route. Links and port icons are
+drawn after node and composite bodies so internal composite links remain visible.
 
 An expanded composite reserves sufficient horizontal clearance between its
 children and both boundaries for port stubs, labels, and a routing lane. A link

@@ -79,9 +79,15 @@ repository computes this parent when the link is created and recomputes it when
 an endpoint is reparented.
 
 `compositeBoundaryIds` lists, in source-to-target order, every composite boundary
-that the direct link crosses. The canvas renders one continuous route, marks each
-boundary crossing, and does not treat those listed composites as routing
-obstacles. Persisted boundary data is normalized when a document is loaded.
+that the direct link crosses. Each crossing is assigned to the left or right edge
+of its composite from the direct endpoint line. Direct composite ports and
+boundary crossings share port rows ordered by that line's vertical intersection
+with the chosen edge, starting near the top edge and progressing downward. The
+canvas routes through those assigned points, renders a black boundary dot with
+the link label outside the composite, and does not treat crossed composites as
+routing obstacles. Collapsing a composite hides only route segments logically
+inside it; external segments remain visible from the composite boundary.
+Persisted boundary data is normalized when a document is loaded.
 
 ## 6. Shared Type Declarations
 
