@@ -82,11 +82,81 @@ class WorkflowArchetypeResourcesTest {
             assertTrue(probe.text.specification.contains("orderly network shutdown"))
         }
 
+        val starterLanguages = listOf("c", "php", "javascript", "python", "go")
+        val starterResources = starterLanguages.flatMap { language ->
+            listOf("http-server", "file-queue", "config-reader", "http-reader", "http-writer")
+                .map { archetype -> "/workflow-archetypes/$language/$archetype.orch" }
+        }
+        starterResources.forEach { path ->
+            val document = store.loadText(requireNotNull(javaClass.getResourceAsStream(path))
+                .bufferedReader().use { it.readText() })
+            assertTrue(document.nodes.values.filter { it.id != document.rootNodeId }.all {
+                it.text.specification.isNotBlank()
+            })
+        }
+        starterLanguages.forEach { language ->
+            val document = store.loadText(requireNotNull(javaClass.getResourceAsStream(
+                "/workflow-archetypes/$language/http-server.orch",
+            )).bufferedReader().use { it.readText() })
+            val server = document.nodes.values.single {
+                it.id != document.rootNodeId && it.name == "http_server"
+            }
+            assertEquals(
+                mapOf("request" to PortDirection.Output, "response" to PortDirection.Input),
+                server.ports.associate { it.name to it.direction },
+            )
+            assertTrue(server.ports.all { it.dataType == "HttpExchange" })
+            assertTrue(server.text.specification.contains("exactly these two data ports"))
+            assertTrue(server.text.specification.contains("`id`, `request_text`, and `response_text`"))
+            assertTrue(server.text.specification.contains("SIGTERM"))
+            assertTrue(document.nodes.values.any { it.name == "http_request_registry_lib" })
+
+            val fileQueue = starterNode(store, language, "file-queue", "file_queue")
+            assertEquals(
+                mapOf(
+                    "config" to PortDirection.Input,
+                    "read" to PortDirection.Output,
+                    "response" to PortDirection.Input,
+                ),
+                fileQueue.ports.associate { it.name to it.direction },
+            )
+            assertTrue(fileQueue.text.specification.contains("`in`, `out`, and `err`"))
+            assertTrue(fileQueue.text.specification.contains("`id`, `filename`, and `content`"))
+
+            val configReader = starterNode(store, language, "config-reader", "config_reader_lib")
+            assertTrue(configReader.text.specification.contains("caller-supplied file path"))
+
+            val httpReader = starterNode(store, language, "http-reader", "http_reader")
+            assertEquals(
+                mapOf("config" to PortDirection.Input, "result" to PortDirection.Output),
+                httpReader.ports.associate { it.name to it.direction },
+            )
+            assertTrue(httpReader.text.specification.contains("`method`, `url`, `params`, and `headers`"))
+
+            val httpWriter = starterNode(store, language, "http-writer", "http_writer")
+            assertEquals(
+                mapOf("config" to PortDirection.Input, "request" to PortDirection.Input),
+                httpWriter.ports.associate { it.name to it.direction },
+            )
+            assertTrue(httpWriter.text.specification.contains("`method`, `url`, and `headers`"))
+        }
+
         val catalogRows = requireNotNull(javaClass.getResourceAsStream("/workflow-archetypes/catalog.tsv"))
             .bufferedReader()
             .useLines { lines -> lines.filter { it.isNotBlank() && !it.startsWith('#') }.toList() }
-        assertEquals(workflowResources.size + shutdownResources.size, catalogRows.size)
+        assertEquals(workflowResources.size + shutdownResources.size + starterResources.size, catalogRows.size)
         assertTrue(catalogRows.all { row -> row.substringAfterLast('\t').count { it == '/' } == 1 })
+    }
+
+    private fun starterNode(
+        store: KotlinxJsonDocumentStore,
+        language: String,
+        resource: String,
+        name: String,
+    ) = store.loadText(requireNotNull(javaClass.getResourceAsStream(
+        "/workflow-archetypes/$language/$resource.orch",
+    )).bufferedReader().use { it.readText() }).let { document ->
+        document.nodes.values.single { it.id != document.rootNodeId && it.name == name }
     }
 
     @Test
@@ -101,8 +171,8 @@ class WorkflowArchetypeResourcesTest {
 
         val archetypes = loadWorkflowArchetypes(store, userFolder)
 
-        assertEquals(8, archetypes.size)
-        assertEquals(7, archetypes.count { !it.id.startsWith("user:") })
+        assertEquals(33, archetypes.size)
+        assertEquals(32, archetypes.count { !it.id.startsWith("user:") })
         val custom = archetypes.single { it.id == "user:custom-flows/custom-request.orch" }
         assertEquals("custom-flows", custom.group)
         assertEquals("Request Response Template", custom.label)
