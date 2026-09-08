@@ -78,7 +78,7 @@ Available layout strategies are:
 | `classified-filesystem` | Groups generated entities into directories such as `nodes`, `links`, `libraries`, and `composites`. |
 | `source-set` | Places generated content under a conventional source/resource tree. |
 
-Built-in compiler implementations target Kotlin/JVM, Node.js/CommonJS, and PHP. They are backed by Pebble template sets. The generic compiler consumes graph-defined `@Compiler`, compiler-template, project/static-file overrides, and the compiler-compiler can generate a Kotlin `CompilerPlugin` implementation from one `@Compiler` subtree.
+Built-in compiler implementations target C17, Go, Kotlin/JVM, Node.js/CommonJS, PHP, and QuickJS. They are backed by Pebble template sets. The generic compiler consumes graph-defined `@Compiler`, compiler-template, project/static-file overrides, and the compiler-compiler can generate a Kotlin `CompilerPlugin` implementation from one `@Compiler` subtree. The initial Go backend emits a self-contained `single-file` application.
 
 Compilation may target the current selection or the full project. When child technology differs from its parent, the structured compiler can delegate that subtree to a registered compiler advertising the matching technology.
 
@@ -96,7 +96,7 @@ Compiler plugins are discovered with Java `ServiceLoader`. Desktop plugins can r
 | `storage-json/` | Mutable repository operations and JSON `.orch` persistence/repair. |
 | `completion-core/` | Model-aware and technology-aware editor completions. |
 | `compiler-api/` | Compiler contracts, virtual files, recursive compilation kernel, and layout strategies. |
-| `compilers-impl/` | Generic/template compiler plus Kotlin, Node.js, PHP, and compiler-compiler implementations. |
+| `compilers-impl/` | Generic/template compiler plus C, Go, Kotlin, Node.js, PHP, QuickJS, and compiler-compiler implementations. |
 | `assets/` | Licensed fonts, SVG sources, and generated multi-resolution UI icons. |
 | `app-desktop/` | CLI, Swing application, canvas, sheet exporter, plugin loading, and editor adapters. |
 | `spec/` | Functional, object-model, graphics, plugin, and compiler specifications. |

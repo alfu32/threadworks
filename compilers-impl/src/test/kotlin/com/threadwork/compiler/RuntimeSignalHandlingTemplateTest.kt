@@ -6,7 +6,7 @@ import kotlin.test.assertTrue
 
 class RuntimeSignalHandlingTemplateTest {
     @Test
-    fun `C PHP and Node signal handlers record a signal for model shutdown logic`() {
+    fun `runtime signal handlers record a signal for model shutdown logic`() {
         val cRuntime = runtime("c")
         val cHandler = cRuntime.substringAfter("static void threadwork_shutdown_signal_handler")
             .substringBefore("threadwork_error_t threadwork_runner__init")
@@ -24,6 +24,12 @@ class RuntimeSignalHandlingTemplateTest {
             .substringBefore("process.once(\"SIGINT\"")
         assertTrue(nodeHandler.contains("this.shutdownSignal = signalNumber;"))
         assertFalse(nodeHandler.contains("this.shutdownRequest"))
+
+        val goRuntime = runtime("go")
+        val goHandler = goRuntime.substringAfter("for received := range signals")
+            .substringBefore("// StopShutdownSignalHandlers")
+        assertTrue(goHandler.contains("runner.shutdownSignal.Store"))
+        assertFalse(goHandler.contains("ShutdownRequest"))
     }
 
     private fun runtime(language: String): String = requireNotNull(

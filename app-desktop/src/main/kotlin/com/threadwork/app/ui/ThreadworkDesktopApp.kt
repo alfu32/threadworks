@@ -32,6 +32,7 @@ import com.threadwork.compiler.generated.nodejs.JSCompiler
 import com.threadwork.compiler.generic.CompilerCompiler
 import com.threadwork.compiler.generic.CompilerTemplateRoles
 import com.threadwork.compiler.generic.GenericCompiler
+import com.threadwork.compiler.go.GoCompiler
 import com.threadwork.compiler.naivekotlin.NaiveKotlinCompiler
 import com.threadwork.compiler.php.PhpCompiler
 import com.threadwork.compiler.quickjs.QuickJsCompiler
@@ -300,7 +301,16 @@ class ThreadworkDesktopApp(
     private val markdownOptions = MutableDataSet().set(Parser.EXTENSIONS, listOf(TablesExtension.create()))
     private val markdownParser = Parser.builder(markdownOptions).build()
     private val markdownHtmlRenderer = HtmlRenderer.builder(markdownOptions).build()
-    private val compilerPlugins: List<CompilerPlugin> = loadCompilerPlugins(pluginsFolder) + FilesystemCompiler() + JSCompiler() + QuickJsCompiler() + PhpCompiler() + CCompiler() + GenericCompiler() + NaiveKotlinCompiler()
+    private val compilerPlugins: List<CompilerPlugin> = loadCompilerPlugins(pluginsFolder) + listOf(
+        FilesystemCompiler(),
+        JSCompiler(),
+        QuickJsCompiler(),
+        PhpCompiler(),
+        GoCompiler(),
+        CCompiler(),
+        GenericCompiler(),
+        NaiveKotlinCompiler(),
+    )
     private val compilerTechnologies = availableCompilerTechnologies()
     private val languageIds = availableLanguageIds(compilerTechnologies)
     private val technologyIds = availableTechnologyIds(compilerTechnologies)

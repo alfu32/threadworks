@@ -672,6 +672,7 @@ The initial built-in compiler support matrix is:
 | Kotlin/JVM | supported | supported | rejected with a diagnostic |
 | PHP | supported | supported | rejected with a diagnostic |
 | C | supported | supported | rejected with a diagnostic |
+| Go | supported | supported | rejected with a diagnostic |
 
 For `src`, the returned product is the provider node's compiler-generated
 declaration after parameter interpolation, not the raw declaration field from

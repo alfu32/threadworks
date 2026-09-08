@@ -4,7 +4,9 @@
 
 Templates use Pebble syntax. Values use `{{ value }}`, branches use `{% if ... %}`, and collections use `{% for ... %}`. Legacy `${value}` placeholders remain accepted.
 
-The built-in Node.js, PHP, and Kotlin compilers are template-set specializations. Their Kotlin classes contain only compiler identity, supported technology metadata, validation, and template-set loading; language generation lives under `compilers-impl/src/main/resources/compiler-templates/`.
+The built-in C, Go, Node.js, PHP, QuickJS, and Kotlin compilers are template-set specializations. Their Kotlin classes contain compiler identity, supported technology metadata, validation, code-intelligence adaptations, and template-set loading; language generation lives under `compilers-impl/src/main/resources/compiler-templates/`.
+
+The Go specialization initially advertises only `single-file`. Its assembly template emits one `package main` source unit containing the runner, modeled types, package-scope service libraries, double-buffered transports, node functions, and the application entry point. Runtime `run` capabilities remain unsupported until an explicit Go evaluator or artifact ABI is configured.
 
 ## Resource Template Sets
 

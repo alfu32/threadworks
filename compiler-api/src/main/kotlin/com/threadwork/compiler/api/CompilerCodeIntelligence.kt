@@ -290,6 +290,15 @@ private fun bufferMethodsFor(
         add(CompilerCodeMember("threadwork_buffer_count($bufferName)", "buffer size"))
     }
 
+    "go" -> buildList {
+        if (input) {
+            add(CompilerCodeMember("pop($bufferName, &item)", "take next item", "Copy and remove the next item."))
+        } else {
+            add(CompilerCodeMember("push($bufferName, item)", "append item", "Append an item to this output buffer."))
+        }
+        add(CompilerCodeMember("len(*$bufferName)", "buffer size"))
+    }
+
     else -> listOf(
         CompilerCodeMember("$bufferName.push(item)", "append item"),
         CompilerCodeMember("$bufferName.pop()", "take next item"),
@@ -306,18 +315,27 @@ private fun builtInTypeDescription(typeName: String, languageId: String): String
     BuiltInTypeIds.Number -> when (languageId.lowercase()) {
         "kotlin" -> "Double"
         "c" -> "double"
+        "go" -> "float64"
         else -> "number"
+    }
+
+    BuiltInTypeIds.Boolean -> when (languageId.lowercase()) {
+        "kotlin" -> "Boolean"
+        "c", "go", "php" -> "bool"
+        else -> "boolean"
     }
 
     BuiltInTypeIds.Date -> when (languageId.lowercase()) {
         "kotlin" -> "java.time.Instant"
         "c" -> "int64_t"
+        "go" -> "int64"
         else -> "date"
     }
 
     BuiltInTypeIds.Array -> when (languageId.lowercase()) {
         "kotlin" -> "List<Any?>"
         "c" -> "ThreadworkArray"
+        "go" -> "[]any"
         else -> "array"
     }
 

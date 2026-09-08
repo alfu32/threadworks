@@ -7,6 +7,7 @@ import com.threadwork.compiler.filesystem.FilesystemCompiler
 import com.threadwork.compiler.generated.nodejs.JSCompiler
 import com.threadwork.compiler.generic.CompilerCompiler
 import com.threadwork.compiler.generic.GenericCompiler
+import com.threadwork.compiler.go.GoCompiler
 import com.threadwork.compiler.naivekotlin.NaiveKotlinCompiler
 import com.threadwork.compiler.php.PhpCompiler
 import com.threadwork.compiler.quickjs.QuickJsCompiler
@@ -103,7 +104,17 @@ private fun compile(args: Array<String>) {
 }
 
 private fun compilersFrom(pluginsFolder: Path): List<CompilerPlugin> =
-    loadCompilerPlugins(pluginsFolder) + CompilerCompiler() + FilesystemCompiler() + GenericCompiler() + NaiveKotlinCompiler() + JSCompiler() + QuickJsCompiler() + PhpCompiler() + CCompiler()
+    loadCompilerPlugins(pluginsFolder) + listOf(
+        CompilerCompiler(),
+        FilesystemCompiler(),
+        GenericCompiler(),
+        NaiveKotlinCompiler(),
+        JSCompiler(),
+        QuickJsCompiler(),
+        PhpCompiler(),
+        GoCompiler(),
+        CCompiler(),
+    )
 
 private fun selectCompiler(document: com.threadwork.core.model.ThreadworkDocument, compilers: List<CompilerPlugin>): CompilerPlugin? {
     val root = document.rootNode()
