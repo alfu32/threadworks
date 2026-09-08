@@ -36,8 +36,7 @@
                 "node_078ec47e-e735-4cc2-a56a-34da3933ac8b",
                 "node_352d6efc-bce0-4273-8c4b-03c64e7764fc",
                 "node_6a831982-71aa-47ad-ab14-fbfcbc9cd384",
-                "node_34e10e8d-c693-4e56-91d9-f03334aafa9b",
-                "node_a6c39bd2-e8c7-48df-a6c4-166f189453c6"
+                "node_34e10e8d-c693-4e56-91d9-f03334aafa9b"
             ],
             "incomingLinks": [],
             "outgoingLinks": [],
@@ -79,7 +78,7 @@
             },
             "responsible": "devlin",
             "modified": {
-                "date": "2026-09-05T19:17:12.044925023Z",
+                "date": "2026-09-07T22:58:15.391284748Z",
                 "user": "devlin"
             },
             "ports": [],
@@ -1504,44 +1503,7 @@
             ],
             "link": null,
             "typeDefinition": null,
-            "diagnostics": [
-                {
-                    "severity": "Warning",
-                    "message": "implicit declaration of function 'threadwork_install_shutdown_signal_handlers'",
-                    "nodeId": "node_c43e7a55-0e44-428b-972a-6dab999df396",
-                    "textSection": null,
-                    "line": null,
-                    "column": null,
-                    "sourcePluginId": "tinycc"
-                },
-                {
-                    "severity": "Error",
-                    "message": "'threadwork_running' undeclared",
-                    "nodeId": "node_c43e7a55-0e44-428b-972a-6dab999df396",
-                    "textSection": null,
-                    "line": null,
-                    "column": null,
-                    "sourcePluginId": "tinycc"
-                },
-                {
-                    "severity": "Error",
-                    "message": "declaration expected",
-                    "nodeId": "node_c43e7a55-0e44-428b-972a-6dab999df396",
-                    "textSection": null,
-                    "line": null,
-                    "column": null,
-                    "sourcePluginId": "tinycc"
-                },
-                {
-                    "severity": "Warning",
-                    "message": "type defaults to int",
-                    "nodeId": "node_c43e7a55-0e44-428b-972a-6dab999df396",
-                    "textSection": null,
-                    "line": null,
-                    "column": null,
-                    "sourcePluginId": "tinycc"
-                }
-            ],
+            "diagnostics": [],
             "metadata": {},
             "pluginData": {},
             "nameDetail": ""
@@ -1693,44 +1655,7 @@
             ],
             "link": null,
             "typeDefinition": null,
-            "diagnostics": [
-                {
-                    "severity": "Warning",
-                    "message": "implicit declaration of function 'threadwork_install_shutdown_signal_handlers'",
-                    "nodeId": "node_3b600a6f-96a5-42b4-beae-b74338ccf170",
-                    "textSection": null,
-                    "line": null,
-                    "column": null,
-                    "sourcePluginId": "tinycc"
-                },
-                {
-                    "severity": "Error",
-                    "message": "'threadwork_running' undeclared",
-                    "nodeId": "node_3b600a6f-96a5-42b4-beae-b74338ccf170",
-                    "textSection": null,
-                    "line": null,
-                    "column": null,
-                    "sourcePluginId": "tinycc"
-                },
-                {
-                    "severity": "Error",
-                    "message": "declaration expected",
-                    "nodeId": "node_3b600a6f-96a5-42b4-beae-b74338ccf170",
-                    "textSection": null,
-                    "line": null,
-                    "column": null,
-                    "sourcePluginId": "tinycc"
-                },
-                {
-                    "severity": "Warning",
-                    "message": "type defaults to int",
-                    "nodeId": "node_3b600a6f-96a5-42b4-beae-b74338ccf170",
-                    "textSection": null,
-                    "line": null,
-                    "column": null,
-                    "sourcePluginId": "tinycc"
-                }
-            ],
+            "diagnostics": [],
             "metadata": {},
             "pluginData": {},
             "nameDetail": ""
@@ -2089,100 +2014,6 @@
             "metadata": {},
             "pluginData": {},
             "nameDetail": ""
-        },
-        {
-            "id": "node_a6c39bd2-e8c7-48df-a6c4-166f189453c6",
-            "name": "@CompositeSingleFile",
-            "kind": "Processor",
-            "parentId": "root",
-            "children": [],
-            "incomingLinks": [],
-            "outgoingLinks": [],
-            "layout": {
-                "x": 1206.0,
-                "y": 736.0,
-                "width": 391.0,
-                "height": 70.0,
-                "closedWidth": 391.0,
-                "closedHeight": 70.0,
-                "openWidth": 391.0,
-                "openHeight": 70.0,
-                "isExpanded": true
-            },
-            "fileLayoutStrategyId": "single-file",
-            "text": {
-                "initialization": "",
-                "initializationLanguageId": "",
-                "source": "{# Assembles exactly one portable C17 translation unit for the compilation root. #}\n{% if isCompilationRoot %}/* Generated by Threadwork's C17 compiler. */\n#include <stddef.h>\n#include <stdbool.h>\n#include <stdint.h>\n#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n#include <signal.h>\n#include <unistd.h>\n\n{{ runtimeSupport }}\n{% if hoistedDeclarations is not empty %}\n/* Modeled wire and domain types. */\n{{ hoistedDeclarations }}\n{% endif %}{% if forwardDeclarations is not empty %}\n/* Generated application prototypes. */\n{{ forwardDeclarations }}\n{% endif %}{% endif %}{% if inlineChildDeclarations is not empty %}\n/* Generated child definitions. */\n{{ inlineChildDeclarations }}\n{% endif %}\n/* Generated root definition. */\n{{ ownDeclaration }}\n{% if isCompilationRoot %}\n\n\nint main(void)\n{\n    threadwork_context context;\n    threadwork_error_t status;\n    int running;\n    int recent_transit;\n\n    status = threadwork_runner__init(&threadwork_runner);\n    if (status != THREADWORK_OK) {\n        return EXIT_FAILURE;\n    }\n    if (threadwork_context_init(&context) != THREADWORK_OK) {\n        (void)threadwork_runner__destroy(&threadwork_runner);\n        return EXIT_FAILURE;\n    }\n    status = threadwork_runner__install_shutdown_signal_handlers(&threadwork_runner);\n    if (status == THREADWORK_OK) {\n        status = tw_{{ initializerSymbol }}(&context);\n    }\n\n    while (status == THREADWORK_OK) {\n        status = threadwork_runner__is_running(&threadwork_runner, &running);\n        if (status != THREADWORK_OK || !running) {\n            break;\n        }\n        status = tw_{{ runSymbol }}(&context);\n    }\n\n    if (status == THREADWORK_OK) {\n        status = threadwork_runner__begin_shutdown_drain(&threadwork_runner, 10U);\n        while (status == THREADWORK_OK) {\n            status = threadwork_runner__has_recent_transit(&threadwork_runner, &recent_transit);\n            if (status != THREADWORK_OK || !recent_transit) {\n                break;\n            }\n            status = tw_{{ runSymbol }}(&context);\n        }\n    }\n\n    /* graceful shutdown */\n    printf(\"Shutting down...\\n\");\n\n    threadwork_context_destroy(&context);\n    (void)threadwork_runner__destroy(&threadwork_runner);\n    return status == THREADWORK_OK ? EXIT_SUCCESS : EXIT_FAILURE;\n}\n{% endif %}\n",
-                "sourceLanguageId": "",
-                "specification": "",
-                "specificationLanguageId": "markdown",
-                "tests": "",
-                "testsLanguageId": "json",
-                "aiInstructions": "",
-                "aiInstructionsLanguageId": "markdown"
-            },
-            "binaryContent": null,
-            "technology": {
-                "languageId": "",
-                "technologyId": "",
-                "compilerId": "",
-                "fileExtension": "",
-                "contentType": ""
-            },
-            "revision": {
-                "name": "A",
-                "date": "20260831"
-            },
-            "responsible": null,
-            "modified": {
-                "date": "2026-09-05T19:18:13.146316311Z",
-                "user": "devlin"
-            },
-            "ports": [],
-            "link": null,
-            "typeDefinition": null,
-            "diagnostics": [
-                {
-                    "severity": "Warning",
-                    "message": "implicit declaration of function 'threadwork_install_shutdown_signal_handlers'",
-                    "nodeId": "node_a6c39bd2-e8c7-48df-a6c4-166f189453c6",
-                    "textSection": null,
-                    "line": null,
-                    "column": null,
-                    "sourcePluginId": "tinycc"
-                },
-                {
-                    "severity": "Error",
-                    "message": "'threadwork_running' undeclared",
-                    "nodeId": "node_a6c39bd2-e8c7-48df-a6c4-166f189453c6",
-                    "textSection": null,
-                    "line": null,
-                    "column": null,
-                    "sourcePluginId": "tinycc"
-                },
-                {
-                    "severity": "Error",
-                    "message": "declaration expected",
-                    "nodeId": "node_a6c39bd2-e8c7-48df-a6c4-166f189453c6",
-                    "textSection": null,
-                    "line": null,
-                    "column": null,
-                    "sourcePluginId": "tinycc"
-                },
-                {
-                    "severity": "Warning",
-                    "message": "type defaults to int",
-                    "nodeId": "node_a6c39bd2-e8c7-48df-a6c4-166f189453c6",
-                    "textSection": null,
-                    "line": null,
-                    "column": null,
-                    "sourcePluginId": "tinycc"
-                }
-            ],
-            "metadata": {},
-            "pluginData": {},
-            "nameDetail": "(main_busy_loop)"
         }
     ],
     "metadata": {},

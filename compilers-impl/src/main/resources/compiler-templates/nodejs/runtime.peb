@@ -13,7 +13,6 @@ class ThreadworkRunner {
   installShutdownHandlers() {
     const requestShutdown = (signalNumber) => {
       this.shutdownSignal = signalNumber;
-      this.shutdownRequest();
     };
     process.once("SIGINT", () => requestShutdown(2));
     process.once("SIGTERM", () => requestShutdown(15));

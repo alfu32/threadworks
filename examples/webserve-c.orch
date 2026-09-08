@@ -87,11 +87,11 @@
                 "x": 670.0,
                 "y": 732.0,
                 "width": 200.0,
-                "height": 78.0,
+                "height": 108.0,
                 "closedWidth": 200.0,
-                "closedHeight": 78.0,
+                "closedHeight": 108.0,
                 "openWidth": 200.0,
-                "openHeight": 78.0,
+                "openHeight": 108.0,
                 "isExpanded": true
             },
             "fileLayoutStrategyId": "single-file",
@@ -435,8 +435,8 @@
                 "link_245f4370-e4ab-48ba-8a1b-e4011826e037"
             ],
             "layout": {
-                "x": 670.0,
-                "y": 531.0,
+                "x": 655.0,
+                "y": 526.0,
                 "width": 200.0,
                 "height": 108.0,
                 "closedWidth": 200.0,

@@ -23,12 +23,11 @@ threadwork_runner_t threadwork_runner;
 /* POSIX signal handlers cannot receive a context pointer. */
 static threadwork_runner_t *threadwork_active_signal_runner = NULL;
 
-/** @brief Convert SIGINT and SIGTERM into a graceful Threadwork shutdown request. */
+/** @brief Record SIGINT or SIGTERM for modeled nodes to handle. */
 static void threadwork_shutdown_signal_handler(int signal_number)
 {
     if (threadwork_active_signal_runner != NULL) {
         threadwork_active_signal_runner->shutdown_signal = signal_number;
-        threadwork_active_signal_runner->running = 0;
     }
 }
 

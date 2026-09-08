@@ -1,3 +1,8 @@
 # id	label	description	group/resource
 request-response	Request / Response	Receive, handle, and return a typed request.	integration/request-response.orch
 validation-pipeline	Validation Pipeline	Validate input, route failures, and emit accepted data.	quality/validation-pipeline.orch
+shutdown-signal-c	Shutdown Signal (C)	Probe SIGTERM and request an orderly C network shutdown.	runtime/shutdown-signal-c.orch
+shutdown-signal-php	Shutdown Signal (PHP)	Probe SIGTERM and request an orderly PHP network shutdown.	runtime/shutdown-signal-php.orch
+shutdown-signal-javascript	Shutdown Signal (JavaScript)	Probe SIGTERM and request an orderly Node.js network shutdown.	runtime/shutdown-signal-javascript.orch
+shutdown-signal-python	Shutdown Signal (Python)	Probe SIGTERM and request an orderly Python network shutdown.	runtime/shutdown-signal-python.orch
+shutdown-signal-go	Shutdown Signal (Go)	Probe SIGTERM and request an orderly Go network shutdown.	runtime/shutdown-signal-go.orch

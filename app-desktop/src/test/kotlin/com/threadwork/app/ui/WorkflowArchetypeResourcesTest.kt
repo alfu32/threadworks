@@ -45,14 +45,14 @@ class WorkflowArchetypeResourcesTest {
     }
 
     @Test
-    fun `bundled workflow archetypes are grouped valid specification-only documents`() {
+    fun `bundled workflow archetypes are grouped valid documents`() {
         val store = KotlinxJsonDocumentStore()
-        val resources = listOf(
+        val workflowResources = listOf(
             "/workflow-archetypes/integration/request-response.orch",
             "/workflow-archetypes/quality/validation-pipeline.orch",
         )
 
-        resources.forEach { path ->
+        workflowResources.forEach { path ->
             val source = requireNotNull(javaClass.getResourceAsStream(path))
                 .bufferedReader()
                 .use { it.readText() }
@@ -66,10 +66,26 @@ class WorkflowArchetypeResourcesTest {
             )
         }
 
+        val shutdownResources = listOf(
+            "/workflow-archetypes/runtime/shutdown-signal-c.orch" to "threadwork_runner__get_shutdown_signal",
+            "/workflow-archetypes/runtime/shutdown-signal-php.orch" to "getShutdownSignal",
+            "/workflow-archetypes/runtime/shutdown-signal-javascript.orch" to "getShutdownSignal",
+            "/workflow-archetypes/runtime/shutdown-signal-python.orch" to "get_shutdown_signal",
+            "/workflow-archetypes/runtime/shutdown-signal-go.orch" to "GetShutdownSignal",
+        )
+        shutdownResources.forEach { (path, signalProbe) ->
+            val document = store.loadText(requireNotNull(javaClass.getResourceAsStream(path))
+                .bufferedReader().use { it.readText() })
+            val probe = document.nodes.values.single { it.name == "probe_shutdown_signal" }
+            assertTrue(probe.text.declaration.contains(signalProbe))
+            assertTrue(probe.text.declaration.contains("shutdown", ignoreCase = true))
+            assertTrue(probe.text.specification.contains("orderly network shutdown"))
+        }
+
         val catalogRows = requireNotNull(javaClass.getResourceAsStream("/workflow-archetypes/catalog.tsv"))
             .bufferedReader()
             .useLines { lines -> lines.filter { it.isNotBlank() && !it.startsWith('#') }.toList() }
-        assertEquals(resources.size, catalogRows.size)
+        assertEquals(workflowResources.size + shutdownResources.size, catalogRows.size)
         assertTrue(catalogRows.all { row -> row.substringAfterLast('\t').count { it == '/' } == 1 })
     }
 
@@ -85,8 +101,8 @@ class WorkflowArchetypeResourcesTest {
 
         val archetypes = loadWorkflowArchetypes(store, userFolder)
 
-        assertEquals(3, archetypes.size)
-        assertEquals(2, archetypes.count { !it.id.startsWith("user:") })
+        assertEquals(8, archetypes.size)
+        assertEquals(7, archetypes.count { !it.id.startsWith("user:") })
         val custom = archetypes.single { it.id == "user:custom-flows/custom-request.orch" }
         assertEquals("custom-flows", custom.group)
         assertEquals("Request Response Template", custom.label)
