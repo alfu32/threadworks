@@ -11,3 +11,4 @@ test-compilers
 examples/**
 !examples/**/
 !examples/**/*.orch
+/.secrets/
