@@ -13,7 +13,6 @@ class NodeClassifierTest {
     @Test
     fun `classifies composite names`() {
         val node = Node(NodeId("n1"), "payment error", NodeKind.Group)
-        node.children += NodeId("child")
 
         assertEquals(NodeStereotype.CompositeErrorHandler, NodeClassifier.classify(node))
     }

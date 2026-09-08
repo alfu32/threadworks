@@ -27,6 +27,40 @@ class GraphCanvasCompositeLayoutTest {
     }
 
     @Test
+    fun `collapsed composites reserve room for every metadata line`() {
+        val repository = InMemoryDocumentRepository(newDocument("collapsed composite"))
+        val root = repository.getDocument().rootNodeId
+        val composite = repository.createNode(root, "group", NodeKind.Group)
+        composite.layout.isExpanded = false
+        val canvas = GraphCanvas(repository, linkedSetOf(), {}, {}, {})
+
+        canvas.refreshBoundsFromChildren()
+
+        assertEquals(106.0, composite.layout.height)
+        assertEquals(106.0, composite.layout.closedHeight)
+    }
+
+    @Test
+    fun `empty composites discard their former child envelope width`() {
+        val repository = InMemoryDocumentRepository(newDocument("emptied composite"))
+        val root = repository.getDocument().rootNodeId
+        val composite = repository.createNode(root, "group", NodeKind.Group)
+        val child = repository.createNode(composite.id, "child", NodeKind.Processor)
+        repository.updateNodeLayout(child.id, NodeLayout(x = 400.0, y = 300.0, width = 700.0, height = 70.0))
+        val canvas = GraphCanvas(repository, linkedSetOf(), {}, {}, {})
+        canvas.refreshBoundsFromChildren()
+        assertTrue(composite.layout.openWidth > 200.0)
+
+        repository.moveNode(child.id, root)
+        canvas.refreshBoundsFromChildren()
+
+        assertTrue(composite.isComposite)
+        assertEquals(200.0, composite.layout.openWidth)
+        assertEquals(200.0, composite.layout.closedWidth)
+        assertEquals(200.0, composite.layout.width)
+    }
+
+    @Test
     fun `expanded composite reserves horizontal routing clearance around children`() {
         val repository = InMemoryDocumentRepository(newDocument("routing clearance"))
         val root = repository.getDocument().rootNodeId

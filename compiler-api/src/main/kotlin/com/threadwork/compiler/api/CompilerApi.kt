@@ -211,7 +211,7 @@ data class CompiledNodeArtifact(
     /** Compiler-produced source represented by this artifact, including delegated compiler output. */
     val compiledProductText: String = declarationText,
 ) {
-    val isComposite: Boolean get() = node.children.isNotEmpty() && !node.isLink
+    val isComposite: Boolean get() = node.isComposite && !node.isLink
 }
 
 data class NodeCompilerContext(

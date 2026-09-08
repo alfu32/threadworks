@@ -200,8 +200,8 @@ data class Node(
     var status: ProjectStatus? = null,
     val statusChanges: MutableList<ProjectStatusChange> = mutableListOf(),
 ) {
-    val isTerminal: Boolean get() = children.isEmpty()
-    val isComposite: Boolean get() = children.isNotEmpty()
+    val isComposite: Boolean get() = kind == NodeKind.Group || children.isNotEmpty()
+    val isTerminal: Boolean get() = !isComposite
     val isLink: Boolean get() = kind == NodeKind.Link || link != null
     val isType: Boolean get() = kind == NodeKind.Type
 }

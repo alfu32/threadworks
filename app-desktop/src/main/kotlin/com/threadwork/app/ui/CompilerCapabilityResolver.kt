@@ -84,7 +84,7 @@ internal class CompilerCapabilityResolver(
         candidates: List<CompilerPlugin>,
     ): CompilerPlugin? {
         val node = document.getElementById(nodeId) ?: return null
-        if (node.isLink || node.children.isNotEmpty()) return null
+        if (node.isLink || node.isComposite) return null
         val technologyId = document.effectiveTechnologyId(nodeId).trim()
         if (technologyId == "file-export") return candidates.firstOrNull { it.id == "multi-tech" }
         if (document.effectiveLayoutStrategyId(nodeId) != SingleFileLayoutStrategy.id) return null

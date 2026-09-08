@@ -2,8 +2,18 @@ package com.threadwork.core.model
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 class ProjectManagementModelTest {
+    @Test
+    fun `empty groups retain composite identity`() {
+        val group = Node(NodeId("group"), "group", NodeKind.Group)
+
+        assertTrue(group.isComposite)
+        assertFalse(group.isTerminal)
+    }
+
     @Test
     fun `qualified names follow the node hierarchy`() {
         val root = Node(NodeId("root"), "project", NodeKind.Group)

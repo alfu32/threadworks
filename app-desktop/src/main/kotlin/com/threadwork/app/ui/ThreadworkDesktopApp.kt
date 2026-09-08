@@ -3328,15 +3328,15 @@ class GraphCanvas(
             .filter { !it.isLink && it.id != document.rootNodeId }
             .forEach(::ensureLayoutCanHoldPortsAndLabels)
         document.nodes.values
-            .filter { !it.isLink && it.children.isNotEmpty() && it.id != document.rootNodeId }
+            .filter { !it.isLink && it.isComposite && it.id != document.rootNodeId }
             .sortedByDescending { depthOf(it) }
             .forEach { parent ->
                 val boxes = parent.children.mapNotNull(document.nodes::get).filter { !it.isLink }.map { it.layout.rect() }
-                val terminalWidth = max(requiredNodeWidth(parent), parent.layout.closedWidth)
+                val terminalWidth = requiredNodeWidth(parent)
                 val terminalHeight = requiredTerminalHeight(parent)
-                parent.layout.closedWidth = max(parent.layout.closedWidth, terminalWidth)
                 parent.layout.closedHeight = terminalHeight
                 if (boxes.isNotEmpty()) {
+                    parent.layout.closedWidth = max(parent.layout.closedWidth, terminalWidth)
                     val childLeft = boxes.minOf { it.x }
                     val childTop = boxes.minOf { it.y }
                     val childRight = boxes.maxOf { it.x + it.width }
@@ -3366,8 +3366,14 @@ class GraphCanvas(
                     parent.layout.x = openX.toDouble()
                     parent.layout.y = openY.toDouble()
                 } else {
+                    parent.layout.closedWidth = terminalWidth
                     parent.layout.openWidth = parent.layout.closedWidth
-                    parent.layout.openHeight = parent.layout.closedHeight + compositeTextMetrics(parent).topPadding - COMPOSITE_TOP_PADDING
+                    val compactMetrics = compositeTextMetrics(
+                        parent,
+                        parent.layout.closedWidth,
+                        parent.layout.closedHeight,
+                    )
+                    parent.layout.openHeight = parent.layout.closedHeight + compactMetrics.topPadding - COMPOSITE_TOP_PADDING
                 }
                 parent.layout.width = if (parent.layout.isExpanded) parent.layout.openWidth else parent.layout.closedWidth
                 parent.layout.height = if (parent.layout.isExpanded) parent.layout.openHeight else parent.layout.closedHeight
@@ -3396,11 +3402,14 @@ class GraphCanvas(
         return (topSpacing + portCount * PORT_SPACING + PORT_BOTTOM_SPACING).toDouble()
     }
 
-    private fun requiredTerminalHeight(node: Node): Double = maxOf(
-        TERMINAL_NODE_BASE_HEIGHT.toDouble(),
-        requiredPortHeight(node, PORT_TOP_SPACING),
-        requiredTypeHeight(node),
-    )
+    private fun requiredTerminalHeight(node: Node): Double {
+        val textHeight = TERMINAL_NODE_BASE_HEIGHT + if (node.isComposite) COMPOSITE_HEADER_EXTRA_HEIGHT else 0
+        return maxOf(
+            textHeight.toDouble(),
+            requiredPortHeight(node, PORT_TOP_SPACING),
+            requiredTypeHeight(node),
+        )
+    }
 
     private fun requiredNodeWidth(node: Node): Double {
         val labels = buildList {
@@ -4351,9 +4360,9 @@ class GraphCanvas(
     private fun svgNode(svg: StringBuilder, node: Node) {
         val r = node.layout.rect()
         val stereotype = nodeStereotype(node)
-        val strokeDash = if (node.children.isNotEmpty()) "24 8 4 8" else null
+        val strokeDash = if (node.isComposite) "24 8 4 8" else null
         val strokeWidth = when {
-            node.children.isNotEmpty() -> 2.2
+            node.isComposite -> 2.2
             stereotype == NodeStereotype.ServiceLibrary -> 2.2
             stereotype in setOf(NodeStereotype.ErrorHandler, NodeStereotype.CompositeErrorHandler) -> 2.2
             stereotype in setOf(NodeStereotype.Test, NodeStereotype.TestSuite) -> 2.2
@@ -4433,7 +4442,10 @@ class GraphCanvas(
     }
 
     private fun svgBoundaryPierceMarker(svg: StringBuilder, point: Point) =
-        svg.appendLine("    <circle cx=\"${point.x}\" cy=\"${point.y}\" r=\"5\" fill=\"#000000\"/>")
+        svg.appendLine(
+            "    <circle cx=\"${point.x}\" cy=\"${point.y}\" r=\"5\" " +
+                "fill=\"${hex(activePalette[DesignerColorKey.NodeStroke])}\"/>",
+        )
 
     private fun svgBoundaryLinkLabel(
         svg: StringBuilder,
@@ -5120,7 +5132,7 @@ class GraphCanvas(
     private fun orderedVisibleNodes(scopeIds: Set<NodeId>? = null): List<Node> =
         visibleNodes(scopeIds).sortedWith(
             compareBy<Node> { depthOf(it) }
-                .thenBy { it.children.isEmpty() }
+                .thenBy { !it.isComposite }
                 .thenBy { it.layout.y }
                 .thenBy { it.layout.x }
                 .thenBy { it.id.value },
@@ -5218,7 +5230,7 @@ class GraphCanvas(
 
     private fun drawBoundaryPierceMarker(g2: Graphics2D, point: Point) {
         val previousColor = g2.color
-        g2.color = Color.BLACK
+        g2.color = activePalette[DesignerColorKey.NodeStroke]
         g2.fillOval(point.x - 5, point.y - 5, 10, 10)
         g2.color = previousColor
     }
@@ -6360,7 +6372,7 @@ class GraphCanvas(
         selected -> BasicStroke(3f, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER)
         node.isType -> BasicStroke(2.2f)
         nodeStereotype(node) in compilerDesignStereotypes -> BasicStroke(2.4f)
-        node.children.isNotEmpty() -> BasicStroke(2.2f, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 10f, floatArrayOf(24f, 8f, 4f, 8f), 0f)
+        node.isComposite -> BasicStroke(2.2f, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 10f, floatArrayOf(24f, 8f, 4f, 8f), 0f)
         nodeStereotype(node) == NodeStereotype.ServiceLibrary -> BasicStroke(2.2f)
         nodeStereotype(node) in setOf(NodeStereotype.ErrorHandler, NodeStereotype.CompositeErrorHandler) -> BasicStroke(2.2f)
         nodeStereotype(node) in setOf(NodeStereotype.Test, NodeStereotype.TestSuite) -> BasicStroke(2.2f)

@@ -75,7 +75,7 @@ internal fun DesignerPalette.fillForNode(document: ThreadworkDocument, node: Nod
     return when {
         node.isType -> this[DesignerColorKey.TypeFill]
         stereotype in compilerNodeStereotypes -> this[DesignerColorKey.CompilerFill]
-        node.children.isNotEmpty() -> this[DesignerColorKey.NodeFill]
+        node.isComposite -> this[DesignerColorKey.NodeFill]
         stereotype == NodeStereotype.ServiceLibrary -> this[DesignerColorKey.LibraryFill]
         stereotype in setOf(NodeStereotype.ErrorHandler, NodeStereotype.CompositeErrorHandler) -> this[DesignerColorKey.ErrorFill]
         stereotype in setOf(NodeStereotype.Test, NodeStereotype.TestSuite) -> this[DesignerColorKey.TestFill]
