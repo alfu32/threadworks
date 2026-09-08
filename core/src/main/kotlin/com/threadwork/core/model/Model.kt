@@ -40,6 +40,24 @@ enum class NodeKind {
 }
 
 @Serializable
+enum class ProjectStatus {
+    BUSINESS,
+    FUNCTIONAL,
+    IMPLEMENTATION,
+    TESTING,
+    DEPLOYED,
+    CANCELED,
+}
+
+@Serializable
+data class ProjectStatusChange(
+    val userId: String,
+    val changedDate: String,
+    val initStatus: ProjectStatus? = null,
+    val endStatus: ProjectStatus? = null,
+)
+
+@Serializable
 data class NodeLayout(
     var x: Double = 0.0,
     var y: Double = 0.0,
@@ -179,6 +197,8 @@ data class Node(
     var metadata: MutableMap<String, String> = mutableMapOf(),
     var pluginData: MutableMap<String, JsonObject> = mutableMapOf(),
     var nameDetail: String = "",
+    var status: ProjectStatus? = null,
+    val statusChanges: MutableList<ProjectStatusChange> = mutableListOf(),
 ) {
     val isTerminal: Boolean get() = children.isEmpty()
     val isComposite: Boolean get() = children.isNotEmpty()
@@ -207,6 +227,24 @@ fun ThreadworkDocument.projectName(): String =
     nodes[rootNodeId]?.name?.trim()?.takeIf(String::isNotBlank)
         ?: name.trim().takeIf(String::isNotBlank)
         ?: "project"
+
+fun ThreadworkDocument.fullyQualifiedName(nodeId: NodeId): String =
+    qualifiedNameParts(nodeId).joinToString("/")
+
+fun ThreadworkDocument.fullyQualifiedParentName(nodeId: NodeId): String =
+    nodes[nodeId]?.parentId?.let(::qualifiedNameParts).orEmpty().joinToString("/")
+
+private fun ThreadworkDocument.qualifiedNameParts(nodeId: NodeId): List<String> {
+    val parts = mutableListOf<String>()
+    val visited = mutableSetOf<NodeId>()
+    var currentId: NodeId? = nodeId
+    while (currentId != null && visited.add(currentId)) {
+        val node = nodes[currentId] ?: break
+        parts += node.name.trim().ifBlank { node.id.value }
+        currentId = node.parentId
+    }
+    return parts.asReversed()
+}
 
 fun ThreadworkDocument.getElementById(id: String): Node? = nodes[NodeId(id)]
 

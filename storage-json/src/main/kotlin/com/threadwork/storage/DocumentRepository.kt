@@ -13,6 +13,8 @@ import com.threadwork.core.model.NodeKind
 import com.threadwork.core.model.NodeLayout
 import com.threadwork.core.model.NodePort
 import com.threadwork.core.model.NodeText
+import com.threadwork.core.model.ProjectStatus
+import com.threadwork.core.model.ProjectStatusChange
 import com.threadwork.core.model.Revision
 import com.threadwork.core.model.TechnologyMetadata
 import com.threadwork.core.model.TypeDefinition
@@ -52,6 +54,7 @@ interface DocumentRepository {
     fun updateNodeFileLayoutStrategy(id: NodeId, strategyId: String)
     fun updateNodeMetadata(id: NodeId, metadata: Map<String, String>)
     fun updateNodeResponsible(id: NodeId, responsible: String?)
+    fun updateNodeStatus(id: NodeId, status: ProjectStatus?)
     fun updateNodeTypeDefinition(id: NodeId, definition: TypeDefinition)
     fun updateNodeDiagnostics(id: NodeId, diagnostics: List<Diagnostic>)
     fun updateLinkData(id: NodeId, linkData: LinkData)
@@ -100,12 +103,23 @@ class InMemoryDocumentRepository(
 
     override fun createNode(parentId: NodeId?, name: String, kind: NodeKind): Node {
         parentId?.let(::requireNode)
+        val createdDate = modifiedDateProvider()
+        val createdBy = modifiedUserProvider()
         val node = Node(
             id = nextNodeId("node"),
             name = name,
             kind = kind,
             parentId = parentId,
             typeDefinition = TypeDefinition().takeIf { kind == NodeKind.Type },
+            status = ProjectStatus.BUSINESS,
+            statusChanges = mutableListOf(
+                ProjectStatusChange(
+                    userId = createdBy,
+                    changedDate = createdDate,
+                    initStatus = null,
+                    endStatus = ProjectStatus.BUSINESS,
+                ),
+            ),
         )
         document.nodes[node.id] = node
         parentId?.let {
@@ -205,6 +219,20 @@ class InMemoryDocumentRepository(
         val normalized = responsible?.trim()?.takeIf(String::isNotBlank)
         if (node.responsible == normalized) return
         node.responsible = normalized
+        touchNodes(listOf(id))
+        markDirty()
+    }
+
+    override fun updateNodeStatus(id: NodeId, status: ProjectStatus?) {
+        val node = requireNode(id)
+        if (node.status == status) return
+        node.statusChanges += ProjectStatusChange(
+            userId = modifiedUserProvider(),
+            changedDate = modifiedDateProvider(),
+            initStatus = node.status,
+            endStatus = status,
+        )
+        node.status = status
         touchNodes(listOf(id))
         markDirty()
     }

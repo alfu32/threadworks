@@ -57,6 +57,7 @@ import com.threadwork.core.model.NodePort
 import com.threadwork.core.model.NodeText
 import com.threadwork.core.model.NodeTextSection
 import com.threadwork.core.model.PortDirection
+import com.threadwork.core.model.ProjectStatus
 import com.threadwork.core.model.Revision
 import com.threadwork.core.model.TechnologyMetadata
 import com.threadwork.core.model.TypeDefinition
@@ -70,6 +71,7 @@ import com.threadwork.core.model.effectiveResponsible
 import com.threadwork.core.model.effectiveRevision
 import com.threadwork.core.model.effectiveTechnologyId
 import com.threadwork.core.model.effectiveTextLanguageId
+import com.threadwork.core.model.fullyQualifiedParentName
 import com.threadwork.core.model.getElementById
 import com.threadwork.core.model.linkTypeDisplayName
 import com.threadwork.core.model.projectName
@@ -395,6 +397,7 @@ class ThreadworkDesktopApp(
     }
     private lateinit var projectPanels: JTabbedPane
     private lateinit var archetypesPanel: WorkflowArchetypesPanel
+    private lateinit var projectManagementPanel: ProjectManagementPanel
     private val modeButtons = mutableMapOf<CanvasMode, JToggleButton>()
     private var sheetButton: JToggleButton? = null
     private val commands = linkedMapOf<String, AppCommand>()
@@ -535,16 +538,34 @@ class ThreadworkDesktopApp(
             JSplitPane.HORIZONTAL_SPLIT,
             editorTabs,
             labeledPanel("Inspector", JScrollPane(inspector)),
-        ).apply {
-            ThreadworkUiSettings.rememberTrailingPanelWidth(this, "editor.inspector.width", 420)
-        }
-        val detailsEditor = JSplitPane(JSplitPane.HORIZONTAL_SPLIT, selectedAndHierarchy, editorAndInspector).apply {
-            ThreadworkUiSettings.rememberLeadingPanelWidth(this, "editor.hierarchy.width", 420)
-        }
+        )
+        val detailsEditor = JSplitPane(JSplitPane.HORIZONTAL_SPLIT, selectedAndHierarchy, editorAndInspector)
+        ThreadworkUiSettings.rememberHorizontalSidePanelWidths(
+            outerSplitPane = detailsEditor,
+            innerSplitPane = editorAndInspector,
+            leadingKey = "editor.hierarchy.width",
+            trailingKey = "editor.inspector.width",
+            defaultLeadingWidth = 420,
+            defaultTrailingWidth = 420,
+        )
 
         projectPanels = JTabbedPane().apply {
             addTab("Designer", flowDesigner)
             addTab("Editor", detailsEditor)
+            val projectInspector = InspectorPanel(
+                repository,
+                ::refreshAfterProjectManagementEdit,
+                languageIds,
+                technologyIds,
+                layoutStrategies,
+                compilerCapabilityResolver,
+            )
+            projectManagementPanel = ProjectManagementPanel(
+                repository,
+                projectInspector,
+                ::selectProjectNode,
+            )
+            addTab("Project Management", projectManagementPanel)
             archetypesPanel = WorkflowArchetypesPanel(store) { archetype ->
                 canvas.insertArchetype(archetype)
                 checkpointHistory()
@@ -555,6 +576,9 @@ class ThreadworkDesktopApp(
             )
             pluginContentTabs.forEach { tab ->
                 addTab(tab.title, tab.createPanel())
+            }
+            addChangeListener {
+                if (selectedComponent === projectManagementPanel) projectManagementPanel.refresh()
             }
         }
         val content = JPanel(BorderLayout()).apply {
@@ -2269,6 +2293,7 @@ class ThreadworkDesktopApp(
         canvas.refreshBoundsFromChildren()
         canvas.repaint()
         onSelectionChanged()
+        if (::projectManagementPanel.isInitialized) projectManagementPanel.refresh()
         checkpointHistory()
     }
 
@@ -2278,6 +2303,17 @@ class ThreadworkDesktopApp(
         canvas.invalidateRenderCache()
         canvas.repaint()
         checkpointHistory()
+    }
+
+    private fun refreshAfterProjectManagementEdit() {
+        refreshAfterInspectorEdit()
+        projectManagementPanel.refresh()
+    }
+
+    private fun selectProjectNode(nodeId: NodeId) {
+        selection.clear()
+        selection += nodeId
+        onSelectionChanged()
     }
 
     private fun refreshTree() {
@@ -3118,18 +3154,18 @@ class GraphCanvas(
     }
 
     fun pasteSelection() {
-        pasteEntities(clipboard)
+        pasteEntities(clipboard, preserveStatus = true)
     }
 
     fun insertArchetype(document: ThreadworkDocument) {
         val entities = document.nodes.values
             .filter { it.id != document.rootNodeId }
             .map(::clipboardCopy)
-        pasteEntities(entities)
+        pasteEntities(entities, preserveStatus = false)
         zoomExtentsAfterLayout()
     }
 
-    private fun pasteEntities(entities: List<Node>) {
+    private fun pasteEntities(entities: List<Node>, preserveStatus: Boolean) {
         val root = repository.getDocument().rootNodeId
         val pasted = mutableListOf<NodeId>()
         val snapshots = entities.associateBy(Node::id)
@@ -3141,7 +3177,7 @@ class GraphCanvas(
             val parentId = node.parentId?.let(copiedIds::get) ?: root
             val copy = repository.createNode(parentId, node.name, node.kind)
             copiedIds[node.id] = copy.id
-            applyClipboardNode(copy, node, copiedIds)
+            applyClipboardNode(copy, node, copiedIds, preserveStatus)
             pasted += copy.id
         }
         entities.filter(Node::isLink).forEach { node ->
@@ -3157,7 +3193,7 @@ class GraphCanvas(
                 targetPortName = link.targetPortName,
             )
             copiedIds[node.id] = copy.id
-            applyClipboardNode(copy, node, copiedIds)
+            applyClipboardNode(copy, node, copiedIds, preserveStatus)
             repository.updateLinkData(
                 copy.id,
                 link.copy(
@@ -3190,9 +3226,15 @@ class GraphCanvas(
         ),
         metadata = node.metadata.toMutableMap(),
         pluginData = node.pluginData.toMutableMap(),
+        statusChanges = node.statusChanges.toMutableList(),
     )
 
-    private fun applyClipboardNode(copy: Node, source: Node, copiedIds: Map<NodeId, NodeId>) {
+    private fun applyClipboardNode(
+        copy: Node,
+        source: Node,
+        copiedIds: Map<NodeId, NodeId>,
+        preserveStatus: Boolean,
+    ) {
         repository.updateNodeLayout(
             copy.id,
             source.layout.copy(x = source.layout.x + 40, y = source.layout.y + 40),
@@ -3203,6 +3245,7 @@ class GraphCanvas(
         repository.updateNodeFileLayoutStrategy(copy.id, source.fileLayoutStrategyId)
         repository.updateNodeMetadata(copy.id, source.metadata)
         repository.updateNodeResponsible(copy.id, source.responsible)
+        if (!copy.isLink && preserveStatus) repository.updateNodeStatus(copy.id, source.status)
         source.typeDefinition?.let { definition ->
             repository.updateNodeTypeDefinition(
                 copy.id,
@@ -6158,24 +6201,12 @@ class GraphCanvas(
 
     private fun modelPoint(point: Point): Point = Point(((point.x / zoom) - panX).toInt(), ((point.y / zoom) - panY).toInt())
 
-    private fun fillFor(node: Node): Color = when {
-        node.isType -> activePalette[DesignerColorKey.TypeFill]
-        nodeStereotype(node) in compilerDesignStereotypes -> activePalette[DesignerColorKey.CompilerFill]
-        node.children.isNotEmpty() -> activePalette[DesignerColorKey.NodeFill]
-        nodeStereotype(node) == NodeStereotype.ServiceLibrary -> activePalette[DesignerColorKey.LibraryFill]
-        nodeStereotype(node) in setOf(NodeStereotype.ErrorHandler, NodeStereotype.CompositeErrorHandler) -> activePalette[DesignerColorKey.ErrorFill]
-        nodeStereotype(node) in setOf(NodeStereotype.Test, NodeStereotype.TestSuite) -> activePalette[DesignerColorKey.TestFill]
-        else -> activePalette[DesignerColorKey.NodeFill]
-    }
+    private fun fillFor(node: Node): Color =
+        activePalette.fillForNode(repository.getDocument(), node)
 
     private fun strokeFor(node: Node, selected: Boolean): Color = when {
         selected -> activePalette[DesignerColorKey.Selection]
-        node.isType -> activePalette[DesignerColorKey.TypeStroke]
-        nodeStereotype(node) in compilerDesignStereotypes -> activePalette[DesignerColorKey.CompilerStroke]
-        nodeStereotype(node) in setOf(NodeStereotype.ErrorHandler, NodeStereotype.CompositeErrorHandler) -> activePalette[DesignerColorKey.ErrorStroke]
-        nodeStereotype(node) in setOf(NodeStereotype.Test, NodeStereotype.TestSuite) -> activePalette[DesignerColorKey.TestStroke]
-        nodeStereotype(node) == NodeStereotype.ServiceLibrary -> activePalette[DesignerColorKey.LibraryStroke]
-        else -> activePalette[DesignerColorKey.NodeStroke]
+        else -> activePalette.strokeForNode(repository.getDocument(), node)
     }
 
     private fun nodeStroke(node: Node, selected: Boolean): Stroke = when {
@@ -6258,7 +6289,7 @@ class GraphCanvas(
     }
 }
 
-private class InspectorPanel(
+internal class InspectorPanel(
     private val repository: DocumentRepository,
     private val refreshView: () -> Unit,
     languageIds: List<String>,
@@ -6309,6 +6340,7 @@ private class InspectorPanel(
     private var binding = false
     private var unsupportedLayoutSelectionId: String? = null
     private var compilerTechnologyProposal = "generated"
+    private val parentPath = JLabel()
     private val nameField = JTextField()
     private val nameDetail = JTextField()
     private val namePrefixes = listOf(
@@ -6426,7 +6458,9 @@ private class InspectorPanel(
         add(customTechnology, BorderLayout.CENTER)
         isVisible = false
     }
-    private val state = JTextField()
+    private val statusSelector = JComboBox(
+        (listOf(NoneProjectStatusChoice) + ProjectStatus.entries.map { it.name }).toTypedArray(),
+    ).apply { isEditable = false }
     private val responsible = JTextField()
     private val computedResponsible = JLabel()
     private val revisionName = JTextField().apply { isEditable = false }
@@ -6475,7 +6509,7 @@ private class InspectorPanel(
             add(layoutCompilerCapability)
         },
     )
-    private val stateRow = fieldRow("State", state)
+    private val statusRow = fieldRow("Status", statusSelector)
     private val responsibleRow = fieldRow(
         "Responsible",
         JPanel().apply {
@@ -6527,7 +6561,6 @@ private class InspectorPanel(
             nameDetail,
             customLanguage,
             customTechnology,
-            state,
             responsible,
             customTransportKind,
             masterRevisionName,
@@ -6536,6 +6569,7 @@ private class InspectorPanel(
         applyOnCommit(language)
         applyOnCommit(technology)
         applyOnCommit(layoutStrategy)
+        applyOnCommit(statusSelector)
         applyOnCommit(linkTransportKind)
         applyOnCommit(linkInteractionKind)
         applyOnCommit(linkTypeDefinition)
@@ -6550,7 +6584,7 @@ private class InspectorPanel(
             add(technologyRow)
             add(customTechnologyPanel)
             add(layoutStrategyRow)
-            add(stateRow)
+            add(statusRow)
             add(responsibleRow)
             add(revisionNameRow)
             add(revisionDateRow)
@@ -6566,7 +6600,14 @@ private class InspectorPanel(
             add(metadataRow)
             add(JButton("Apply").apply { addActionListener { apply() } })
         }
-        add(form, BorderLayout.NORTH)
+        add(
+            JPanel().apply {
+                layout = BoxLayout(this, BoxLayout.Y_AXIS)
+                add(parentPath)
+                add(form)
+            },
+            BorderLayout.NORTH,
+        )
     }
 
     fun bind(id: NodeId?) {
@@ -6581,13 +6622,18 @@ private class InspectorPanel(
         boundNodeIsCompiler = node?.name?.trim()?.equals("@Compiler", ignoreCase = true) == true
         boundNodeIsRoot = node?.id == repository.getDocument().rootNodeId
         compilerTechnologyProposal = proposedCompilerTechnologyId()
+        parentPath.text = node?.let {
+            val parentName = repository.getDocument().fullyQualifiedParentName(it.id).ifBlank { "(none)" }
+            "Parent: $parentName"
+        }.orEmpty()
+        parentPath.border = BorderFactory.createEmptyBorder(8, 8, 0, 8)
         nameField.text = node?.name.orEmpty()
         nameDetail.text = node?.nameDetail.orEmpty()
         bindLanguage(node?.technology?.languageId.orEmpty())
         refreshTechnologyOptions()
         bindTechnology(node?.technology?.technologyId.orEmpty(), forceCustom = boundNodeIsCompiler)
         bindLayoutStrategy(node?.fileLayoutStrategyId.orEmpty())
-        state.text = node?.metadata?.get("state").orEmpty()
+        statusSelector.selectedItem = node?.status?.name ?: NoneProjectStatusChoice
         responsible.text = node?.responsible.orEmpty()
         val effectiveRevision = node?.let { repository.getDocument().effectiveRevision(it.id) }
         revisionName.text = effectiveRevision?.name.orEmpty()
@@ -6779,7 +6825,7 @@ private class InspectorPanel(
             technology.hasFocus() ||
             layoutStrategy.hasFocus() ||
             customTechnology.hasFocus() ||
-            state.hasFocus() ||
+            statusSelector.hasFocus() ||
             responsible.hasFocus() ||
             masterRevisionName.hasFocus() ||
             masterRevisionDate.hasFocus() ||
@@ -6791,14 +6837,13 @@ private class InspectorPanel(
             customTransportKind.hasFocus() ||
             metadata.hasFocus()
 
-    private fun parseMetadata(includeState: Boolean): MutableMap<String, String> {
+    private fun parseMetadata(): MutableMap<String, String> {
         val next = mutableMapOf<String, String>()
         metadata.text.lines().filter { "=" in it }.forEach {
             val key = it.substringBefore("=").trim()
             val value = it.substringAfter("=").trim()
             if (key.isNotBlank()) next[key] = value
         }
-        if (includeState && state.text.isNotBlank()) next["state"] = state.text
         return next
     }
 
@@ -6824,8 +6869,9 @@ private class InspectorPanel(
             else -> VOID_LAYOUT_STRATEGY_ID
         }
         repository.updateNodeFileLayoutStrategy(id, normalizedLayout)
-        repository.updateNodeMetadata(id, parseMetadata(includeState = !isLink))
+        repository.updateNodeMetadata(id, parseMetadata())
         repository.updateNodeResponsible(id, responsible.text)
+        if (!isLink) repository.updateNodeStatus(id, selectedProjectStatus())
         if (node.isType) repository.updateNodeTypeDefinition(id, typeDefinitionFromTable())
         if (isLink) node.link?.copy()?.let {
             it.transportKind = selectedTransportKind().ifBlank { LinkTransportKinds.Default }
@@ -6857,6 +6903,11 @@ private class InspectorPanel(
                 else -> technologyIdByDisplay[selected] ?: selected.trim()
             }
         }
+
+    private fun selectedProjectStatus(): ProjectStatus? =
+        statusSelector.selectedItem?.toString()
+            ?.takeUnless { it == NoneProjectStatusChoice }
+            ?.let(ProjectStatus::valueOf)
 
     private fun refreshTechnologyOptions() {
         val values = buildList {
@@ -7066,7 +7117,7 @@ private class InspectorPanel(
         languageRow.isVisible = showNodeFields
         technologyRow.isVisible = showNodeFields
         customTechnologyPanel.isVisible = showNodeFields && (boundNodeIsCompiler || technology.selectedItem == OtherTechnologyChoice)
-        stateRow.isVisible = showNodeFields
+        statusRow.isVisible = showNodeFields
         responsibleRow.isVisible = boundHasNode
         revisionNameRow.isVisible = boundHasNode
         revisionDateRow.isVisible = boundHasNode
@@ -7115,7 +7166,7 @@ private class InspectorPanel(
     private fun metadataText(node: Node?): String =
         node?.metadata
             ?.entries
-            ?.filterNot { (key, _) -> !node.isLink && key == "state" }
+            ?.filterNot { (key, _) -> key == "state" }
             ?.joinToString("\n") { "${it.key}=${it.value}" }
             .orEmpty()
 
@@ -7156,6 +7207,7 @@ private class InspectorPanel(
         private const val OtherTransportChoice = "Other"
         private const val NoneLayoutChoice = "None"
         private const val NoneTypeChoice = "None"
+        private const val NoneProjectStatusChoice = "(none)"
     }
 }
 

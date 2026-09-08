@@ -3,6 +3,10 @@ package com.threadwork.app.ui
 import com.formdev.flatlaf.FlatDarkLaf
 import com.formdev.flatlaf.FlatLightLaf
 import com.threadwork.core.classification.LinkStereotype
+import com.threadwork.core.classification.NodeStereotype
+import com.threadwork.core.classification.stereotype
+import com.threadwork.core.model.Node
+import com.threadwork.core.model.ThreadworkDocument
 import java.awt.Color
 import java.util.prefs.Preferences
 import javax.swing.UIManager
@@ -62,6 +66,33 @@ class DesignerPalette internal constructor(
 
     fun withColor(key: DesignerColorKey, color: Color): DesignerPalette =
         DesignerPalette(colors + (key to color))
+}
+
+private val compilerNodeStereotypes = setOf(NodeStereotype.CompilerTemplate, NodeStereotype.StaticFile)
+
+internal fun DesignerPalette.fillForNode(document: ThreadworkDocument, node: Node): Color {
+    val stereotype = node.stereotype(document)
+    return when {
+        node.isType -> this[DesignerColorKey.TypeFill]
+        stereotype in compilerNodeStereotypes -> this[DesignerColorKey.CompilerFill]
+        node.children.isNotEmpty() -> this[DesignerColorKey.NodeFill]
+        stereotype == NodeStereotype.ServiceLibrary -> this[DesignerColorKey.LibraryFill]
+        stereotype in setOf(NodeStereotype.ErrorHandler, NodeStereotype.CompositeErrorHandler) -> this[DesignerColorKey.ErrorFill]
+        stereotype in setOf(NodeStereotype.Test, NodeStereotype.TestSuite) -> this[DesignerColorKey.TestFill]
+        else -> this[DesignerColorKey.NodeFill]
+    }
+}
+
+internal fun DesignerPalette.strokeForNode(document: ThreadworkDocument, node: Node): Color {
+    val stereotype = node.stereotype(document)
+    return when {
+        node.isType -> this[DesignerColorKey.TypeStroke]
+        stereotype in compilerNodeStereotypes -> this[DesignerColorKey.CompilerStroke]
+        stereotype in setOf(NodeStereotype.ErrorHandler, NodeStereotype.CompositeErrorHandler) -> this[DesignerColorKey.ErrorStroke]
+        stereotype in setOf(NodeStereotype.Test, NodeStereotype.TestSuite) -> this[DesignerColorKey.TestStroke]
+        stereotype == NodeStereotype.ServiceLibrary -> this[DesignerColorKey.LibraryStroke]
+        else -> this[DesignerColorKey.NodeStroke]
+    }
 }
 
 fun DesignerPalette.colorForLink(stereotype: LinkStereotype): Color = when (stereotype) {

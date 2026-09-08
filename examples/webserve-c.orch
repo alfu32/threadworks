@@ -167,7 +167,7 @@
             "text": {
                 "initialization": "",
                 "initializationLanguageId": "",
-                "source": "\nprintf(\"timestamp.read:%lld\\n\", (long long)(bstate.id));\n\n// pattern set the speed of the show\nusleep(100000);\n\n// pattern shutdown when shutdown requested through signal\nint signal;\nthreadwork_runner__get_shutdown_signal(&threadwork_runner,&signal);\nint is_running;\nthreadwork_runner__is_running(&threadwork_runner,&is_running);\nif(signal == 2 || !is_running){\n    return THREADWORK_OK;\n}\nprintf(\"signal:%d,is_running:%d\\n\", signal,is_running);\n\n// pattern request/signal shutdown when internal condition has been reached\nif(bstate.id > 1){\n    threadwork_runner__shutdown_request(&threadwork_runner);\n    return THREADWORK_OK;\n}\nblpi__setbstate(bstate.id+1,bstate.timestamp);\n// main operation\n\nprintf(\"timestamp.sent:%lld\\n\", (long long)(bstate.id));\n\npush(clock, &bstate);\n\nbean bb;\n\nbb.id=6;",
+                "source": "\nprintf(\"timestamp.read:%lld\\n\", (long long)(bstate.id));\n\n// pattern set the speed of the show\nusleep(100000);\n\n// pattern shutdown when shutdown requested through signal\nint signal;\nthreadwork_runner__get_shutdown_signal(&threadwork_runner,&signal);\nint is_running;\nthreadwork_runner__is_running(&threadwork_runner,&is_running);\nif(/*signal == 2 ||*/ !is_running){\n    return THREADWORK_OK;\n}\nprintf(\"signal:%d,is_running:%d\\n\", signal,is_running);\n\n// pattern request/signal shutdown when internal condition has been reached\nif(bstate.id > 1){\n    threadwork_runner__shutdown_request(&threadwork_runner);\n    return THREADWORK_OK;\n}\nblpi__setbstate(bstate.id+1,bstate.timestamp);\n// main operation\n\nprintf(\"timestamp.sent:%lld\\n\", (long long)(bstate.id));\n\npush(clock, &bstate);\n\nbean bb;\n\nbb.id=6;",
                 "sourceLanguageId": "",
                 "specification": "",
                 "specificationLanguageId": "markdown",
@@ -190,7 +190,7 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-07T22:36:20.887536472Z",
+                "date": "2026-09-08T14:37:36.202853095Z",
                 "user": "devlin"
             },
             "ports": [

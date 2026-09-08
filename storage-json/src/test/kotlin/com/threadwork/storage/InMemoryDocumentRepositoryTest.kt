@@ -6,6 +6,7 @@ import com.threadwork.core.model.NodeId
 import com.threadwork.core.model.NodeKind
 import com.threadwork.core.model.NodePort
 import com.threadwork.core.model.PortDirection
+import com.threadwork.core.model.ProjectStatus
 import com.threadwork.core.model.Revision
 import com.threadwork.core.model.TypeDefinition
 import com.threadwork.core.model.TypeFieldDefinition
@@ -17,6 +18,41 @@ import kotlin.test.assertTrue
 import kotlin.test.assertFailsWith
 
 class InMemoryDocumentRepositoryTest {
+    @Test
+    fun `new nodes start in business while links have no project status`() {
+        val repository = InMemoryDocumentRepository(newDocument("project"))
+        val root = repository.getDocument().rootNodeId
+        val source = repository.createNode(root, "source", NodeKind.Processor)
+        val target = repository.createNode(root, "target", NodeKind.Processor)
+        repository.addPort(source.id, NodePort("out", "out", PortDirection.Output))
+        repository.addPort(target.id, NodePort("in", "in", PortDirection.Input))
+        val link = repository.createLink(root, "transport", source.id, "out", target.id, "in")
+
+        assertEquals(ProjectStatus.BUSINESS, source.status)
+        assertEquals(ProjectStatus.BUSINESS, target.status)
+        assertEquals(null, link.status)
+        assertEquals(null, source.statusChanges.single().initStatus)
+        assertEquals(ProjectStatus.BUSINESS, source.statusChanges.single().endStatus)
+        assertTrue(source.statusChanges.single().userId.isNotBlank())
+        assertTrue(source.statusChanges.single().changedDate.isNotBlank())
+    }
+
+    @Test
+    fun `project status can be changed and cleared`() {
+        val repository = InMemoryDocumentRepository(newDocument("project"))
+        val node = repository.createNode(repository.getDocument().rootNodeId, "task", NodeKind.Processor)
+
+        repository.updateNodeStatus(node.id, ProjectStatus.TESTING)
+        assertEquals(ProjectStatus.TESTING, repository.requireNode(node.id).status)
+        assertEquals(ProjectStatus.BUSINESS, repository.requireNode(node.id).statusChanges.last().initStatus)
+        assertEquals(ProjectStatus.TESTING, repository.requireNode(node.id).statusChanges.last().endStatus)
+
+        repository.updateNodeStatus(node.id, null)
+        assertEquals(null, repository.requireNode(node.id).status)
+        assertEquals(ProjectStatus.TESTING, repository.requireNode(node.id).statusChanges.last().initStatus)
+        assertEquals(null, repository.requireNode(node.id).statusChanges.last().endStatus)
+    }
+
     @Test
     fun `declared type can be assigned to a link and validates`() {
         val repository = InMemoryDocumentRepository(newDocument("typed flow"))

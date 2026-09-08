@@ -7,6 +7,7 @@ import com.threadwork.core.model.Node
 import com.threadwork.core.model.NodeId
 import com.threadwork.core.model.NodeKind
 import com.threadwork.core.model.PortDirection
+import com.threadwork.core.model.ProjectStatus
 import com.threadwork.core.model.Revision
 import com.threadwork.core.model.TypeDefinition
 import com.threadwork.core.model.TypeFieldDefinition
@@ -23,6 +24,28 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class JsonDocumentStoreTest {
+    @Test
+    fun `project status round trips and missing status remains unassigned`() {
+        val repository = InMemoryDocumentRepository(newDocument("status json"))
+        val node = repository.createNode(repository.getDocument().rootNodeId, "task", NodeKind.Processor)
+        repository.updateNodeStatus(node.id, ProjectStatus.IMPLEMENTATION)
+        val file = createTempFile(suffix = ".orch")
+        val store = KotlinxJsonDocumentStore()
+
+        store.save(repository.getDocument(), file)
+        val json = Files.readString(file)
+        val loaded = store.load(file)
+        assertEquals(ProjectStatus.IMPLEMENTATION, loaded.nodes.getValue(node.id).status)
+        assertEquals(2, loaded.nodes.getValue(node.id).statusChanges.size)
+        listOf("userId", "changedDate", "initStatus", "endStatus").forEach { field ->
+            assertTrue(json.contains("\"$field\""))
+        }
+
+        val withoutStatus = json
+            .replace(Regex("\\s*\"status\": \"IMPLEMENTATION\",?\\n"), "\n")
+        assertEquals(null, store.loadText(withoutStatus).nodes.getValue(node.id).status)
+    }
+
     @Test
     fun `binary node content round trips as Base64`() {
         val repository = InMemoryDocumentRepository(newDocument("binary json"))
