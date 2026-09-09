@@ -5016,7 +5016,7 @@ class GraphCanvas(
     }
 
     private fun assigneeUser(node: Node): ModelUser? {
-        val assignee = node.assignee?.trim().takeIf(String::isNotBlank) ?: return null
+        val assignee = node.assignee?.trim()?.takeIf(String::isNotBlank) ?: return null
         return repository.getDocument().users.firstOrNull { user ->
             user.uniqueKey == assignee || user.identifier == assignee || user.displayName() == assignee
         }
