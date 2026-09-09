@@ -46,6 +46,8 @@ import com.threadwork.core.diagnostics.Diagnostic
 import com.threadwork.completion.ModelAwareCompletionService
 import com.threadwork.completion.AnalysisResult
 import com.threadwork.completion.CompletionRequest
+import com.threadwork.completion.DeclarationSymbol
+import com.threadwork.completion.DeclarationSymbolOrigin
 import com.threadwork.core.classification.LinkClassifier
 import com.threadwork.core.classification.LinkStereotype
 import com.threadwork.core.classification.NodeStereotype
@@ -7838,6 +7840,7 @@ private class NodeTextEditor(
     private val languageSelectorsBySection = mutableMapOf<NodeTextSection, JComboBox<String>>()
     private val effectiveLanguageLabelsBySection = mutableMapOf<NodeTextSection, JLabel>()
     private val componentsBySection = mutableMapOf<NodeTextSection, JComponent>()
+    private val declarationSymbolsByEditor = mutableMapOf<GridCodeEditorAdapter, List<DeclarationSymbol>>()
     private var testsPanel: TestTextEditorPanel? = null
     private var binaryPanel: BinaryContentPanel? = null
     private var imagePanel: ImagePreviewPanel? = null
@@ -7971,12 +7974,20 @@ private class NodeTextEditor(
         val colors: Map<String, Color>,
     )
 
-    private fun applySemanticIdentifierPresentation(editor: GridCodeEditorAdapter) {
-        val presentation = semanticIdentifierPresentation()
+    private fun applySemanticIdentifierPresentation(
+        editor: GridCodeEditorAdapter,
+        declarationSymbols: List<DeclarationSymbol>? = null,
+    ) {
+        if (declarationSymbols != null) {
+            declarationSymbolsByEditor[editor] = declarationSymbols
+        }
+        val presentation = semanticIdentifierPresentation(declarationSymbolsByEditor[editor].orEmpty())
         editor.setSemanticIdentifierColors(presentation.colors)
     }
 
-    private fun semanticIdentifierPresentation(): SemanticIdentifierPresentation {
+    private fun semanticIdentifierPresentation(
+        declarationSymbols: List<DeclarationSymbol> = emptyList(),
+    ): SemanticIdentifierPresentation {
         val document = repository.getDocument()
         val node = document.getElementById(nodeId) ?: return SemanticIdentifierPresentation(emptyMap())
         val compiler = compilerCapabilityResolver.compilerFor(document, node.id)
@@ -8008,6 +8019,21 @@ private class NodeTextEditor(
                         }
                     }
                 }
+            }
+        }
+        declarationSymbols.forEach { symbol ->
+            val color = when (symbol.origin) {
+                DeclarationSymbolOrigin.Runtime -> activePalette[DesignerColorKey.RuntimeText]
+                DeclarationSymbolOrigin.ConnectedEntity -> document.nodes.values.firstOrNull { candidate ->
+                    val link = candidate.link ?: return@firstOrNull false
+                    (link.sourceNodeId == symbol.ownerNodeId && link.targetNodeId == node.id) ||
+                        (link.targetNodeId == symbol.ownerNodeId && link.sourceNodeId == node.id)
+                }?.let { activePalette.colorForLink(LinkClassifier.classify(document, it)) }
+                DeclarationSymbolOrigin.Local -> null
+            }
+            if (color != null) {
+                colors[symbol.name] = color
+            }
         }
         return SemanticIdentifierPresentation(colors)
     }
@@ -8046,7 +8072,11 @@ private class NodeTextEditor(
         applySemanticIdentifierPresentation(editor)
         editor.setPinnedHeader(generatedFunctionHeader(node, spec.section))
         editor.onCompletionRequested = completionService::getSuggestions
-        editor.onDeclarationSymbolsRequested = completionService::getDeclarationSymbols
+        editor.onDeclarationSymbolsRequested = { request ->
+            completionService.getDeclarationSymbols(request).also { symbols ->
+                applySemanticIdentifierPresentation(editor, symbols)
+            }
+        }
         editor.onHoverInfoRequested = ::typeHoverInfo
         editor.setText(spec.textGetter(node.text))
         fun saveNow() {
@@ -8118,7 +8148,11 @@ private class NodeTextEditor(
         editor.setCompletionContext(EditorCompletionContext(node.id.value, NodeTextSection.Tests))
         applySemanticIdentifierPresentation(editor)
         editor.onCompletionRequested = completionService::getSuggestions
-        editor.onDeclarationSymbolsRequested = completionService::getDeclarationSymbols
+        editor.onDeclarationSymbolsRequested = { request ->
+            completionService.getDeclarationSymbols(request).also { symbols ->
+                applySemanticIdentifierPresentation(editor, symbols)
+            }
+        }
         editor.onHoverInfoRequested = ::typeHoverInfo
         editor.setText(node.text.tests)
         fun saveNow() {

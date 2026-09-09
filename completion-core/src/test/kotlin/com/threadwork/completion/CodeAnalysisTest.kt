@@ -73,6 +73,8 @@ class CodeAnalysisTest {
         assertEquals("bean", assertIs<CodeType.Named>(type).name)
         val members = assertIs<AnalysisResult.Available<List<CodeMember>>>(analysis.members("bstate", cursor)).value
         assertEquals(listOf("id", "timestamp"), members.map { it.name })
+        val declarations = assertIs<AnalysisResult.Available<List<DeclarationSymbol>>>(analysis.declarations()).value
+        assertTrue(declarations.any { it.name == "bstate" && it.origin == DeclarationSymbolOrigin.ConnectedEntity })
     }
 
     @Test

@@ -17,6 +17,12 @@ enum class DeclarationSymbolKind {
     Variable,
 }
 
+enum class DeclarationSymbolOrigin {
+    Local,
+    ConnectedEntity,
+    Runtime,
+}
+
 data class DeclarationSymbol(
     val name: String,
     val kind: DeclarationSymbolKind,
@@ -26,6 +32,7 @@ data class DeclarationSymbol(
     val ownerNodeName: String,
     val startOffset: Int,
     val endOffset: Int,
+    val origin: DeclarationSymbolOrigin = DeclarationSymbolOrigin.Local,
 )
 
 /** Language-specific declaration discovery. Parser-backed implementations can replace the built-ins. */

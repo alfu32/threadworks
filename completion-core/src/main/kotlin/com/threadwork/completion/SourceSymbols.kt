@@ -169,8 +169,12 @@ internal class SourceSymbols(
     }.sortedWith(compareBy<SourceBinding> { it.scope.end - it.scope.start }.thenByDescending { it.location.range.start })
         .distinctBy { it.name }
 
-    fun declarationSymbols(): List<DeclarationSymbol> = bindings.map {
+    fun declarationSymbols(
+        origin: DeclarationSymbolOrigin = DeclarationSymbolOrigin.Local,
+        selectedBindings: List<SourceBinding> = bindings,
+    ): List<DeclarationSymbol> = selectedBindings.map {
         DeclarationSymbol(it.name, it.kind, it.header, language, nodeId, nodeName, it.location.range.start, it.location.range.end)
+            .copy(origin = origin)
     }
 
     companion object {

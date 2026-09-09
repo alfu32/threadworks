@@ -17,7 +17,21 @@ internal class ParsedCodeAnalysis(
     }
     private val compiler = context.compiler
 
-    override fun declarations() = AnalysisResult.Available(active.declarationSymbols())
+    override fun declarations() = AnalysisResult.Available(
+        active.declarationSymbols() +
+            companions.flatMap { unit ->
+                unit.declarationSymbols(
+                    DeclarationSymbolOrigin.ConnectedEntity,
+                    unit.bindings.filter { it.scope == CodeRange(0, unit.source.length) && it.ownerType == null },
+                )
+            } +
+            runtime.flatMap { unit ->
+                unit.declarationSymbols(
+                    DeclarationSymbolOrigin.Runtime,
+                    unit.bindings.filter { it.scope == CodeRange(0, unit.source.length) && it.ownerType == null },
+                )
+            },
+    )
     override fun scopes() = AnalysisResult.Available(active.scopes.toList())
 
     override fun completions(): AnalysisResult<List<CompletionSuggestion>> {

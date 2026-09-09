@@ -8,6 +8,7 @@ import com.threadwork.completion.CompletionRequest
 import com.threadwork.completion.AnalysisResult
 import com.threadwork.completion.CodeHoverInfo
 import com.threadwork.completion.CodeLocation
+import com.threadwork.completion.DeclarationSymbolOrigin
 import com.threadwork.completion.ModelAwareCompletionService
 import com.threadwork.core.model.NodeKind
 import com.threadwork.core.model.NodeTextSection
@@ -65,6 +66,10 @@ class CCompletionIntegrationTest {
             assertTrue(suggestions.any { it.label == name }, "Missing $name: ${suggestions.map { it.label }}")
         }
         assertTrue(service.getSuggestions(request("THREADWORK_", "THREADWORK_")).any { it.label == "THREADWORK_OK" })
+        val declarations = assertIs<AnalysisResult.Available<List<com.threadwork.completion.DeclarationSymbol>>>(
+            service.analysis(request("threadwork_", "threadwork_")).declarations(),
+        ).value
+        assertTrue(declarations.any { it.name == "threadwork_runner" && it.origin == DeclarationSymbolOrigin.Runtime })
         for (source in listOf("threadwork_runner.", "threadwork_runner_t *runner;\nrunner->")) {
             val fields = service.getSuggestions(request(source)).map { it.label }
             assertTrue("running" in fields, fields.toString())
