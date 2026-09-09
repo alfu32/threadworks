@@ -58,6 +58,12 @@ data class ProjectStatusChange(
 )
 
 @Serializable
+data class ModelUser(
+    val identifier: String,
+    val avatar: String = "",
+)
+
+@Serializable
 data class NodeLayout(
     var x: Double = 0.0,
     var y: Double = 0.0,
@@ -199,6 +205,7 @@ data class Node(
     var nameDetail: String = "",
     var status: ProjectStatus? = null,
     val statusChanges: MutableList<ProjectStatusChange> = mutableListOf(),
+    var assignee: String? = null,
 ) {
     val isComposite: Boolean get() = kind == NodeKind.Group || children.isNotEmpty()
     val isTerminal: Boolean get() = !isComposite
@@ -214,6 +221,7 @@ data class ThreadworkDocument(
     val nodes: MutableMap<NodeId, Node> = mutableMapOf(),
     var metadata: MutableMap<String, String> = mutableMapOf(),
     var masterRevision: Revision = Revision(),
+    val users: MutableList<ModelUser> = mutableListOf(),
 )
 
 const val VOID_LANGUAGE_ID = "plain"

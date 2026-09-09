@@ -65,18 +65,16 @@
             },
             "responsible": "devlin",
             "modified": {
-                "date": "2026-09-02T14:29:10.358384806Z",
-                "user": "devlin"
+                "date": "2026-09-09T06:39:33.183600685Z",
+                "user": "cristian.alferaru@gmail.com"
             },
             "ports": [],
             "link": null,
             "typeDefinition": null,
             "diagnostics": [],
-            "metadata": {
-                "state": "RESOLVED"
-            },
+            "metadata": {},
             "pluginData": {},
-            "nameDetail": "",
+            "nameDetail": "aaaa",
             "status": null,
             "statusChanges": []
         },
@@ -126,7 +124,7 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-09T06:26:12.940385044Z",
+                "date": "2026-09-09T06:38:36.684896808Z",
                 "user": "cristian.alferaru@gmail.com"
             },
             "ports": [],
@@ -135,7 +133,7 @@
             "diagnostics": [],
             "metadata": {},
             "pluginData": {},
-            "nameDetail": "",
+            "nameDetail": "a",
             "status": "IMPLEMENTATION",
             "statusChanges": [
                 {
@@ -198,8 +196,8 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-02T09:33:57.072284031Z",
-                "user": "devlin"
+                "date": "2026-09-09T06:38:27.261277341Z",
+                "user": "cristian.alferaru@gmail.com"
             },
             "ports": [],
             "link": null,
@@ -235,7 +233,7 @@
             "diagnostics": [],
             "metadata": {},
             "pluginData": {},
-            "nameDetail": "",
+            "nameDetail": "a",
             "status": null,
             "statusChanges": []
         },
@@ -509,8 +507,8 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-02T15:48:00.300033952Z",
-                "user": "devlin"
+                "date": "2026-09-09T06:38:49.730443985Z",
+                "user": "cristian.alferaru@gmail.com"
             },
             "ports": [
                 {
@@ -533,7 +531,7 @@
             "diagnostics": [],
             "metadata": {},
             "pluginData": {},
-            "nameDetail": "",
+            "nameDetail": "a",
             "status": null,
             "statusChanges": []
         },
@@ -657,8 +655,8 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-02T17:39:04.678680556Z",
-                "user": "devlin"
+                "date": "2026-09-09T06:38:45.889392744Z",
+                "user": "cristian.alferaru@gmail.com"
             },
             "ports": [
                 {
@@ -681,7 +679,7 @@
             "diagnostics": [],
             "metadata": {},
             "pluginData": {},
-            "nameDetail": "",
+            "nameDetail": "a",
             "status": null,
             "statusChanges": []
         },
@@ -734,8 +732,8 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-02T15:48:20.341389828Z",
-                "user": "devlin"
+                "date": "2026-09-09T06:38:59.714707811Z",
+                "user": "cristian.alferaru@gmail.com"
             },
             "ports": [
                 {
@@ -751,7 +749,7 @@
             "diagnostics": [],
             "metadata": {},
             "pluginData": {},
-            "nameDetail": "",
+            "nameDetail": "a",
             "status": null,
             "statusChanges": []
         },
@@ -801,8 +799,8 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-02T14:26:07.648519410Z",
-                "user": "devlin"
+                "date": "2026-09-09T06:38:42.669033656Z",
+                "user": "cristian.alferaru@gmail.com"
             },
             "ports": [],
             "link": null,
@@ -810,7 +808,7 @@
             "diagnostics": [],
             "metadata": {},
             "pluginData": {},
-            "nameDetail": "",
+            "nameDetail": "a",
             "status": null,
             "statusChanges": []
         },
@@ -828,8 +826,8 @@
                 "link_3475d6a9-445c-43eb-8486-323b890443a4"
             ],
             "layout": {
-                "x": 548.0,
-                "y": 740.0,
+                "x": 536.0,
+                "y": 672.0,
                 "width": 200.0,
                 "height": 70.0,
                 "closedWidth": 200.0,
@@ -865,8 +863,8 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-02T15:47:00.308511987Z",
-                "user": "devlin"
+                "date": "2026-09-09T06:39:24.574252927Z",
+                "user": "cristian.alferaru@gmail.com"
             },
             "ports": [
                 {
@@ -882,7 +880,7 @@
             "diagnostics": [],
             "metadata": {},
             "pluginData": {},
-            "nameDetail": "",
+            "nameDetail": "aa",
             "status": null,
             "statusChanges": []
         },

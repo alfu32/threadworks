@@ -6,6 +6,7 @@ import com.threadwork.core.model.LinkInteractionKinds
 import com.threadwork.core.model.Node
 import com.threadwork.core.model.NodeId
 import com.threadwork.core.model.NodeKind
+import com.threadwork.core.model.ModelUser
 import com.threadwork.core.model.PortDirection
 import com.threadwork.core.model.ProjectStatus
 import com.threadwork.core.model.Revision
@@ -117,6 +118,8 @@ class JsonDocumentStoreTest {
         repository.getDocument().masterRevision = Revision("R4", "2026-08-17")
         val child = repository.createNode(repository.getDocument().rootNodeId, "child", NodeKind.Processor)
         repository.updateNodeResponsible(child.id, "Ada")
+        repository.updateNodeAssignee(child.id, "Grace")
+        repository.registerUser(ModelUser("Grace", "https://example.test/grace.png"))
         repository.updateNodeNameDetail(child.id, "worker entry point")
         val file = createTempFile(suffix = ".threadwork.json")
         val store = KotlinxJsonDocumentStore()
@@ -129,6 +132,8 @@ class JsonDocumentStoreTest {
         assertEquals(repository.getDocument().nodes.keys, loaded.nodes.keys)
         assertEquals(Revision("R4", "2026-08-17"), loaded.masterRevision)
         assertEquals("Ada", loaded.nodes.getValue(child.id).responsible)
+        assertEquals("Grace", loaded.nodes.getValue(child.id).assignee)
+        assertEquals(ModelUser("Grace", "https://example.test/grace.png"), loaded.users.single { it.identifier == "Grace" })
         assertEquals("worker entry point", loaded.nodes.getValue(child.id).nameDetail)
         assertEquals("R4", loaded.nodes.getValue(child.id).revision?.name)
         assertTrue(loaded.nodes.getValue(child.id).modified.date.isNotBlank())

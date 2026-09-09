@@ -5,6 +5,7 @@ import com.threadwork.core.model.Node
 import com.threadwork.core.model.NodeId
 import com.threadwork.core.model.NodeKind
 import com.threadwork.core.model.NodePort
+import com.threadwork.core.model.ModelUser
 import com.threadwork.core.model.LinkInteractionKinds
 import com.threadwork.core.model.PortDirection
 import com.threadwork.core.model.Revision
@@ -43,6 +44,7 @@ class KotlinxJsonDocumentStore(
             nodes = orderedNodes(document),
             metadata = document.metadata.toMutableMap(),
             masterRevision = document.masterRevision.copy(),
+            users = document.users.toList(),
         )
         Files.writeString(filePath, json.encodeToString(ThreadworkDocumentFile.serializer(), file))
     }
@@ -80,6 +82,7 @@ class KotlinxJsonDocumentStore(
             nodes = nodesById(file.nodes),
             metadata = file.metadata,
             masterRevision = file.masterRevision,
+            users = file.users.toMutableList(),
         )
     }
 
@@ -263,4 +266,5 @@ private data class ThreadworkDocumentFile(
     val nodes: List<Node> = emptyList(),
     var metadata: MutableMap<String, String> = mutableMapOf(),
     var masterRevision: Revision = Revision(),
+    val users: List<ModelUser> = emptyList(),
 )

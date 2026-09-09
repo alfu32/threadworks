@@ -13,6 +13,7 @@ import com.threadwork.app.ai.AiPromptResponse
 import com.threadwork.app.ai.AiSupportProviders
 import com.threadwork.app.ai.AiSupportTask
 import com.threadwork.app.identity.ThreadworkUserIdentity
+import com.threadwork.app.identity.designator
 import com.threadwork.Version
 import com.threadwork.compiler.api.CompilerOptions
 import com.threadwork.compiler.api.writeSourceMapBeside
@@ -57,6 +58,7 @@ import com.threadwork.core.model.NodeLayout
 import com.threadwork.core.model.NodePort
 import com.threadwork.core.model.NodeText
 import com.threadwork.core.model.NodeTextSection
+import com.threadwork.core.model.ModelUser
 import com.threadwork.core.model.PortDirection
 import com.threadwork.core.model.ProjectStatus
 import com.threadwork.core.model.Revision
@@ -433,6 +435,7 @@ class ThreadworkDesktopApp(
 
     fun show() {
         loadInitialFile()
+        registerCurrentUser()
         registerBuiltInCommands()
         configurePlugins()
         frame.defaultCloseOperation = WindowConstants.EXIT_ON_CLOSE
@@ -465,6 +468,16 @@ class ThreadworkDesktopApp(
         }
         currentFile = path
         repository.clearDirty()
+    }
+
+    private fun registerCurrentUser() {
+        val identity = ThreadworkUserIdentity.store.load()
+        repository.registerUser(
+            ModelUser(
+                identifier = identity.designator(),
+                avatar = identity?.profilePhotoUrl.orEmpty(),
+            ),
+        )
     }
 
     private fun layout(): JComponent {
@@ -654,7 +667,10 @@ class ThreadworkDesktopApp(
         })
         add(currentFileLabel)
         add(Box.createHorizontalGlue())
-        userIdentityTitleBar = UserIdentityTitleBar(frame) { message -> status.text = message }
+        userIdentityTitleBar = UserIdentityTitleBar(frame) { message ->
+            status.text = message
+            registerCurrentUser()
+        }
         add(userIdentityTitleBar)
     }
 
@@ -3276,6 +3292,7 @@ class GraphCanvas(
         repository.updateNodeFileLayoutStrategy(copy.id, source.fileLayoutStrategyId)
         repository.updateNodeMetadata(copy.id, source.metadata)
         repository.updateNodeResponsible(copy.id, source.responsible)
+        repository.updateNodeAssignee(copy.id, source.assignee)
         if (!copy.isLink && preserveStatus) repository.updateNodeStatus(copy.id, source.status)
         source.typeDefinition?.let { definition ->
             repository.updateNodeTypeDefinition(
@@ -6633,6 +6650,7 @@ internal class InspectorPanel(
     ).apply { isEditable = false }
     private val responsible = JTextField()
     private val computedResponsible = JLabel()
+    private val assignee = JComboBox<String>().apply { isEditable = true }
     private val revisionName = JTextField().apply { isEditable = false }
     private val revisionDate = JTextField().apply { isEditable = false }
     private val modifiedDate = JTextField().apply { isEditable = false }
@@ -6690,6 +6708,7 @@ internal class InspectorPanel(
             add(computedResponsible)
         },
     )
+    private val assigneeRow = fieldRow("Assignee", assignee)
     private val revisionNameRow = fieldRow("Effective revision", revisionName)
     private val revisionDateRow = fieldRow("Effective revision date", revisionDate)
     private val modifiedDateRow = fieldRow("Modified date", modifiedDate)
@@ -6740,6 +6759,8 @@ internal class InspectorPanel(
         applyOnCommit(technology)
         applyOnCommit(layoutStrategy)
         applyOnCommit(statusSelector)
+        applyOnCommit(assignee)
+        (assignee.editor?.editorComponent as? JTextField)?.let(::applyOnCommit)
         applyOnCommit(linkTransportKind)
         applyOnCommit(linkInteractionKind)
         applyOnCommit(linkTypeDefinition)
@@ -6756,6 +6777,7 @@ internal class InspectorPanel(
             add(layoutStrategyRow)
             add(statusRow)
             add(responsibleRow)
+            add(assigneeRow)
             add(revisionNameRow)
             add(revisionDateRow)
             add(modifiedDateRow)
@@ -6805,6 +6827,7 @@ internal class InspectorPanel(
         bindLayoutStrategy(node?.fileLayoutStrategyId.orEmpty())
         statusSelector.selectedItem = node?.status?.name ?: NoneProjectStatusChoice
         responsible.text = node?.responsible.orEmpty()
+        refreshAssigneeOptions(node?.assignee.orEmpty())
         val effectiveRevision = node?.let { repository.getDocument().effectiveRevision(it.id) }
         revisionName.text = effectiveRevision?.name.orEmpty()
         revisionDate.text = effectiveRevision?.date.orEmpty()
@@ -6997,6 +7020,7 @@ internal class InspectorPanel(
             customTechnology.hasFocus() ||
             statusSelector.hasFocus() ||
             responsible.hasFocus() ||
+            assignee.hasFocus() || assignee.editor?.editorComponent?.hasFocus() == true ||
             masterRevisionName.hasFocus() ||
             masterRevisionDate.hasFocus() ||
             linkTransportKind.hasFocus() ||
@@ -7041,7 +7065,12 @@ internal class InspectorPanel(
         repository.updateNodeFileLayoutStrategy(id, normalizedLayout)
         repository.updateNodeMetadata(id, parseMetadata())
         repository.updateNodeResponsible(id, responsible.text)
-        if (!isLink) repository.updateNodeStatus(id, selectedProjectStatus())
+        if (!isLink) {
+            val assigneeId = selectedAssignee()
+            repository.updateNodeAssignee(id, assigneeId)
+            assigneeId?.let { repository.registerUser(ModelUser(it)) }
+            repository.updateNodeStatus(id, selectedProjectStatus())
+        }
         if (node.isType) repository.updateNodeTypeDefinition(id, typeDefinitionFromTable())
         if (isLink) node.link?.copy()?.let {
             it.transportKind = selectedTransportKind().ifBlank { LinkTransportKinds.Default }
@@ -7078,6 +7107,22 @@ internal class InspectorPanel(
         statusSelector.selectedItem?.toString()
             ?.takeUnless { it == NoneProjectStatusChoice }
             ?.let(ProjectStatus::valueOf)
+
+    private fun selectedAssignee(): String? =
+        assignee.editor?.item?.toString()?.trim()?.takeIf(String::isNotBlank)
+
+    private fun refreshAssigneeOptions(selectedId: String) {
+        val identifiers = buildList {
+            add("")
+            addAll(repository.getDocument().users.map { it.identifier.trim() }.filter(String::isNotBlank))
+            if (selectedId.isNotBlank()) add(selectedId.trim())
+        }.distinct()
+        val previousBinding = binding
+        binding = true
+        assignee.model = DefaultComboBoxModel(identifiers.toTypedArray())
+        assignee.selectedItem = selectedId
+        binding = previousBinding
+    }
 
     private fun refreshTechnologyOptions() {
         val values = buildList {
@@ -7289,6 +7334,7 @@ internal class InspectorPanel(
         customTechnologyPanel.isVisible = showNodeFields && (boundNodeIsCompiler || technology.selectedItem == OtherTechnologyChoice)
         statusRow.isVisible = showNodeFields
         responsibleRow.isVisible = boundHasNode
+        assigneeRow.isVisible = showNodeFields
         revisionNameRow.isVisible = boundHasNode
         revisionDateRow.isVisible = boundHasNode
         modifiedDateRow.isVisible = boundHasNode

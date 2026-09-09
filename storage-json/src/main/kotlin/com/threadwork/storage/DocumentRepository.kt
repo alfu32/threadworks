@@ -7,6 +7,7 @@ import com.threadwork.core.model.ThreadworkDocument
 import com.threadwork.core.model.LinkData
 import com.threadwork.core.model.LinkInteractionKinds
 import com.threadwork.core.model.ModificationMetadata
+import com.threadwork.core.model.ModelUser
 import com.threadwork.core.model.Node
 import com.threadwork.core.model.NodeId
 import com.threadwork.core.model.NodeKind
@@ -54,6 +55,8 @@ interface DocumentRepository {
     fun updateNodeFileLayoutStrategy(id: NodeId, strategyId: String)
     fun updateNodeMetadata(id: NodeId, metadata: Map<String, String>)
     fun updateNodeResponsible(id: NodeId, responsible: String?)
+    fun updateNodeAssignee(id: NodeId, assignee: String?)
+    fun registerUser(user: ModelUser)
     fun updateNodeStatus(id: NodeId, status: ProjectStatus?)
     fun updateNodeTypeDefinition(id: NodeId, definition: TypeDefinition)
     fun updateNodeDiagnostics(id: NodeId, diagnostics: List<Diagnostic>)
@@ -221,6 +224,30 @@ class InMemoryDocumentRepository(
         node.responsible = normalized
         touchNodes(listOf(id))
         markDirty()
+    }
+
+    override fun updateNodeAssignee(id: NodeId, assignee: String?) {
+        val node = requireNode(id)
+        val normalized = assignee?.trim()?.takeIf(String::isNotBlank)
+        if (node.assignee == normalized) return
+        node.assignee = normalized
+        touchNodes(listOf(id))
+        markDirty()
+    }
+
+    override fun registerUser(user: ModelUser) {
+        val identifier = user.identifier.trim()
+        if (identifier.isBlank()) return
+        val index = document.users.indexOfFirst { it.identifier == identifier }
+        if (index < 0) {
+            document.users += user.copy(identifier = identifier)
+            markDirty()
+            return
+        }
+        if (user.avatar.isNotBlank() && document.users[index].avatar != user.avatar) {
+            document.users[index] = document.users[index].copy(avatar = user.avatar)
+            markDirty()
+        }
     }
 
     override fun updateNodeStatus(id: NodeId, status: ProjectStatus?) {
@@ -446,6 +473,7 @@ class InMemoryDocumentRepository(
     private fun touchNodes(ids: Iterable<NodeId>) {
         val timestamp = modifiedDateProvider()
         val user = modifiedUserProvider()
+        registerUser(ModelUser(user))
         ids.distinct().forEach { id ->
             document.nodes[id]?.let { node ->
                 node.revision = document.masterRevision.copy()
