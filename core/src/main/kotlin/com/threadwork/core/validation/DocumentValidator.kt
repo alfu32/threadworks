@@ -125,8 +125,11 @@ object DocumentValidator {
             .forEach { diagnostics += error("Duplicate type field '$it'", node.id) }
         definition.fields.forEach { field ->
             if (field.name.isBlank()) diagnostics += error("Type field name cannot be blank", node.id)
-            if (!isKnownType(document, field.typeId)) {
-                diagnostics += error("Type field '${field.name}' references unknown type '${field.typeId}'", node.id)
+            val typeId = field.typeId.trim()
+            if (typeId.isBlank()) {
+                diagnostics += error("Type field '${field.name}' type cannot be blank", node.id)
+            } else if (document.nodes[NodeId(typeId)]?.kind?.let { it != NodeKind.Type } == true) {
+                diagnostics += error("Type field '${field.name}' references non-type node '$typeId'", node.id)
             }
         }
     }

@@ -24,7 +24,6 @@ import com.threadwork.core.model.NodeId
 import com.threadwork.core.model.NodeKind
 import com.threadwork.core.model.NodeTextSection
 import com.threadwork.core.model.ThreadworkDocument
-import com.threadwork.core.model.BuiltInTypeIds
 import com.threadwork.core.model.VOID_LAYOUT_STRATEGY_ID
 import com.threadwork.core.model.effectiveLayoutStrategyId
 import com.threadwork.core.model.effectiveLanguageId
@@ -38,11 +37,35 @@ class CCompiler : TemplateSetCompiler() {
     override val supportedLanguageIds: Set<String> = setOf("c")
     override val supportedTechnologyIds: Set<String> = setOf("c-native")
     override val primitiveTypeIds: List<String> = listOf(
-        BuiltInTypeIds.Boolean,
-        BuiltInTypeIds.Number,
-        BuiltInTypeIds.Date,
-        BuiltInTypeIds.String,
-        BuiltInTypeIds.Array,
+        "void",
+        "bool",
+        "char",
+        "signed char",
+        "unsigned char",
+        "short",
+        "unsigned short",
+        "int",
+        "unsigned int",
+        "long",
+        "unsigned long",
+        "long long",
+        "unsigned long long",
+        "float",
+        "double",
+        "long double",
+        "size_t",
+        "ptrdiff_t",
+        "int8_t",
+        "uint8_t",
+        "int16_t",
+        "uint16_t",
+        "int32_t",
+        "uint32_t",
+        "int64_t",
+        "uint64_t",
+        "char *",
+        "const char *",
+        "void *",
     )
     override val providedTechnologies: List<CompilerTechnology> = listOf(CompilerTechnology("c", "c-native"))
     override val supportedLayoutStrategyIds: Set<String> = setOf(SingleFileLayoutStrategy.id)

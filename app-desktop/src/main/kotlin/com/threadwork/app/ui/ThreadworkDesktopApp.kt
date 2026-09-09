@@ -7374,6 +7374,7 @@ internal class InspectorPanel(
 
     private fun defaultPrimitiveTypeId(): String =
         primitiveTypeIds().firstOrNull { it == BuiltInTypeIds.String }
+            ?: primitiveTypeIds().firstOrNull { it == "char *" }
             ?: primitiveTypeIds().firstOrNull()
             ?: BuiltInTypeIds.String
 

@@ -92,7 +92,7 @@ interface CompilerPlugin : FsStorage {
         document: ThreadworkDocument,
         node: Node,
         typeName: String,
-    ): CompilerTypeInformation? = defaultTypeInformation(document, node, typeName)
+    ): CompilerTypeInformation? = defaultTypeInformation(document, node, typeName, primitiveTypeIds)
 
     fun layoutStrategy(options: CompilerOptions): LayoutStrategy =
         ClassifiedFilesystemLayoutStrategy

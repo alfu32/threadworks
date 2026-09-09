@@ -535,7 +535,7 @@ abstract class TemplateSetCompiler : StructuredCompiler() {
         node: Node,
         typeName: String,
     ): CompilerTypeInformation? {
-        val modelInfo = defaultTypeInformation(document, node, typeName) ?: return null
+        val modelInfo = defaultTypeInformation(document, node, typeName, primitiveTypeIds) ?: return null
         val typeNode = document.nodes.values.firstOrNull {
             it.kind == NodeKind.Type && it.name.equals(typeName.trim(), ignoreCase = true)
         } ?: return modelInfo
@@ -662,7 +662,7 @@ abstract class TemplateSetCompiler : StructuredCompiler() {
         val incomingDataLinks = incoming.filterNot(::isCapabilityDescriptor)
         val outgoingDataLinks = outgoing.filterNot(::isCapabilityDescriptor)
         val nodeView = nodeView(document, node)
-        val typeFields = typeFieldViews(document, node)
+        val typeFields = typeFieldViews(document, node, primitiveTypeIds)
         val symbol = safeIdentifier(node.name, preserveCase = true)
         val kotlinSymbol = indexedNodeSymbol(document, node)
         val isCompilationRoot = node.id == document.rootNodeId || node.id in context.options.scopeNodeIds
@@ -824,9 +824,15 @@ open class StringTemplateCompiler(
     templateSet
 }
 
-private fun typeFieldViews(document: ThreadworkDocument, node: Node): List<Map<String, Any?>> =
+private fun typeFieldViews(
+    document: ThreadworkDocument,
+    node: Node,
+    primitiveTypeIds: Collection<String> = emptyList(),
+): List<Map<String, Any?>> =
     node.typeDefinition?.fields.orEmpty().map { field ->
         val typeName = document.typeDisplayName(field.typeId)
+        val isCompilerPrimitive = document.getElementById(field.typeId)?.kind != NodeKind.Type &&
+            typeName in primitiveTypeIds
         mapOf(
             "name" to field.name,
             "symbol" to safeIdentifier(field.name, preserveCase = true),
@@ -836,6 +842,7 @@ private fun typeFieldViews(document: ThreadworkDocument, node: Node): List<Map<S
                 ?.let { safeIdentifier(it.name, preserveCase = true) }
                 .orEmpty()
                 .ifBlank { typeName },
+            "isCompilerPrimitive" to isCompilerPrimitive,
             "isReference" to field.isReference,
         )
     }

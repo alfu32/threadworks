@@ -22,7 +22,6 @@ import com.threadwork.core.diagnostics.DiagnosticSeverity
 import com.threadwork.core.model.Node
 import com.threadwork.core.model.NodeTextSection
 import com.threadwork.core.model.ThreadworkDocument
-import com.threadwork.core.model.BuiltInTypeIds
 import com.threadwork.core.model.effectiveTechnologyId
 import com.threadwork.core.validation.DocumentValidator
 
@@ -33,11 +32,27 @@ class GoCompiler : TemplateSetCompiler() {
     override val supportedLanguageIds: Set<String> = setOf("go")
     override val supportedTechnologyIds: Set<String> = setOf("go")
     override val primitiveTypeIds: List<String> = listOf(
-        BuiltInTypeIds.Boolean,
-        BuiltInTypeIds.Number,
-        BuiltInTypeIds.Date,
-        BuiltInTypeIds.String,
-        BuiltInTypeIds.Array,
+        "bool",
+        "byte",
+        "rune",
+        "int",
+        "int8",
+        "int16",
+        "int32",
+        "int64",
+        "uint",
+        "uint8",
+        "uint16",
+        "uint32",
+        "uint64",
+        "uintptr",
+        "float32",
+        "float64",
+        "complex64",
+        "complex128",
+        "string",
+        "[]byte",
+        "any",
     )
     override val providedTechnologies: List<CompilerTechnology> = listOf(CompilerTechnology("go", "go"))
     override val supportedLayoutStrategyIds: Set<String> = setOf(SingleFileLayoutStrategy.id)

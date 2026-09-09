@@ -1055,9 +1055,9 @@
                 "name": "",
                 "date": ""
             },
-            "responsible": "devlin",
+            "responsible": "local|devlin|",
             "modified": {
-                "date": "2026-09-09T08:46:42.575281299Z",
+                "date": "2026-09-09T10:12:19.828785300Z",
                 "user": "ioan.alferaru@gmail.com"
             },
             "ports": [],
@@ -1462,8 +1462,8 @@
                 "link_823f422e-35dd-4223-be9b-1907694c76cc",
                 "link_6d0f78b9-7a10-4621-955d-331d8934c60d",
                 "link_9ad4fc83-a96b-4986-9d39-4364f783cd14",
-                "link_189bb051-11a0-4914-8cdc-aba75c081412",
-                "link_a8ce6267-aa95-4362-84e5-c2929e395f3a"
+                "link_a8ce6267-aa95-4362-84e5-c2929e395f3a",
+                "link_189bb051-11a0-4914-8cdc-aba75c081412"
             ],
             "outgoingLinks": [],
             "layout": {
@@ -2353,7 +2353,7 @@
             "username": "",
             "fullName": "Ioan Alferaru",
             "role": "",
-            "refreshedAt": "2026-09-09T10:04:00.386060012Z"
+            "refreshedAt": "2026-09-09T10:11:28.094006005Z"
         },
         {
             "identifier": "alferaru.ioan@gmail.com",
@@ -2438,6 +2438,18 @@
             "fullName": "",
             "role": "",
             "refreshedAt": "2026-09-09T08:10:26.491351206Z"
+        },
+        {
+            "identifier": "ioan.alferaru@gmail.com",
+            "avatar": "",
+            "avatarData": "",
+            "source": "local",
+            "userId": "",
+            "emailAddress": "",
+            "username": "",
+            "fullName": "",
+            "role": "",
+            "refreshedAt": "2026-09-09T10:12:19.828785300Z"
         }
     ]
 }

@@ -226,6 +226,7 @@ fun defaultTypeInformation(
     document: ThreadworkDocument,
     node: Node,
     typeName: String,
+    primitiveTypeIds: Collection<String> = BuiltInTypeIds.all,
 ): CompilerTypeInformation? {
     val normalized = typeName.trim()
     if (normalized.isBlank()) return null
@@ -247,12 +248,12 @@ fun defaultTypeInformation(
                 },
             )
         }
-        ?: BuiltInTypeIds.all.firstOrNull { it == normalized }?.let { builtin ->
+        ?: primitiveTypeIds.firstOrNull { it == normalized }?.let { primitive ->
             CompilerTypeInformation(
-                name = builtin,
+                name = primitive,
                 languageId = document.effectiveLanguageId(node.id),
-                declaration = builtInTypeDescription(builtin, document.effectiveLanguageId(node.id)),
-                documentation = "Built-in Threadwork primitive type.",
+                declaration = builtInTypeDescription(primitive, document.effectiveLanguageId(node.id)),
+                documentation = "Primitive type provided by the active compiler.",
             )
         }
 }
