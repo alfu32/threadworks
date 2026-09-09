@@ -7986,6 +7986,7 @@ private class NodeTextEditor(
             val originLink = symbol.originNodeId?.let(document::getElementById)
             val color = when {
                 symbol.kind == CompilerCodeSymbolKind.Type -> activePalette[DesignerColorKey.TypeText]
+                symbol.kind == CompilerCodeSymbolKind.RuntimeSymbol -> activePalette[DesignerColorKey.RuntimeText]
                 originLink?.link != null -> activePalette.colorForLink(LinkClassifier.classify(document, originLink))
                 else -> null
             }
