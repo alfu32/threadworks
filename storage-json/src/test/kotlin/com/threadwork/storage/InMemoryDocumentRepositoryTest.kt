@@ -40,7 +40,7 @@ class InMemoryDocumentRepositoryTest {
                 avatarData = "resized-png",
                 source = "github",
                 userId = "42",
-                emailAddress = "user@example.test",
+                emailAddress = "new@example.test",
                 username = "user",
                 fullName = "A User",
                 role = "member",
@@ -56,6 +56,8 @@ class InMemoryDocumentRepositoryTest {
         assertEquals("second", users.first { it.role == "member" }.refreshedAt)
         assertEquals("avatar.png", users.first { it.role == "member" }.avatar)
         assertEquals("resized-png", users.first { it.role == "member" }.avatarData)
+        assertEquals("new@example.test", users.single { it.role == "member" }.emailAddress)
+        assertEquals("42", users.single { it.role == "member" }.userId)
         assertEquals("admin", users.single { it.role == "admin" }.role)
     }
 
