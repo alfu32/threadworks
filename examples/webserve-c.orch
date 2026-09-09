@@ -70,7 +70,10 @@
                 "state": "RESOLVED"
             },
             "pluginData": {},
-            "nameDetail": ""
+            "nameDetail": "",
+            "status": null,
+            "statusChanges": [],
+            "assignee": null
         },
         {
             "id": "node_904556ea-a897-47f9-a733-8e0e005e062f",
@@ -138,7 +141,10 @@
             "diagnostics": [],
             "metadata": {},
             "pluginData": {},
-            "nameDetail": ""
+            "nameDetail": "",
+            "status": null,
+            "statusChanges": [],
+            "assignee": null
         },
         {
             "id": "node_0feec713-8eaa-4bd5-8ea0-b02515bf358a",
@@ -214,7 +220,10 @@
             "diagnostics": [],
             "metadata": {},
             "pluginData": {},
-            "nameDetail": ""
+            "nameDetail": "",
+            "status": null,
+            "statusChanges": [],
+            "assignee": null
         },
         {
             "id": "link_718c5de7-18b0-4a52-8337-e7b0c9d08fda",
@@ -282,7 +291,10 @@
             "diagnostics": [],
             "metadata": {},
             "pluginData": {},
-            "nameDetail": ""
+            "nameDetail": "",
+            "status": null,
+            "statusChanges": [],
+            "assignee": null
         },
         {
             "id": "node_4cb84fd7-f340-4ed6-ac3e-10a375a07891",
@@ -349,7 +361,10 @@
             "diagnostics": [],
             "metadata": {},
             "pluginData": {},
-            "nameDetail": ""
+            "nameDetail": "",
+            "status": null,
+            "statusChanges": [],
+            "assignee": null
         },
         {
             "id": "node_62c442a8-f28c-4351-9099-65b837788fb8",
@@ -419,7 +434,10 @@
             "diagnostics": [],
             "metadata": {},
             "pluginData": {},
-            "nameDetail": ""
+            "nameDetail": "",
+            "status": null,
+            "statusChanges": [],
+            "assignee": null
         },
         {
             "id": "node_e9ea318e-27c5-45a4-8bf4-65ced6c66dcd",
@@ -496,7 +514,10 @@
             "diagnostics": [],
             "metadata": {},
             "pluginData": {},
-            "nameDetail": ""
+            "nameDetail": "",
+            "status": null,
+            "statusChanges": [],
+            "assignee": null
         },
         {
             "id": "link_0813977e-4696-4150-a75c-d9de8d291880",
@@ -564,7 +585,10 @@
             "diagnostics": [],
             "metadata": {},
             "pluginData": {},
-            "nameDetail": ""
+            "nameDetail": "",
+            "status": null,
+            "statusChanges": [],
+            "assignee": null
         },
         {
             "id": "link_245f4370-e4ab-48ba-8a1b-e4011826e037",
@@ -632,7 +656,10 @@
             "diagnostics": [],
             "metadata": {},
             "pluginData": {},
-            "nameDetail": ""
+            "nameDetail": "",
+            "status": null,
+            "statusChanges": [],
+            "assignee": null
         },
         {
             "id": "link_f94492a8-867a-4f0b-bcaf-f9a2eb35b3da",
@@ -700,12 +727,28 @@
             "diagnostics": [],
             "metadata": {},
             "pluginData": {},
-            "nameDetail": ""
+            "nameDetail": "",
+            "status": null,
+            "statusChanges": [],
+            "assignee": null
         }
     ],
     "metadata": {},
     "masterRevision": {
         "name": "A",
         "date": "20260831"
-    }
+    },
+    "users": [
+        {
+            "identifier": "13664856",
+            "avatar": "https://avatars.githubusercontent.com/u/13664856?v=4",
+            "source": "github",
+            "userId": "13664856",
+            "emailAddress": "ioan.alferaru@gmail.com",
+            "username": "alfu32",
+            "fullName": "Ioan Alferaru",
+            "role": "User",
+            "refreshedAt": "2026-09-09T08:14:52.570255927Z"
+        }
+    ]
 }

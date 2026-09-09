@@ -40,9 +40,9 @@ data class UserIdentity(
 
 fun UserIdentity?.designator(systemUser: String = System.getProperty("user.name").orEmpty()): String = when {
     this == null -> systemUser.ifBlank { "local user" }
-    userId.isNotBlank() -> userId
     emailAddress.isNotBlank() -> emailAddress
     username.isNotBlank() -> username
+    userId.isNotBlank() -> userId
     fullName.isNotBlank() -> fullName
     else -> systemUser.ifBlank { "local user" }
 }

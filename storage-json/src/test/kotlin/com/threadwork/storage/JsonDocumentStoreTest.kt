@@ -162,7 +162,7 @@ class JsonDocumentStoreTest {
             ),
             loadedUser,
         )
-        assertEquals("github/github-42(member)", loadedUser.displayName())
+        assertEquals("github/grace@example.test(member)", loadedUser.displayName())
         assertEquals("worker entry point", loaded.nodes.getValue(child.id).nameDetail)
         assertEquals("R4", loaded.nodes.getValue(child.id).revision?.name)
         assertTrue(loaded.nodes.getValue(child.id).modified.date.isNotBlank())

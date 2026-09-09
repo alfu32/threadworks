@@ -74,9 +74,9 @@ data class ModelUser(
 ) {
     /** The stable human-facing identifier selected from provider data. */
     val designator: String
-        get() = userId.trim()
-            .ifBlank { emailAddress.trim() }
+        get() = emailAddress.trim()
             .ifBlank { username.trim() }
+            .ifBlank { userId.trim() }
             .ifBlank { fullName.trim() }
             .ifBlank { identifier.trim() }
             .ifBlank { "local user" }

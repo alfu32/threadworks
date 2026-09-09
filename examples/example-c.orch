@@ -2111,31 +2111,91 @@
     "users": [
         {
             "identifier": "cristian.alferaru@gmail.com",
-            "avatar": ""
+            "avatar": "",
+            "source": "",
+            "userId": "",
+            "emailAddress": "",
+            "username": "",
+            "fullName": "",
+            "role": "",
+            "refreshedAt": ""
         },
         {
             "identifier": "devlin",
-            "avatar": ""
+            "avatar": "",
+            "source": "",
+            "userId": "",
+            "emailAddress": "",
+            "username": "",
+            "fullName": "",
+            "role": "",
+            "refreshedAt": ""
         },
         {
             "identifier": "Ioan Alferaru",
-            "avatar": "https://lh3.googleusercontent.com/a/ACg8ocI87950JVkGNlY7V4CMwYGbzyXuuIe5nW0cX6f4LLTh-dj0fE-e=s96-c"
+            "avatar": "https://lh3.googleusercontent.com/a/ACg8ocI87950JVkGNlY7V4CMwYGbzyXuuIe5nW0cX6f4LLTh-dj0fE-e=s96-c",
+            "source": "",
+            "userId": "",
+            "emailAddress": "",
+            "username": "",
+            "fullName": "",
+            "role": "",
+            "refreshedAt": ""
         },
         {
             "identifier": "cristian alferaru",
-            "avatar": "https://lh3.googleusercontent.com/a/ACg8ocIrmCINbJr6wN9L5NWUTHXPeSgKodVTG0om1k9O_sIoljh9S6g=s96-c"
+            "avatar": "https://lh3.googleusercontent.com/a/ACg8ocIrmCINbJr6wN9L5NWUTHXPeSgKodVTG0om1k9O_sIoljh9S6g=s96-c",
+            "source": "",
+            "userId": "",
+            "emailAddress": "",
+            "username": "",
+            "fullName": "",
+            "role": "",
+            "refreshedAt": ""
         },
         {
             "identifier": "octo draw",
-            "avatar": "https://lh3.googleusercontent.com/a/ACg8ocKzE4hgMY2Vtwm-hqpgJTAU97DxSLXKslmbxACbcoBI10say1I=s96-c"
+            "avatar": "https://lh3.googleusercontent.com/a/ACg8ocKzE4hgMY2Vtwm-hqpgJTAU97DxSLXKslmbxACbcoBI10say1I=s96-c",
+            "source": "",
+            "userId": "",
+            "emailAddress": "",
+            "username": "",
+            "fullName": "",
+            "role": "",
+            "refreshedAt": ""
         },
         {
             "identifier": "alfu32",
-            "avatar": "https://avatars.githubusercontent.com/u/13664856?v=4"
+            "avatar": "https://avatars.githubusercontent.com/u/13664856?v=4",
+            "source": "",
+            "userId": "",
+            "emailAddress": "",
+            "username": "",
+            "fullName": "",
+            "role": "",
+            "refreshedAt": ""
         },
         {
             "identifier": "ioan.alferaru@gmail.com",
-            "avatar": ""
+            "avatar": "",
+            "source": "",
+            "userId": "",
+            "emailAddress": "",
+            "username": "",
+            "fullName": "",
+            "role": "",
+            "refreshedAt": ""
+        },
+        {
+            "identifier": "13664856",
+            "avatar": "https://avatars.githubusercontent.com/u/13664856?v=4",
+            "source": "github",
+            "userId": "13664856",
+            "emailAddress": "ioan.alferaru@gmail.com",
+            "username": "alfu32",
+            "fullName": "Ioan Alferaru",
+            "role": "User",
+            "refreshedAt": "2026-09-09T08:13:32.005405367Z"
         }
     ]
 }

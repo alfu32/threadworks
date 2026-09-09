@@ -2315,6 +2315,94 @@
             "fullName": "Ioan Alferaru",
             "role": "",
             "refreshedAt": "2026-09-09T08:03:17.067572399Z"
+        },
+        {
+            "identifier": "109446424439055925887",
+            "avatar": "https://lh3.googleusercontent.com/a/ACg8ocI87950JVkGNlY7V4CMwYGbzyXuuIe5nW0cX6f4LLTh-dj0fE-e=s96-c",
+            "source": "google",
+            "userId": "109446424439055925887",
+            "emailAddress": "ioan.alferaru@gmail.com",
+            "username": "",
+            "fullName": "Ioan Alferaru",
+            "role": "",
+            "refreshedAt": "2026-09-09T08:08:54.592122754Z"
+        },
+        {
+            "identifier": "117210344384403773865",
+            "avatar": "https://lh3.googleusercontent.com/a/ACg8ocLEOuSKJRfe0iYGN2JhrKw_cF0-wwiOwePJ4VjuMCd6dBGgZeBt=s96-c",
+            "source": "google",
+            "userId": "117210344384403773865",
+            "emailAddress": "alferaru.ioan@gmail.com",
+            "username": "",
+            "fullName": "Alferaru Ioan",
+            "role": "",
+            "refreshedAt": "2026-09-09T08:08:13.632178154Z"
+        },
+        {
+            "identifier": "111608427618360323170",
+            "avatar": "https://lh3.googleusercontent.com/a/ACg8ocIrmCINbJr6wN9L5NWUTHXPeSgKodVTG0om1k9O_sIoljh9S6g=s96-c",
+            "source": "google",
+            "userId": "111608427618360323170",
+            "emailAddress": "cristian.alferaru@gmail.com",
+            "username": "",
+            "fullName": "cristian alferaru",
+            "role": "",
+            "refreshedAt": "2026-09-09T08:08:24.768585567Z"
+        },
+        {
+            "identifier": "104019366419327384449",
+            "avatar": "https://lh3.googleusercontent.com/a/ACg8ocKzE4hgMY2Vtwm-hqpgJTAU97DxSLXKslmbxACbcoBI10say1I=s96-c",
+            "source": "google",
+            "userId": "104019366419327384449",
+            "emailAddress": "8todraw@gmail.com",
+            "username": "",
+            "fullName": "octo draw",
+            "role": "",
+            "refreshedAt": "2026-09-09T08:08:37.896281469Z"
+        },
+        {
+            "identifier": "13664856",
+            "avatar": "https://avatars.githubusercontent.com/u/13664856?v=4",
+            "source": "github",
+            "userId": "13664856",
+            "emailAddress": "ioan.alferaru@gmail.com",
+            "username": "alfu32",
+            "fullName": "Ioan Alferaru",
+            "role": "User",
+            "refreshedAt": "2026-09-09T08:10:57.147803532Z"
+        },
+        {
+            "identifier": "1bf5056cf7c48c66",
+            "avatar": "",
+            "source": "microsoft",
+            "userId": "1bf5056cf7c48c66",
+            "emailAddress": "ioan.alferaru@gmail.com",
+            "username": "ioan.alferaru@gmail.com",
+            "fullName": "Ioan Alferaru",
+            "role": "",
+            "refreshedAt": "2026-09-09T08:09:28.316395779Z"
+        },
+        {
+            "identifier": "c435df6e251fdc3e",
+            "avatar": "",
+            "source": "microsoft",
+            "userId": "c435df6e251fdc3e",
+            "emailAddress": "cristian.alferaru@gmail.com",
+            "username": "cristian.alferaru@gmail.com",
+            "fullName": "ioan alferaru",
+            "role": "",
+            "refreshedAt": "2026-09-09T08:09:45.703304717Z"
+        },
+        {
+            "identifier": "devlin",
+            "avatar": "",
+            "source": "local",
+            "userId": "",
+            "emailAddress": "",
+            "username": "",
+            "fullName": "",
+            "role": "",
+            "refreshedAt": "2026-09-09T08:10:26.491351206Z"
         }
     ]
 }

@@ -256,7 +256,13 @@ class InMemoryDocumentRepository(
             normalized.fullName,
         ).all(String::isBlank)) return
         val matchingIndices = document.users.mapIndexedNotNull { index, existing ->
-            index.takeIf { existing.uniqueKey == normalized.uniqueKey }
+            index.takeIf {
+                existing.uniqueKey == normalized.uniqueKey ||
+                    normalized.userId.isNotBlank() &&
+                        existing.source == normalized.source &&
+                        existing.userId == normalized.userId &&
+                        existing.role == normalized.role
+            }
         }
         val index = matchingIndices.firstOrNull() ?: -1
         if (index < 0) {
@@ -277,9 +283,20 @@ class InMemoryDocumentRepository(
             role = normalized.role.ifBlank { previous.role },
             refreshedAt = normalized.refreshedAt.ifBlank { previous.refreshedAt },
         )
+        val legacyAssigneeValues = matchingIndices.flatMap { matchingIndex ->
+            document.users[matchingIndex].let { existing ->
+                listOf(existing.uniqueKey, existing.identifier)
+            }
+        }.filter(String::isNotBlank).toSet()
         var changed = previous != merged
         if (changed) {
             document.users[index] = merged
+        }
+        document.nodes.values.forEach { node ->
+            if (node.assignee in legacyAssigneeValues && node.assignee != merged.uniqueKey) {
+                node.assignee = merged.uniqueKey
+                changed = true
+            }
         }
         matchingIndices.drop(1).asReversed().forEach { duplicateIndex ->
             document.users.removeAt(duplicateIndex)

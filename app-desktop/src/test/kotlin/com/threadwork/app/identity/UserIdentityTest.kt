@@ -19,12 +19,22 @@ import kotlin.test.assertTrue
 
 class UserIdentityTest {
     @Test
-    fun `designator follows user id email username and fallback priority`() {
+    fun `designator follows email username user id and fallback priority`() {
         val expiration = Instant.parse("2026-09-15T00:00:00Z")
 
         assertEquals(
-            "gh-42",
+            "cat@example.test",
             UserIdentity(OAuthProvider.GITHUB, "cat@example.test", "octocat", "The Octocat", expiresAt = expiration, userId = "gh-42")
+                .designator("local"),
+        )
+        assertEquals(
+            "octocat",
+            UserIdentity(OAuthProvider.GITHUB, username = "octocat", expiresAt = expiration, userId = "gh-42")
+                .designator("local"),
+        )
+        assertEquals(
+            "gh-42",
+            UserIdentity(OAuthProvider.GITHUB, expiresAt = expiration, userId = "gh-42")
                 .designator("local"),
         )
         assertEquals(
