@@ -22,6 +22,7 @@ import com.threadwork.core.diagnostics.DiagnosticSeverity
 import com.threadwork.core.model.Node
 import com.threadwork.core.model.NodeTextSection
 import com.threadwork.core.model.ThreadworkDocument
+import com.threadwork.core.model.BuiltInTypeIds
 import com.threadwork.core.model.effectiveTechnologyId
 import com.threadwork.core.validation.DocumentValidator
 
@@ -31,6 +32,13 @@ class GoCompiler : TemplateSetCompiler() {
     override val displayName: String = "Go Compiler"
     override val supportedLanguageIds: Set<String> = setOf("go")
     override val supportedTechnologyIds: Set<String> = setOf("go")
+    override val primitiveTypeIds: List<String> = listOf(
+        BuiltInTypeIds.Boolean,
+        BuiltInTypeIds.Number,
+        BuiltInTypeIds.Date,
+        BuiltInTypeIds.String,
+        BuiltInTypeIds.Array,
+    )
     override val providedTechnologies: List<CompilerTechnology> = listOf(CompilerTechnology("go", "go"))
     override val supportedLayoutStrategyIds: Set<String> = setOf(SingleFileLayoutStrategy.id)
     override val magicFileNames: Set<String> = TEMPLATES.staticFileNames

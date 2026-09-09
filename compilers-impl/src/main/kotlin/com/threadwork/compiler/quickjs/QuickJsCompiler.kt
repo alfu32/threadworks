@@ -15,6 +15,7 @@ import com.threadwork.compiler.generic.compilerTemplateOverrides
 import com.threadwork.core.diagnostics.Diagnostic
 import com.threadwork.core.model.Node
 import com.threadwork.core.model.ThreadworkDocument
+import com.threadwork.core.model.BuiltInTypeIds
 import com.threadwork.core.validation.DocumentValidator
 
 /** Generates portable JavaScript intended for the QuickJS command-line runtime. */
@@ -23,6 +24,13 @@ class QuickJsCompiler : TemplateSetCompiler() {
     override val displayName: String = "QuickJS JavaScript Compiler"
     override val supportedLanguageIds: Set<String> = setOf("javascript")
     override val supportedTechnologyIds: Set<String> = setOf("quickjs")
+    override val primitiveTypeIds: List<String> = listOf(
+        BuiltInTypeIds.Boolean,
+        BuiltInTypeIds.Number,
+        BuiltInTypeIds.Date,
+        BuiltInTypeIds.String,
+        BuiltInTypeIds.Array,
+    )
     override val providedTechnologies: List<CompilerTechnology> = listOf(
         CompilerTechnology("javascript", "quickjs"),
     )

@@ -16,6 +16,7 @@ import com.threadwork.core.classification.stereotype
 import com.threadwork.core.model.Node
 import com.threadwork.core.model.NodeId
 import com.threadwork.core.model.ThreadworkDocument
+import com.threadwork.core.model.BuiltInTypeIds
 import com.threadwork.core.model.effectiveLayoutStrategyId
 import com.threadwork.core.model.effectiveTechnologyId
 import com.threadwork.core.model.effectiveLanguageId
@@ -32,6 +33,7 @@ class FilesystemCompiler : GenericCompiler() {
     override val displayName: String = "multi-tech"
     override val supportedLanguageIds: Set<String> = setOf(ANY_LANGUAGE_ID)
     override val supportedTechnologyIds: Set<String> = setOf("multi-tech", "file-export")
+    override val primitiveTypeIds: List<String> = BuiltInTypeIds.all
     override val supportedLayoutStrategyIds: Set<String> = setOf(DirectFileSystemHomorphismLayoutStrategy.id)
     override val providedTechnologies: List<CompilerTechnology> = listOf(
         CompilerTechnology(ANY_LANGUAGE_ID, "multi-tech"),

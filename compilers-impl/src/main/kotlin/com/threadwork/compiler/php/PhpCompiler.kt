@@ -22,6 +22,7 @@ import com.threadwork.core.classification.stereotype
 import com.threadwork.core.model.Node
 import com.threadwork.core.model.NodeTextSection
 import com.threadwork.core.model.ThreadworkDocument
+import com.threadwork.core.model.BuiltInTypeIds
 import com.threadwork.core.model.effectiveTechnologyId
 import com.threadwork.core.validation.DocumentValidator
 
@@ -30,6 +31,13 @@ class PhpCompiler : TemplateSetCompiler() {
     override val displayName: String = "PHP Compiler"
     override val supportedLanguageIds: Set<String> = setOf("php")
     override val supportedTechnologyIds: Set<String> = setOf("php")
+    override val primitiveTypeIds: List<String> = listOf(
+        BuiltInTypeIds.Boolean,
+        BuiltInTypeIds.Number,
+        BuiltInTypeIds.Date,
+        BuiltInTypeIds.String,
+        BuiltInTypeIds.Array,
+    )
     override val providedTechnologies: List<CompilerTechnology> = listOf(CompilerTechnology("php", "php"))
     override val magicFileNames: Set<String> = TEMPLATES.staticFileNames
 

@@ -6794,7 +6794,11 @@ internal class InspectorPanel(
                 JPanel(FlowLayout(FlowLayout.LEFT, 4, 0)).apply {
                     add(JButton("Add field").apply {
                         addActionListener {
-                            typeFieldsModel.addRow(arrayOf<Any>("field_${typeFieldsModel.rowCount + 1}", BuiltInTypeIds.String, false))
+                            typeFieldsModel.addRow(arrayOf<Any>(
+                                "field_${typeFieldsModel.rowCount + 1}",
+                                defaultPrimitiveTypeId(),
+                                false,
+                            ))
                             apply()
                         }
                     })
@@ -7341,7 +7345,7 @@ internal class InspectorPanel(
             val displayType = typeFieldsModel.getValueAt(row, 1)?.toString().orEmpty()
             TypeFieldDefinition(
                 name = typeFieldsModel.getValueAt(row, 0)?.toString().orEmpty().trim(),
-                typeId = typeIdByDisplay[displayType] ?: displayType.ifBlank { BuiltInTypeIds.String },
+                typeId = typeIdByDisplay[displayType] ?: displayType.ifBlank { defaultPrimitiveTypeId() },
                 isReference = typeFieldsModel.getValueAt(row, 2) as? Boolean ?: false,
             )
         }.toMutableList(),
@@ -7350,7 +7354,7 @@ internal class InspectorPanel(
     private fun refreshTypeChoices(selectedTypeId: String) {
         val document = repository.getDocument()
         val choices = linkedMapOf(NoneTypeChoice to "")
-        BuiltInTypeIds.all.forEach { choices[it] = it }
+        primitiveTypeIds().forEach { choices[it] = it }
         document.typeNodes()
             .sortedBy { it.name.lowercase() }
             .forEach { type -> choices["${type.name} (${type.id.value})"] = type.id.value }
@@ -7361,6 +7365,17 @@ internal class InspectorPanel(
         val fieldChoices = choices.filterValues(String::isNotBlank).keys.toTypedArray()
         typeFields.columnModel.getColumn(1).cellEditor = DefaultCellEditor(JComboBox(fieldChoices))
     }
+
+    private fun primitiveTypeIds(): List<String> =
+        nodeId
+            ?.let { compilerCapabilityResolver.compilerFor(repository.getDocument(), it)?.primitiveTypeIds }
+            .orEmpty()
+            .distinct()
+
+    private fun defaultPrimitiveTypeId(): String =
+        primitiveTypeIds().firstOrNull { it == BuiltInTypeIds.String }
+            ?: primitiveTypeIds().firstOrNull()
+            ?: BuiltInTypeIds.String
 
     private fun bindTypeFields(node: Node?) {
         typeFieldsModel.rowCount = 0

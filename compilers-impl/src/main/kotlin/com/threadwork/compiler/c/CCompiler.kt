@@ -24,6 +24,7 @@ import com.threadwork.core.model.NodeId
 import com.threadwork.core.model.NodeKind
 import com.threadwork.core.model.NodeTextSection
 import com.threadwork.core.model.ThreadworkDocument
+import com.threadwork.core.model.BuiltInTypeIds
 import com.threadwork.core.model.VOID_LAYOUT_STRATEGY_ID
 import com.threadwork.core.model.effectiveLayoutStrategyId
 import com.threadwork.core.model.effectiveLanguageId
@@ -36,6 +37,13 @@ class CCompiler : TemplateSetCompiler() {
     override val displayName: String = "C17 Compiler"
     override val supportedLanguageIds: Set<String> = setOf("c")
     override val supportedTechnologyIds: Set<String> = setOf("c-native")
+    override val primitiveTypeIds: List<String> = listOf(
+        BuiltInTypeIds.Boolean,
+        BuiltInTypeIds.Number,
+        BuiltInTypeIds.Date,
+        BuiltInTypeIds.String,
+        BuiltInTypeIds.Array,
+    )
     override val providedTechnologies: List<CompilerTechnology> = listOf(CompilerTechnology("c", "c-native"))
     override val supportedLayoutStrategyIds: Set<String> = setOf(SingleFileLayoutStrategy.id)
     override val magicFileNames: Set<String> = TEMPLATES.staticFileNames

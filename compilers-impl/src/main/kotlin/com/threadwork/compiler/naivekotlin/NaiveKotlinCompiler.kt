@@ -16,6 +16,7 @@ import com.threadwork.core.classification.LinkClassifier
 import com.threadwork.core.classification.LinkStereotype
 import com.threadwork.core.model.ThreadworkDocument
 import com.threadwork.core.model.Node
+import com.threadwork.core.model.BuiltInTypeIds
 import com.threadwork.core.model.effectiveTechnologyId
 import com.threadwork.core.validation.DocumentValidator
 
@@ -24,6 +25,13 @@ class NaiveKotlinCompiler : TemplateSetCompiler() {
     override val displayName: String = "Naive Kotlin/JVM Compiler"
     override val supportedLanguageIds: Set<String> = setOf("kotlin")
     override val supportedTechnologyIds: Set<String> = setOf("kotlin-jvm")
+    override val primitiveTypeIds: List<String> = listOf(
+        BuiltInTypeIds.Boolean,
+        BuiltInTypeIds.Number,
+        BuiltInTypeIds.Date,
+        BuiltInTypeIds.String,
+        BuiltInTypeIds.Array,
+    )
     override val providedTechnologies: List<CompilerTechnology> = listOf(CompilerTechnology("kotlin", "kotlin-jvm"))
     override val magicFileNames: Set<String> = TEMPLATES.staticFileNames
 

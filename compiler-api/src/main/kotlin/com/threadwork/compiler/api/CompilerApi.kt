@@ -44,6 +44,8 @@ interface CompilerPlugin : FsStorage {
     val displayName: String
     val supportedLanguageIds: Set<String> get() = emptySet()
     val supportedTechnologyIds: Set<String> get() = emptySet()
+    /** Primitive Threadwork field types supported by this compiler. */
+    val primitiveTypeIds: List<String> get() = emptyList()
     val providedTechnologies: List<CompilerTechnology>
         get() = supportedLanguageIds.flatMap { languageId ->
             supportedTechnologyIds.map { technologyId -> CompilerTechnology(languageId, technologyId) }
