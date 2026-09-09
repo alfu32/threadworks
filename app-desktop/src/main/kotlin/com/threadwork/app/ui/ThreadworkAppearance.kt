@@ -7,8 +7,15 @@ import com.threadwork.core.classification.NodeStereotype
 import com.threadwork.core.classification.stereotype
 import com.threadwork.core.model.Node
 import com.threadwork.core.model.ThreadworkDocument
+import java.awt.AWTEvent
 import java.awt.Color
+import java.awt.Toolkit
+import java.awt.event.AWTEventListener
+import java.awt.event.MouseWheelEvent
 import java.util.prefs.Preferences
+import javax.swing.JScrollPane
+import javax.swing.SwingUtilities
+import javax.swing.JTree
 import javax.swing.UIManager
 
 enum class ApplicationTheme(val label: String) {
@@ -107,7 +114,9 @@ fun DesignerPalette.colorForLink(stereotype: LinkStereotype): Color = when (ster
 object ThreadworkAppearance {
     private const val PREF_NODE = "com/threadwork/app/appearance"
     private const val THEME_KEY = "theme"
+    private const val SCROLL_LINE_PIXELS = 12
     private val preferences: Preferences = Preferences.userRoot().node(PREF_NODE)
+    private var scrollWheelPolicyInstalled = false
 
     var theme: ApplicationTheme
         get() = runCatching { ApplicationTheme.valueOf(preferences.get(THEME_KEY, ApplicationTheme.Light.name)) }
@@ -141,6 +150,32 @@ object ThreadworkAppearance {
         UIManager.put("TitlePane.centerTitleIfMenuBarEmbedded", false)
         UIManager.put("TitlePane.showIcon", false)
         UIManager.put("TitlePane.showIconBesideTitle", false)
+        installScrollWheelPolicy()
+    }
+
+    private fun installScrollWheelPolicy() {
+        if (scrollWheelPolicyInstalled) return
+        scrollWheelPolicyInstalled = true
+        Toolkit.getDefaultToolkit().addAWTEventListener(AWTEventListener { event: AWTEvent ->
+            val wheel = event as? MouseWheelEvent ?: return@AWTEventListener
+            if (wheel.isConsumed) return@AWTEventListener
+            val source = wheel.component ?: return@AWTEventListener
+            val scrollPane = (source as? JScrollPane)
+                ?: SwingUtilities.getAncestorOfClass(JScrollPane::class.java, source) as? JScrollPane
+                ?: return@AWTEventListener
+            if (scrollPane.viewport?.view is JTree) return@AWTEventListener
+            val rotation = wheel.wheelRotation
+            if (rotation == 0) return@AWTEventListener
+            val scrollBar = if (wheel.isShiftDown) {
+                scrollPane.horizontalScrollBar
+            } else {
+                scrollPane.verticalScrollBar
+            }
+            val maxValue = (scrollBar.maximum - scrollBar.visibleAmount).coerceAtLeast(scrollBar.minimum)
+            scrollBar.value = (scrollBar.value + rotation * SCROLL_LINE_PIXELS)
+                .coerceIn(scrollBar.minimum, maxValue)
+            wheel.consume()
+        }, AWTEvent.MOUSE_WHEEL_EVENT_MASK)
     }
 
     fun defaultPalette(theme: ApplicationTheme): DesignerPalette =
