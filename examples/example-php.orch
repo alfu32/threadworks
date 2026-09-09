@@ -11,7 +11,6 @@
             "children": [
                 "node_968f03ce-27b7-4776-a435-ae0d3a01085a",
                 "node_c4fb01af-8d9d-4a30-838f-8ab8f6328db8",
-                "node_f80a075a-d09d-4615-9d6a-5dc5c7429f08",
                 "node_059814d5-2184-47b6-93b0-f754589cf34f",
                 "link_dd5fcd39-8d54-4310-b6fe-242d927f0ec5",
                 "link_8e881876-8d2a-41a8-92a4-2ee3f2c839ce",
@@ -52,6 +51,7 @@
                 "aiInstructions": "",
                 "aiInstructionsLanguageId": "markdown"
             },
+            "binaryContent": null,
             "technology": {
                 "languageId": "php",
                 "technologyId": "php",
@@ -71,10 +71,14 @@
             "ports": [],
             "link": null,
             "typeDefinition": null,
+            "diagnostics": [],
             "metadata": {
                 "state": "RESOLVED"
             },
-            "pluginData": {}
+            "pluginData": {},
+            "nameDetail": "",
+            "status": null,
+            "statusChanges": []
         },
         {
             "id": "node_968f03ce-27b7-4776-a435-ae0d3a01085a",
@@ -108,6 +112,7 @@
                 "aiInstructions": "",
                 "aiInstructionsLanguageId": "markdown"
             },
+            "binaryContent": null,
             "technology": {
                 "languageId": "shellscript",
                 "technologyId": "file-export",
@@ -121,14 +126,31 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-02T14:25:57.988092394Z",
-                "user": "devlin"
+                "date": "2026-09-09T06:26:12.940385044Z",
+                "user": "cristian.alferaru@gmail.com"
             },
             "ports": [],
             "link": null,
             "typeDefinition": null,
+            "diagnostics": [],
             "metadata": {},
-            "pluginData": {}
+            "pluginData": {},
+            "nameDetail": "",
+            "status": "IMPLEMENTATION",
+            "statusChanges": [
+                {
+                    "userId": "cristian.alferaru@gmail.com",
+                    "changedDate": "2026-09-09T06:26:08.102291936Z",
+                    "initStatus": null,
+                    "endStatus": "BUSINESS"
+                },
+                {
+                    "userId": "cristian.alferaru@gmail.com",
+                    "changedDate": "2026-09-09T06:26:12.940356813Z",
+                    "initStatus": "BUSINESS",
+                    "endStatus": "IMPLEMENTATION"
+                }
+            ]
         },
         {
             "id": "node_c4fb01af-8d9d-4a30-838f-8ab8f6328db8",
@@ -162,6 +184,7 @@
                 "aiInstructions": "",
                 "aiInstructionsLanguageId": "markdown"
             },
+            "binaryContent": null,
             "technology": {
                 "languageId": "",
                 "technologyId": "",
@@ -209,8 +232,12 @@
                     }
                 ]
             },
+            "diagnostics": [],
             "metadata": {},
-            "pluginData": {}
+            "pluginData": {},
+            "nameDetail": "",
+            "status": null,
+            "statusChanges": []
         },
         {
             "id": "node_059814d5-2184-47b6-93b0-f754589cf34f",
@@ -229,11 +256,11 @@
                 "x": 1305.3333333333333,
                 "y": 1053.0,
                 "width": 220.0,
-                "height": 108.0,
+                "height": 78.0,
                 "closedWidth": 220.0,
-                "closedHeight": 108.0,
+                "closedHeight": 78.0,
                 "openWidth": 220.0,
-                "openHeight": 108.0,
+                "openHeight": 78.0,
                 "isExpanded": true
             },
             "fileLayoutStrategyId": "none",
@@ -249,6 +276,7 @@
                 "aiInstructions": "",
                 "aiInstructionsLanguageId": "markdown"
             },
+            "binaryContent": null,
             "technology": {
                 "languageId": "",
                 "technologyId": "",
@@ -283,8 +311,12 @@
             ],
             "link": null,
             "typeDefinition": null,
+            "diagnostics": [],
             "metadata": {},
-            "pluginData": {}
+            "pluginData": {},
+            "nameDetail": "",
+            "status": null,
+            "statusChanges": []
         },
         {
             "id": "link_dd5fcd39-8d54-4310-b6fe-242d927f0ec5",
@@ -318,6 +350,7 @@
                 "aiInstructions": "",
                 "aiInstructionsLanguageId": "markdown"
             },
+            "binaryContent": null,
             "technology": {
                 "languageId": "",
                 "technologyId": "",
@@ -348,8 +381,12 @@
                 "interactionKind": "data"
             },
             "typeDefinition": null,
+            "diagnostics": [],
             "metadata": {},
-            "pluginData": {}
+            "pluginData": {},
+            "nameDetail": "",
+            "status": null,
+            "statusChanges": []
         },
         {
             "id": "link_8e881876-8d2a-41a8-92a4-2ee3f2c839ce",
@@ -383,6 +420,7 @@
                 "aiInstructions": "",
                 "aiInstructionsLanguageId": "markdown"
             },
+            "binaryContent": null,
             "technology": {
                 "languageId": "",
                 "technologyId": "",
@@ -413,8 +451,12 @@
                 "interactionKind": "data"
             },
             "typeDefinition": null,
+            "diagnostics": [],
             "metadata": {},
-            "pluginData": {}
+            "pluginData": {},
+            "nameDetail": "",
+            "status": null,
+            "statusChanges": []
         },
         {
             "id": "node_627a3a3e-718f-4867-a71e-584b2d9b138b",
@@ -433,11 +475,11 @@
                 "x": 908.6666666666665,
                 "y": 1212.0,
                 "width": 220.0,
-                "height": 108.0,
+                "height": 78.0,
                 "closedWidth": 220.0,
-                "closedHeight": 108.0,
+                "closedHeight": 78.0,
                 "openWidth": 220.0,
-                "openHeight": 108.0,
+                "openHeight": 78.0,
                 "isExpanded": true
             },
             "fileLayoutStrategyId": "none",
@@ -453,6 +495,7 @@
                 "aiInstructions": "",
                 "aiInstructionsLanguageId": "markdown"
             },
+            "binaryContent": null,
             "technology": {
                 "languageId": "",
                 "technologyId": "",
@@ -487,8 +530,12 @@
             ],
             "link": null,
             "typeDefinition": null,
+            "diagnostics": [],
             "metadata": {},
-            "pluginData": {}
+            "pluginData": {},
+            "nameDetail": "",
+            "status": null,
+            "statusChanges": []
         },
         {
             "id": "link_d1b9d286-d43a-439a-bee0-e66bf2943400",
@@ -522,6 +569,7 @@
                 "aiInstructions": "",
                 "aiInstructionsLanguageId": "markdown"
             },
+            "binaryContent": null,
             "technology": {
                 "languageId": "",
                 "technologyId": "",
@@ -552,8 +600,12 @@
                 "interactionKind": "data"
             },
             "typeDefinition": null,
+            "diagnostics": [],
             "metadata": {},
-            "pluginData": {}
+            "pluginData": {},
+            "nameDetail": "",
+            "status": null,
+            "statusChanges": []
         },
         {
             "id": "node_c43e7a55-0e44-428b-972a-6dab999df396",
@@ -591,6 +643,7 @@
                 "aiInstructions": "",
                 "aiInstructionsLanguageId": "markdown"
             },
+            "binaryContent": null,
             "technology": {
                 "languageId": "",
                 "technologyId": "",
@@ -625,8 +678,12 @@
             ],
             "link": null,
             "typeDefinition": null,
+            "diagnostics": [],
             "metadata": {},
-            "pluginData": {}
+            "pluginData": {},
+            "nameDetail": "",
+            "status": null,
+            "statusChanges": []
         },
         {
             "id": "node_3b600a6f-96a5-42b4-beae-b74338ccf170",
@@ -643,11 +700,11 @@
                 "x": 1675.0,
                 "y": 1223.0,
                 "width": 220.0,
-                "height": 108.0,
+                "height": 78.0,
                 "closedWidth": 220.0,
-                "closedHeight": 108.0,
+                "closedHeight": 78.0,
                 "openWidth": 220.0,
-                "openHeight": 108.0,
+                "openHeight": 78.0,
                 "isExpanded": true
             },
             "fileLayoutStrategyId": "none",
@@ -663,6 +720,7 @@
                 "aiInstructions": "",
                 "aiInstructionsLanguageId": "markdown"
             },
+            "binaryContent": null,
             "technology": {
                 "languageId": "",
                 "technologyId": "",
@@ -690,8 +748,12 @@
             ],
             "link": null,
             "typeDefinition": null,
+            "diagnostics": [],
             "metadata": {},
-            "pluginData": {}
+            "pluginData": {},
+            "nameDetail": "",
+            "status": null,
+            "statusChanges": []
         },
         {
             "id": "node_5b6c66ab-3d46-41fb-96ff-dee9c1738292",
@@ -725,6 +787,7 @@
                 "aiInstructions": "",
                 "aiInstructionsLanguageId": "markdown"
             },
+            "binaryContent": null,
             "technology": {
                 "languageId": "markdown",
                 "technologyId": "file-export",
@@ -744,8 +807,12 @@
             "ports": [],
             "link": null,
             "typeDefinition": null,
+            "diagnostics": [],
             "metadata": {},
-            "pluginData": {}
+            "pluginData": {},
+            "nameDetail": "",
+            "status": null,
+            "statusChanges": []
         },
         {
             "id": "node_2744c992-76b2-46bb-82e4-edaf1f796bf2",
@@ -764,11 +831,11 @@
                 "x": 548.0,
                 "y": 740.0,
                 "width": 200.0,
-                "height": 168.0,
+                "height": 70.0,
                 "closedWidth": 200.0,
-                "closedHeight": 168.0,
+                "closedHeight": 70.0,
                 "openWidth": 200.0,
-                "openHeight": 168.0,
+                "openHeight": 70.0,
                 "isExpanded": true
             },
             "fileLayoutStrategyId": "none",
@@ -784,6 +851,7 @@
                 "aiInstructions": "",
                 "aiInstructionsLanguageId": "markdown"
             },
+            "binaryContent": null,
             "technology": {
                 "languageId": "",
                 "technologyId": "",
@@ -811,8 +879,12 @@
             ],
             "link": null,
             "typeDefinition": null,
+            "diagnostics": [],
             "metadata": {},
-            "pluginData": {}
+            "pluginData": {},
+            "nameDetail": "",
+            "status": null,
+            "statusChanges": []
         },
         {
             "id": "link_2fae235c-f9aa-43ec-8e5c-a351727369df",
@@ -846,6 +918,7 @@
                 "aiInstructions": "",
                 "aiInstructionsLanguageId": "markdown"
             },
+            "binaryContent": null,
             "technology": {
                 "languageId": "",
                 "technologyId": "",
@@ -876,8 +949,12 @@
                 "interactionKind": "lib"
             },
             "typeDefinition": null,
+            "diagnostics": [],
             "metadata": {},
-            "pluginData": {}
+            "pluginData": {},
+            "nameDetail": "",
+            "status": null,
+            "statusChanges": []
         },
         {
             "id": "link_a7727b35-d417-4af2-ab81-86c2dc30a73d",
@@ -911,6 +988,7 @@
                 "aiInstructions": "",
                 "aiInstructionsLanguageId": "markdown"
             },
+            "binaryContent": null,
             "technology": {
                 "languageId": "",
                 "technologyId": "",
@@ -941,8 +1019,12 @@
                 "interactionKind": "lib"
             },
             "typeDefinition": null,
+            "diagnostics": [],
             "metadata": {},
-            "pluginData": {}
+            "pluginData": {},
+            "nameDetail": "",
+            "status": null,
+            "statusChanges": []
         },
         {
             "id": "link_6f1ca2b2-edf2-474b-b933-4bd39ac3426a",
@@ -976,6 +1058,7 @@
                 "aiInstructions": "",
                 "aiInstructionsLanguageId": "markdown"
             },
+            "binaryContent": null,
             "technology": {
                 "languageId": "",
                 "technologyId": "",
@@ -1006,8 +1089,12 @@
                 "interactionKind": "lib"
             },
             "typeDefinition": null,
+            "diagnostics": [],
             "metadata": {},
-            "pluginData": {}
+            "pluginData": {},
+            "nameDetail": "",
+            "status": null,
+            "statusChanges": []
         },
         {
             "id": "link_3475d6a9-445c-43eb-8486-323b890443a4",
@@ -1041,6 +1128,7 @@
                 "aiInstructions": "",
                 "aiInstructionsLanguageId": "markdown"
             },
+            "binaryContent": null,
             "technology": {
                 "languageId": "",
                 "technologyId": "",
@@ -1071,8 +1159,12 @@
                 "interactionKind": "lib"
             },
             "typeDefinition": null,
+            "diagnostics": [],
             "metadata": {},
-            "pluginData": {}
+            "pluginData": {},
+            "nameDetail": "",
+            "status": null,
+            "statusChanges": []
         }
     ],
     "metadata": {},

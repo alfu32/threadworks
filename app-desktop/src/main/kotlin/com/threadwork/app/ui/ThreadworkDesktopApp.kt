@@ -338,6 +338,7 @@ class ThreadworkDesktopApp(
         languageIds,
         compilerCapabilityResolver,
         ::scheduleEmbeddedValidation,
+        ::onEditorNodeChanged,
     )
     private val nativeValidationExecutor = Executors.newSingleThreadExecutor { runnable ->
         Thread(runnable, "threadwork-embedded-validation").apply { isDaemon = true }
@@ -521,6 +522,12 @@ class ThreadworkDesktopApp(
         configureHierarchyTree(hierarchyTree, editable = true, dragAndDrop = true, updatesSelection = true)
         configureHierarchyTree(detailsHierarchyTree, editable = true, dragAndDrop = true, updatesSelection = true)
         configureHierarchyTree(selectedEntitiesTree, editable = false, dragAndDrop = false, updatesSelection = false)
+        selectedEntitiesTree.addTreeSelectionListener {
+            val ref = selectedEntitiesTree.lastSelectedPathComponent as? TreeNodeRef ?: return@addTreeSelectionListener
+            if (ref.id in selection) {
+                editorTabs.selectNode(ref.id)
+            }
+        }
 
         val flowDesigner = JSplitPane(
             JSplitPane.HORIZONTAL_SPLIT,
@@ -2284,6 +2291,10 @@ class ThreadworkDesktopApp(
             val languageId = repository.getDocument().effectiveTextLanguageId(nodeId, NodeTextSection.Declaration)
             scheduleEmbeddedValidation(nodeId, languageId)
         }
+    }
+
+    private fun onEditorNodeChanged(nodeId: NodeId) {
+        inspector.bind(nodeId)
     }
 
     private fun openNodeInEntityEditor(id: NodeId) {
@@ -7379,6 +7390,7 @@ private class NodeEditorTabs(
     private val languageIds: List<String>,
     private val compilerCapabilityResolver: CompilerCapabilityResolver,
     private val requestNativeValidation: (NodeId, String) -> Unit,
+    private val onActiveNodeChanged: (NodeId) -> Unit,
 ) : JTabbedPane() {
     private var boundIds: List<NodeId> = emptyList()
     private var activePalette: DesignerPalette = ThreadworkAppearance.palette()
@@ -7388,7 +7400,10 @@ private class NodeEditorTabs(
 
     init {
         addChangeListener {
-            if (!bindingTabs) ensureSelectedEditor()
+            if (!bindingTabs) {
+                ensureSelectedEditor()
+                boundIds.getOrNull(selectedIndex)?.let(onActiveNodeChanged)
+            }
         }
     }
 
@@ -7410,6 +7425,7 @@ private class NodeEditorTabs(
         } else {
             refreshTitlesAndMetadata()
         }
+        boundIds.getOrNull(selectedIndex)?.let(onActiveNodeChanged)
         applyNativeDiagnosticsToBoundEditors()
         activeSection?.let { section ->
             boundIds.firstOrNull()?.let { selectSection(it, section) }
@@ -7425,6 +7441,14 @@ private class NodeEditorTabs(
 
     private fun ensureSelectedEditor() {
         if (selectedIndex >= 0) ensureEditorAt(selectedIndex)
+    }
+
+    fun selectNode(nodeId: NodeId) {
+        val index = boundIds.indexOf(nodeId)
+        if (index < 0) return
+        selectedIndex = index
+        ensureSelectedEditor()
+        onActiveNodeChanged(nodeId)
     }
 
     private fun ensureEditorAt(index: Int): NodeTextEditor? {
