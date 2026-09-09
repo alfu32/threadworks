@@ -239,6 +239,7 @@ class InMemoryDocumentRepository(
         val normalized = user.copy(
             identifier = user.identifier.trim(),
             avatar = user.avatar.trim(),
+            avatarData = user.avatarData.trim(),
             source = user.source.trim(),
             userId = user.userId.trim(),
             emailAddress = user.emailAddress.trim(),
@@ -267,6 +268,7 @@ class InMemoryDocumentRepository(
         val merged = previous.copy(
             identifier = normalized.identifier.ifBlank { previous.identifier.ifBlank { normalized.designator } },
             avatar = normalized.avatar.ifBlank { previous.avatar },
+            avatarData = normalized.avatarData.ifBlank { previous.avatarData },
             source = normalized.source.ifBlank { previous.source },
             userId = normalized.userId.ifBlank { previous.userId },
             emailAddress = normalized.emailAddress.ifBlank { previous.emailAddress },

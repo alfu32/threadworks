@@ -123,6 +123,7 @@ class JsonDocumentStoreTest {
             ModelUser(
                 identifier = "Grace",
                 avatar = "https://example.test/grace.png",
+                avatarData = "resized-png",
                 source = "github",
                 userId = "github-42",
                 emailAddress = "grace@example.test",
@@ -150,6 +151,7 @@ class JsonDocumentStoreTest {
             ModelUser(
                 identifier = "Grace",
                 avatar = "https://example.test/grace.png",
+                avatarData = "resized-png",
                 source = "github",
                 userId = "github-42",
                 emailAddress = "grace@example.test",

@@ -6,6 +6,7 @@ import java.awt.RenderingHints
 import java.awt.geom.Ellipse2D
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
 import java.nio.charset.StandardCharsets
 import java.nio.file.AtomicMoveNotSupportedException
 import java.nio.file.Files
@@ -15,6 +16,7 @@ import java.security.MessageDigest
 import java.time.Duration
 import java.time.Instant
 import java.util.prefs.Preferences
+import java.util.Base64
 import javax.imageio.ImageIO
 import javax.swing.Icon
 import javax.swing.ImageIcon
@@ -100,6 +102,15 @@ class UserIdentityStore(
         return runCatching { Files.newInputStream(avatarFile).use(ImageIO::read) }.getOrNull()
     }
 
+    /** Returns the final application-sized avatar, including the fallback initials rendering. */
+    fun avatarPngBytes(designator: String): ByteArray {
+        val rendered = renderUserAvatar(designator, avatarImage(), AVATAR_CACHE_SIZE)
+        return ByteArrayOutputStream().use { output ->
+            ImageIO.write(rendered, "png", output)
+            output.toByteArray()
+        }
+    }
+
     fun clear() {
         listOf(
             PROVIDER_KEY,
@@ -174,6 +185,18 @@ data class OAuthUserProfile(
 
 fun userAvatarIcon(designator: String, profilePhoto: BufferedImage?, size: Int): Icon =
     ImageIcon(renderUserAvatar(designator, profilePhoto, size))
+
+fun userAvatarIcon(designator: String, avatarData: String, size: Int): Icon =
+    ImageIcon(renderUserAvatar(designator, decodeAvatarData(avatarData), size))
+
+fun avatarDataFromBytes(bytes: ByteArray): String = Base64.getEncoder().encodeToString(bytes)
+
+private fun decodeAvatarData(data: String): BufferedImage? {
+    if (data.isBlank()) return null
+    return runCatching {
+        Base64.getDecoder().decode(data).inputStream().use(ImageIO::read)
+    }.getOrNull()
+}
 
 internal fun avatarBaseColor(designator: String): Color {
     val digest = MessageDigest.getInstance("MD5").digest(designator.toByteArray(StandardCharsets.UTF_8))

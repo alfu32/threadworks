@@ -2,6 +2,7 @@ package com.threadwork.app.identity
 
 import java.awt.Color
 import java.awt.image.BufferedImage
+import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.nio.file.Files
 import java.time.Instant
@@ -67,6 +68,7 @@ class UserIdentityTest {
             assertEquals("google-42", saved.userId)
             assertEquals("member", saved.role)
             assertEquals(64, store.avatarImage()?.width)
+            assertEquals(64, ImageIO.read(ByteArrayInputStream(store.avatarPngBytes(saved.designator())))?.width)
 
             now = now.plus(8, ChronoUnit.DAYS)
             assertNull(store.load())

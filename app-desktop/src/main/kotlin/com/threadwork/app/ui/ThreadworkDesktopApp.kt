@@ -13,7 +13,9 @@ import com.threadwork.app.ai.AiPromptResponse
 import com.threadwork.app.ai.AiSupportProviders
 import com.threadwork.app.ai.AiSupportTask
 import com.threadwork.app.identity.ThreadworkUserIdentity
+import com.threadwork.app.identity.avatarDataFromBytes
 import com.threadwork.app.identity.designator
+import com.threadwork.app.identity.userAvatarIcon
 import com.threadwork.Version
 import com.threadwork.compiler.api.CompilerOptions
 import com.threadwork.compiler.api.writeSourceMapBeside
@@ -477,6 +479,9 @@ class ThreadworkDesktopApp(
             ModelUser(
                 identifier = identity.designator(),
                 avatar = identity?.profilePhotoUrl.orEmpty(),
+                avatarData = avatarDataFromBytes(
+                    ThreadworkUserIdentity.store.avatarPngBytes(identity.designator()),
+                ),
                 source = identity?.provider?.id ?: "local",
                 userId = identity?.userId.orEmpty(),
                 emailAddress = identity?.emailAddress.orEmpty(),
@@ -4441,7 +4446,21 @@ class GraphCanvas(
                 }
             }
         }
+        svgNodeAssigneeAvatar(svg, node)
         svgCompositeToggle(svg, node)
+    }
+
+    private fun svgNodeAssigneeAvatar(svg: StringBuilder, node: Node) {
+        val user = assigneeUser(node) ?: return
+        if (user.avatarData.isBlank()) return
+        val bounds = node.layout.rect()
+        val size = 24
+        if (bounds.width < size + 12 || bounds.height < size + 12) return
+        svg.appendLine(
+            "    <image x=\"${bounds.x + bounds.width - size - 6}\" " +
+                "y=\"${bounds.y + bounds.height - size - 6}\" width=\"$size\" height=\"$size\" " +
+                "href=\"data:image/png;base64,${user.avatarData}\"/>",
+        )
     }
 
     private fun svgLink(svg: StringBuilder, node: Node) {
@@ -4978,8 +4997,29 @@ class GraphCanvas(
         }
         drawCompositeToggle(g2, node)
         drawDiagnosticBadge(g2, node)
+        drawAssigneeAvatar(g2, node)
         g2.stroke = previousStroke
         g2.font = previousFont
+    }
+
+    private fun drawAssigneeAvatar(g2: Graphics2D, node: Node) {
+        val user = assigneeUser(node) ?: return
+        val bounds = node.layout.rect()
+        val size = 24
+        if (bounds.width < size + 12 || bounds.height < size + 12) return
+        userAvatarIcon(user.designator, user.avatarData, size).paintIcon(
+            this,
+            g2,
+            bounds.x + bounds.width - size - 6,
+            bounds.y + bounds.height - size - 6,
+        )
+    }
+
+    private fun assigneeUser(node: Node): ModelUser? {
+        val assignee = node.assignee?.trim().takeIf(String::isNotBlank) ?: return null
+        return repository.getDocument().users.firstOrNull { user ->
+            user.uniqueKey == assignee || user.identifier == assignee || user.displayName() == assignee
+        }
     }
 
     private fun nodeDisplayName(node: Node): String {
@@ -6666,6 +6706,7 @@ internal class InspectorPanel(
     private val computedResponsible = JLabel()
     private val assignee = JComboBox<String>().apply { isEditable = true }
     private var assigneeKeyByDisplay = emptyMap<String, String>()
+    private var assigneeUserByDisplay = emptyMap<String, ModelUser>()
     private val revisionName = JTextField().apply { isEditable = false }
     private val revisionDate = JTextField().apply { isEditable = false }
     private val modifiedDate = JTextField().apply { isEditable = false }
@@ -6759,6 +6800,21 @@ internal class InspectorPanel(
     private val metadataRow = fieldRow("Metadata key=value", JScrollPane(metadata))
 
     init {
+        assignee.renderer = object : DefaultListCellRenderer() {
+            override fun getListCellRendererComponent(
+                list: JList<*>?,
+                value: Any?,
+                index: Int,
+                isSelected: Boolean,
+                cellHasFocus: Boolean,
+            ): Component {
+                val component = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus) as JLabel
+                val user = assigneeUserByDisplay[value?.toString().orEmpty()]
+                component.icon = user?.let { userAvatarIcon(it.designator, it.avatarData, 22) }
+                component.iconTextGap = 6
+                return component
+            }
+        }
         installNameCompletions()
         listOf(
             nameField,
@@ -7141,6 +7197,7 @@ internal class InspectorPanel(
     private fun refreshAssigneeOptions(selectedId: String) {
         val users = repository.getDocument().users
         assigneeKeyByDisplay = users.associate { user -> user.displayName() to user.uniqueKey }
+        assigneeUserByDisplay = users.associateBy { user -> user.displayName() }
         val selectedDisplay = users.firstOrNull { user ->
             user.uniqueKey == selectedId || user.identifier == selectedId || user.displayName() == selectedId
         }?.displayName() ?: selectedId.trim()

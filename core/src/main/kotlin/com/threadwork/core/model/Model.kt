@@ -62,6 +62,8 @@ data class ModelUser(
     /** Legacy/manual identifier, retained as a fallback for older documents. */
     val identifier: String = "",
     val avatar: String = "",
+    /** Base64-encoded, application-sized PNG used without network access. */
+    val avatarData: String = "",
     val source: String = "",
     val userId: String = "",
     val emailAddress: String = "",

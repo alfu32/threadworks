@@ -2285,11 +2285,36 @@
     "users": [
         {
             "identifier": "cristian.alferaru@gmail.com",
-            "avatar": ""
+            "avatar": "",
+            "source": "",
+            "userId": "",
+            "emailAddress": "",
+            "username": "",
+            "fullName": "",
+            "role": "",
+            "refreshedAt": ""
         },
         {
             "identifier": "alfu32",
-            "avatar": ""
+            "avatar": "",
+            "source": "",
+            "userId": "",
+            "emailAddress": "",
+            "username": "",
+            "fullName": "",
+            "role": "",
+            "refreshedAt": ""
+        },
+        {
+            "identifier": "ioan.alferaru@gmail.com",
+            "avatar": "https://avatars.githubusercontent.com/u/13664856?v=4",
+            "source": "github",
+            "userId": "",
+            "emailAddress": "ioan.alferaru@gmail.com",
+            "username": "alfu32",
+            "fullName": "Ioan Alferaru",
+            "role": "",
+            "refreshedAt": "2026-09-09T08:03:17.067572399Z"
         }
     ]
 }
