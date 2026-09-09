@@ -13,7 +13,17 @@ import com.threadwork.core.model.closestCommonAncestorId
 import com.threadwork.core.model.compositeBoundaryIdsBetween
 
 object DocumentValidator {
-    fun validate(document: ThreadworkDocument): List<Diagnostic> {
+    /**
+     * Validate document structure independently from a selected compiler.
+     *
+     * A document store does not know which compiler will consume a link, so a
+     * null [knownPrimitiveTypeIds] accepts externally supplied primitive
+     * spellings. A compiler supplies its own list to validate strictly.
+     */
+    fun validate(
+        document: ThreadworkDocument,
+        knownPrimitiveTypeIds: Collection<String>? = null,
+    ): List<Diagnostic> {
         val diagnostics = mutableListOf<Diagnostic>()
 
         if (!document.nodes.containsKey(document.rootNodeId)) {
@@ -23,7 +33,7 @@ object DocumentValidator {
         document.nodes.values.forEach { node ->
             validateParent(document, node, diagnostics)
             validateChildren(document, node, diagnostics)
-            validateLinks(document, node, diagnostics)
+            validateLinks(document, node, diagnostics, knownPrimitiveTypeIds)
             validatePorts(node, diagnostics)
             validateType(document, node, diagnostics)
         }
@@ -57,7 +67,12 @@ object DocumentValidator {
         }
     }
 
-    private fun validateLinks(document: ThreadworkDocument, node: Node, diagnostics: MutableList<Diagnostic>) {
+    private fun validateLinks(
+        document: ThreadworkDocument,
+        node: Node,
+        diagnostics: MutableList<Diagnostic>,
+        knownPrimitiveTypeIds: Collection<String>?,
+    ) {
         node.incomingLinks.forEach { if (it !in document.nodes) diagnostics += error("Incoming link '$it' does not exist", node.id) }
         node.outgoingLinks.forEach { if (it !in document.nodes) diagnostics += error("Outgoing link '$it' does not exist", node.id) }
 
@@ -89,7 +104,7 @@ object DocumentValidator {
         }
 
         val typeId = link.typeDefinitionId.trim()
-        if (typeId.isNotBlank() && !isKnownType(document, typeId)) {
+        if (typeId.isNotBlank() && !isKnownType(document, typeId, knownPrimitiveTypeIds)) {
             diagnostics += error("Link '${node.id}' references unknown type '$typeId'", node.id)
         }
 
@@ -134,10 +149,14 @@ object DocumentValidator {
         }
     }
 
-    private fun isKnownType(document: ThreadworkDocument, typeId: String): Boolean {
+    private fun isKnownType(
+        document: ThreadworkDocument,
+        typeId: String,
+        knownPrimitiveTypeIds: Collection<String>?,
+    ): Boolean {
         val normalized = typeId.trim()
-        if (normalized in BuiltInTypeIds.all) return true
-        return document.nodes[NodeId(normalized)]?.kind == NodeKind.Type
+        if (document.nodes[NodeId(normalized)]?.kind == NodeKind.Type) return true
+        return knownPrimitiveTypeIds == null || normalized in knownPrimitiveTypeIds
     }
 
     private fun error(message: String, nodeId: NodeId? = null): Diagnostic =

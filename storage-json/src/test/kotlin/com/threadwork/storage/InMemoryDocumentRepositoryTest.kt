@@ -5,6 +5,7 @@ import com.threadwork.core.model.Node
 import com.threadwork.core.model.NodeId
 import com.threadwork.core.model.NodeKind
 import com.threadwork.core.model.NodePort
+import com.threadwork.core.model.BuiltInTypeIds
 import com.threadwork.core.model.ModelUser
 import com.threadwork.core.model.PortDirection
 import com.threadwork.core.model.ProjectStatus
@@ -139,7 +140,10 @@ class InMemoryDocumentRepositoryTest {
             requireNotNull(link.link).copy(typeDefinitionId = "missing_type"),
         )
 
-        assertTrue(DocumentValidator.validate(repository.getDocument()).any { it.message.contains("unknown type") })
+        assertTrue(
+            DocumentValidator.validate(repository.getDocument(), BuiltInTypeIds.all)
+                .any { it.message.contains("unknown type") },
+        )
     }
 
     @Test

@@ -74,7 +74,7 @@ class CCompiler : TemplateSetCompiler() {
     override fun supports(document: ThreadworkDocument): Boolean = true
 
     override fun validate(document: ThreadworkDocument): List<Diagnostic> =
-        DocumentValidator.validate(document) + validateCModel(document)
+        DocumentValidator.validate(document, primitiveTypeIds) + validateCModel(document)
 
     override fun templatesFor(document: ThreadworkDocument, options: CompilerOptions): CompilerTemplateSet {
         val overrides = compilerTemplateOverrides(document)

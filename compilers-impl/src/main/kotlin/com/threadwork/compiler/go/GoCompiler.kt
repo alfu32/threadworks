@@ -61,7 +61,7 @@ class GoCompiler : TemplateSetCompiler() {
     override fun supports(document: ThreadworkDocument): Boolean = true
 
     override fun validate(document: ThreadworkDocument): List<Diagnostic> =
-        DocumentValidator.validate(document) + document.nodes.values
+        DocumentValidator.validate(document, primitiveTypeIds) + document.nodes.values
             .filter { it.isLink && document.effectiveTechnologyId(it.id) == "go" }
             .filter { LinkClassifier.classify(document, it) == LinkStereotype.RunnableCapability }
             .map {

@@ -74,10 +74,10 @@ private fun validate(args: Array<String>) {
     val file = positionals.getOrNull(0)?.let(Path::of) ?: error("Usage: validate <file.orch> [--plugins <dir>]")
     val pluginsFolder = parsePluginsFolderOrDefault(commandArgs)
     val document = KotlinxJsonDocumentStore().load(file)
-    val compilerDiagnostics = compilersFrom(pluginsFolder)
-        .filter { compiler -> runCatching { compiler.supports(document) }.getOrDefault(false) }
-        .flatMap { compiler -> compiler.validate(document) }
-    val diagnostics = DocumentValidator.validate(document) + compilerDiagnostics
+    val compilers = compilersFrom(pluginsFolder)
+    val compiler = selectCompiler(document, compilers)
+        ?: error("No compiler plugin supports ${file.fileName}")
+    val diagnostics = compiler.validate(document)
     diagnostics.forEach { println("${it.severity}: ${it.message}") }
     if (diagnostics.none { it.severity == DiagnosticSeverity.Error }) {
         println("Document is valid")

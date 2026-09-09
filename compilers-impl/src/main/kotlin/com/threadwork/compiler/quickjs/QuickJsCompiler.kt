@@ -44,7 +44,7 @@ class QuickJsCompiler : TemplateSetCompiler() {
     override fun supports(document: ThreadworkDocument): Boolean = true
 
     override fun validate(document: ThreadworkDocument): List<Diagnostic> =
-        DocumentValidator.validate(document)
+        DocumentValidator.validate(document, primitiveTypeIds)
 
     override fun codeIntelligence(document: ThreadworkDocument, node: Node): CompilerCodeIntelligence {
         val defaults = defaultCodeIntelligence(document, node)

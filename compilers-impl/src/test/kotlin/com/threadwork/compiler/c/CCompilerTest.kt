@@ -26,6 +26,26 @@ import kotlin.test.assertTrue
 
 class CCompilerTest {
     @Test
+    fun `C compiler accepts native primitive link types without translation`() {
+        val repository = cProject()
+        val root = repository.getDocument().rootNodeId
+        val source = repository.createNode(root, "source", NodeKind.Processor)
+        val target = repository.createNode(root, "target", NodeKind.Processor)
+        repository.addPort(source.id, NodePort("out", "out", PortDirection.Output))
+        repository.addPort(target.id, NodePort("in", "in", PortDirection.Input))
+        val link = repository.createLink(root, "items", source.id, "out", target.id, "in")
+        repository.updateLinkData(
+            link.id,
+            requireNotNull(link.link).copy(typeDefinitionId = "unsigned long long"),
+        )
+
+        val result = CCompiler().compile(repository.getDocument())
+
+        assertTrue(result.success, result.diagnostics.joinToString { it.message })
+        assertFalse(result.diagnostics.any { it.message.contains("unknown type") })
+    }
+
+    @Test
     fun `generated functions and transports carry adjacent documentation comments`() {
         val repository = cProject()
         val root = repository.getDocument().rootNodeId
