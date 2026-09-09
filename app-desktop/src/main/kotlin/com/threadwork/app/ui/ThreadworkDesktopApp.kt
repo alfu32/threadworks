@@ -8019,7 +8019,6 @@ private class NodeTextEditor(
                         }
                     }
                 }
-            }
         }
         declarationSymbols.forEach { symbol ->
             val color = when (symbol.origin) {
