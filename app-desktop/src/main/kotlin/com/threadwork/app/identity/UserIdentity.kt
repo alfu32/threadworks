@@ -189,6 +189,9 @@ fun userAvatarIcon(designator: String, profilePhoto: BufferedImage?, size: Int):
 fun userAvatarIcon(designator: String, avatarData: String, size: Int): Icon =
     ImageIcon(renderUserAvatar(designator, decodeAvatarData(avatarData), size))
 
+fun userAvatarImage(designator: String, avatarData: String, size: Int): BufferedImage =
+    renderUserAvatar(designator, decodeAvatarData(avatarData), size)
+
 fun avatarDataFromBytes(bytes: ByteArray): String = Base64.getEncoder().encodeToString(bytes)
 
 private fun decodeAvatarData(data: String): BufferedImage? {

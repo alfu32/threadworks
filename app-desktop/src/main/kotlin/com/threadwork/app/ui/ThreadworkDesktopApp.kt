@@ -15,6 +15,7 @@ import com.threadwork.app.ai.AiSupportTask
 import com.threadwork.app.identity.ThreadworkUserIdentity
 import com.threadwork.app.identity.avatarDataFromBytes
 import com.threadwork.app.identity.designator
+import com.threadwork.app.identity.userAvatarImage
 import com.threadwork.app.identity.userAvatarIcon
 import com.threadwork.Version
 import com.threadwork.compiler.api.CompilerOptions
@@ -5005,14 +5006,12 @@ class GraphCanvas(
     private fun drawAssigneeAvatar(g2: Graphics2D, node: Node) {
         val user = assigneeUser(node) ?: return
         val bounds = node.layout.rect()
-        val size = 24
-        if (bounds.width < size + 12 || bounds.height < size + 12) return
-        userAvatarIcon(user.designator, user.avatarData, size).paintIcon(
-            this,
-            g2,
-            bounds.x + bounds.width - size - 6,
-            bounds.y + bounds.height - size - 6,
-        )
+        val displaySize = 24
+        val rasterSize = 32
+        if (bounds.width < displaySize + 12 || bounds.height < displaySize + 12) return
+        val x = bounds.x + bounds.width - displaySize - 6
+        val y = bounds.y + bounds.height - displaySize - 6
+        g2.drawImage(userAvatarImage(user.designator, user.avatarData, rasterSize), x, y, displaySize, displaySize, null)
     }
 
     private fun assigneeUser(node: Node): ModelUser? {
