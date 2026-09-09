@@ -5,6 +5,7 @@ import com.threadwork.core.model.Node
 import com.threadwork.core.model.NodeId
 import com.threadwork.core.model.NodeKind
 import com.threadwork.core.model.NodePort
+import com.threadwork.core.model.ModelUser
 import com.threadwork.core.model.PortDirection
 import com.threadwork.core.model.ProjectStatus
 import com.threadwork.core.model.Revision
@@ -18,6 +19,44 @@ import kotlin.test.assertTrue
 import kotlin.test.assertFailsWith
 
 class InMemoryDocumentRepositoryTest {
+    @Test
+    fun `users merge by source designator and role while refreshing details`() {
+        val repository = InMemoryDocumentRepository(newDocument("users"))
+        repository.registerUser(
+            ModelUser(
+                identifier = "legacy-name",
+                source = "github",
+                userId = "42",
+                emailAddress = "user@example.test",
+                username = "user",
+                role = "member",
+                refreshedAt = "first",
+            ),
+        )
+        repository.registerUser(
+            ModelUser(
+                identifier = "user",
+                avatar = "avatar.png",
+                source = "github",
+                userId = "42",
+                emailAddress = "user@example.test",
+                username = "user",
+                fullName = "A User",
+                role = "member",
+                refreshedAt = "second",
+            ),
+        )
+        repository.registerUser(
+            ModelUser(source = "github", userId = "42", role = "admin", refreshedAt = "third"),
+        )
+
+        val users = repository.getDocument().users.filter { it.source == "github" }
+        assertEquals(2, users.size)
+        assertEquals("second", users.first { it.role == "member" }.refreshedAt)
+        assertEquals("avatar.png", users.first { it.role == "member" }.avatar)
+        assertEquals("admin", users.single { it.role == "admin" }.role)
+    }
+
     @Test
     fun `new nodes start in business while links have no project status`() {
         val repository = InMemoryDocumentRepository(newDocument("project"))

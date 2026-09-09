@@ -472,12 +472,24 @@ class ThreadworkDesktopApp(
 
     private fun registerCurrentUser() {
         val identity = ThreadworkUserIdentity.store.load()
+        val wasDirty = repository.isDirty()
         repository.registerUser(
             ModelUser(
                 identifier = identity.designator(),
                 avatar = identity?.profilePhotoUrl.orEmpty(),
+                source = identity?.provider?.id ?: "local",
+                userId = identity?.userId.orEmpty(),
+                emailAddress = identity?.emailAddress.orEmpty(),
+                username = identity?.username.orEmpty(),
+                fullName = identity?.fullName.orEmpty(),
+                role = identity?.role.orEmpty(),
+                refreshedAt = Instant.now().toString(),
             ),
         )
+        currentFile?.let { path ->
+            store.save(repository.getDocument(), path)
+            if (wasDirty) repository.markDirty() else repository.clearDirty()
+        }
     }
 
     private fun layout(): JComponent {
@@ -872,6 +884,7 @@ class ThreadworkDesktopApp(
     private fun newFile() {
         autosave()
         repository.replaceDocument(newDocument("Untitled Threadwork"))
+        registerCurrentUser()
         selection.clear()
         currentFile = null
         resetHistory()
@@ -1351,6 +1364,7 @@ class ThreadworkDesktopApp(
         autosave()
         repository.replaceDocument(store.load(path))
         currentFile = path
+        registerCurrentUser()
         selection.clear()
         resetHistory()
         refreshAll()
@@ -6651,6 +6665,7 @@ internal class InspectorPanel(
     private val responsible = JTextField()
     private val computedResponsible = JLabel()
     private val assignee = JComboBox<String>().apply { isEditable = true }
+    private var assigneeKeyByDisplay = emptyMap<String, String>()
     private val revisionName = JTextField().apply { isEditable = false }
     private val revisionDate = JTextField().apply { isEditable = false }
     private val modifiedDate = JTextField().apply { isEditable = false }
@@ -7068,7 +7083,17 @@ internal class InspectorPanel(
         if (!isLink) {
             val assigneeId = selectedAssignee()
             repository.updateNodeAssignee(id, assigneeId)
-            assigneeId?.let { repository.registerUser(ModelUser(it)) }
+            assigneeId?.let { selected ->
+                if (repository.getDocument().users.none { it.uniqueKey == selected }) {
+                    repository.registerUser(
+                        ModelUser(
+                            identifier = selected,
+                            source = "local",
+                            refreshedAt = Instant.now().toString(),
+                        ),
+                    )
+                }
+            }
             repository.updateNodeStatus(id, selectedProjectStatus())
         }
         if (node.isType) repository.updateNodeTypeDefinition(id, typeDefinitionFromTable())
@@ -7109,18 +7134,25 @@ internal class InspectorPanel(
             ?.let(ProjectStatus::valueOf)
 
     private fun selectedAssignee(): String? =
-        assignee.editor?.item?.toString()?.trim()?.takeIf(String::isNotBlank)
+        assignee.editor?.item?.toString()?.trim()?.takeIf(String::isNotBlank)?.let { value ->
+            assigneeKeyByDisplay[value] ?: value
+        }
 
     private fun refreshAssigneeOptions(selectedId: String) {
-        val identifiers = buildList {
+        val users = repository.getDocument().users
+        assigneeKeyByDisplay = users.associate { user -> user.displayName() to user.uniqueKey }
+        val selectedDisplay = users.firstOrNull { user ->
+            user.uniqueKey == selectedId || user.identifier == selectedId || user.displayName() == selectedId
+        }?.displayName() ?: selectedId.trim()
+        val displays = buildList {
             add("")
-            addAll(repository.getDocument().users.map { it.identifier.trim() }.filter(String::isNotBlank))
-            if (selectedId.isNotBlank()) add(selectedId.trim())
+            addAll(users.map { it.displayName() }.filter(String::isNotBlank))
+            if (selectedDisplay.isNotBlank()) add(selectedDisplay)
         }.distinct()
         val previousBinding = binding
         binding = true
-        assignee.model = DefaultComboBoxModel(identifiers.toTypedArray())
-        assignee.selectedItem = selectedId
+        assignee.model = DefaultComboBoxModel(displays.toTypedArray())
+        assignee.selectedItem = selectedDisplay
         binding = previousBinding
     }
 

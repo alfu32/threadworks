@@ -236,16 +236,54 @@ class InMemoryDocumentRepository(
     }
 
     override fun registerUser(user: ModelUser) {
-        val identifier = user.identifier.trim()
-        if (identifier.isBlank()) return
-        val index = document.users.indexOfFirst { it.identifier == identifier }
+        val normalized = user.copy(
+            identifier = user.identifier.trim(),
+            avatar = user.avatar.trim(),
+            source = user.source.trim(),
+            userId = user.userId.trim(),
+            emailAddress = user.emailAddress.trim(),
+            username = user.username.trim(),
+            fullName = user.fullName.trim(),
+            role = user.role.trim(),
+            refreshedAt = user.refreshedAt.trim(),
+        )
+        if (listOf(
+            normalized.identifier,
+            normalized.userId,
+            normalized.emailAddress,
+            normalized.username,
+            normalized.fullName,
+        ).all(String::isBlank)) return
+        val matchingIndices = document.users.mapIndexedNotNull { index, existing ->
+            index.takeIf { existing.uniqueKey == normalized.uniqueKey }
+        }
+        val index = matchingIndices.firstOrNull() ?: -1
         if (index < 0) {
-            document.users += user.copy(identifier = identifier)
+            document.users += normalized.copy(identifier = normalized.identifier.ifBlank { normalized.designator })
             markDirty()
             return
         }
-        if (user.avatar.isNotBlank() && document.users[index].avatar != user.avatar) {
-            document.users[index] = document.users[index].copy(avatar = user.avatar)
+        val previous = document.users[index]
+        val merged = previous.copy(
+            identifier = normalized.identifier.ifBlank { previous.identifier.ifBlank { normalized.designator } },
+            avatar = normalized.avatar.ifBlank { previous.avatar },
+            source = normalized.source.ifBlank { previous.source },
+            userId = normalized.userId.ifBlank { previous.userId },
+            emailAddress = normalized.emailAddress.ifBlank { previous.emailAddress },
+            username = normalized.username.ifBlank { previous.username },
+            fullName = normalized.fullName.ifBlank { previous.fullName },
+            role = normalized.role.ifBlank { previous.role },
+            refreshedAt = normalized.refreshedAt.ifBlank { previous.refreshedAt },
+        )
+        var changed = previous != merged
+        if (changed) {
+            document.users[index] = merged
+        }
+        matchingIndices.drop(1).asReversed().forEach { duplicateIndex ->
+            document.users.removeAt(duplicateIndex)
+            changed = true
+        }
+        if (changed) {
             markDirty()
         }
     }
@@ -473,7 +511,7 @@ class InMemoryDocumentRepository(
     private fun touchNodes(ids: Iterable<NodeId>) {
         val timestamp = modifiedDateProvider()
         val user = modifiedUserProvider()
-        registerUser(ModelUser(user))
+        registerUser(ModelUser(identifier = user, source = "local", refreshedAt = timestamp))
         ids.distinct().forEach { id ->
             document.nodes[id]?.let { node ->
                 node.revision = document.masterRevision.copy()

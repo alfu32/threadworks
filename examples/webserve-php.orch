@@ -78,7 +78,8 @@
             "pluginData": {},
             "nameDetail": "",
             "status": null,
-            "statusChanges": []
+            "statusChanges": [],
+            "assignee": null
         },
         {
             "id": "node_24257a88-cfe9-4707-bd63-c777eb75edb0",
@@ -161,7 +162,8 @@
                     "initStatus": "BUSINESS",
                     "endStatus": "IMPLEMENTATION"
                 }
-            ]
+            ],
+            "assignee": null
         },
         {
             "id": "node_f6279658-075b-44d9-a93e-b1e12d47c19c",
@@ -244,7 +246,8 @@
                     "initStatus": "BUSINESS",
                     "endStatus": "IMPLEMENTATION"
                 }
-            ]
+            ],
+            "assignee": null
         },
         {
             "id": "node_c4771abb-1184-417a-9157-23f77a5a0aa5",
@@ -262,8 +265,8 @@
                 "link_a8ce6267-aa95-4362-84e5-c2929e395f3a"
             ],
             "layout": {
-                "x": -322.0,
-                "y": 657.0,
+                "x": -305.0,
+                "y": 626.0,
                 "width": 200.0,
                 "height": 108.0,
                 "closedWidth": 200.0,
@@ -332,7 +335,8 @@
                     "initStatus": null,
                     "endStatus": "IMPLEMENTATION"
                 }
-            ]
+            ],
+            "assignee": null
         },
         {
             "id": "node_b120f8cf-1386-48bd-a894-ed420ee7b97e",
@@ -347,8 +351,8 @@
                 "link_bad231a8-7d70-4818-a821-3b5669b0b083"
             ],
             "layout": {
-                "x": 1758.0,
-                "y": 660.0,
+                "x": 1749.0,
+                "y": 671.0,
                 "width": 205.0,
                 "height": 108.0,
                 "closedWidth": 205.0,
@@ -417,7 +421,8 @@
                     "initStatus": null,
                     "endStatus": "IMPLEMENTATION"
                 }
-            ]
+            ],
+            "assignee": null
         },
         {
             "id": "node_4432ce6f-4306-4ff7-8490-c2887bf451fc",
@@ -499,7 +504,8 @@
                     "initStatus": "BUSINESS",
                     "endStatus": "IMPLEMENTATION"
                 }
-            ]
+            ],
+            "assignee": null
         },
         {
             "id": "node_e116763d-a5ee-4a7a-9ee9-8ccc1bc3ef6b",
@@ -587,7 +593,8 @@
                     "initStatus": "FUNCTIONAL",
                     "endStatus": "IMPLEMENTATION"
                 }
-            ]
+            ],
+            "assignee": null
         },
         {
             "id": "link_b3a9576f-e2b9-4548-9b02-2438fda8b78e",
@@ -657,7 +664,8 @@
             "pluginData": {},
             "nameDetail": "",
             "status": null,
-            "statusChanges": []
+            "statusChanges": [],
+            "assignee": null
         },
         {
             "id": "link_bad231a8-7d70-4818-a821-3b5669b0b083",
@@ -729,7 +737,8 @@
             "pluginData": {},
             "nameDetail": "",
             "status": null,
-            "statusChanges": []
+            "statusChanges": [],
+            "assignee": null
         },
         {
             "id": "link_8b69fa03-f5ad-474f-91d7-0201eee0fcba",
@@ -799,7 +808,8 @@
             "pluginData": {},
             "nameDetail": "",
             "status": null,
-            "statusChanges": []
+            "statusChanges": [],
+            "assignee": null
         },
         {
             "id": "link_f3a46c55-d830-419a-817e-f0a54a9339e0",
@@ -871,7 +881,8 @@
             "pluginData": {},
             "nameDetail": "",
             "status": null,
-            "statusChanges": []
+            "statusChanges": [],
+            "assignee": null
         },
         {
             "id": "link_82d8b8bf-5902-49ef-ae53-9b94238a131c",
@@ -943,19 +954,20 @@
             "pluginData": {},
             "nameDetail": "",
             "status": null,
-            "statusChanges": []
+            "statusChanges": [],
+            "assignee": null
         },
         {
             "id": "node_c9ef5e41-5a4b-4271-b98a-c6d69d434a6d",
-            "name": "RequestResponse",
+            "name": "RqRp",
             "kind": "Type",
             "parentId": "root",
             "children": [],
             "incomingLinks": [],
             "outgoingLinks": [],
             "layout": {
-                "x": 1539.0,
-                "y": 929.0,
+                "x": 1578.0,
+                "y": 936.0,
                 "width": 220.0,
                 "height": 268.0,
                 "closedWidth": 220.0,
@@ -991,8 +1003,8 @@
             },
             "responsible": "devlin",
             "modified": {
-                "date": "2026-09-08T17:00:28.366428856Z",
-                "user": "alfu32@github"
+                "date": "2026-09-09T07:45:35.567652204Z",
+                "user": "alfu32"
             },
             "ports": [],
             "link": null,
@@ -1018,7 +1030,7 @@
             "diagnostics": [],
             "metadata": {},
             "pluginData": {},
-            "nameDetail": "a",
+            "nameDetail": "",
             "status": "IMPLEMENTATION",
             "statusChanges": [
                 {
@@ -1033,7 +1045,8 @@
                     "initStatus": "BUSINESS",
                     "endStatus": "IMPLEMENTATION"
                 }
-            ]
+            ],
+            "assignee": null
         },
         {
             "id": "node_6fe0a353-135a-4433-b77b-4521da00d728",
@@ -1056,14 +1069,14 @@
             "incomingLinks": [],
             "outgoingLinks": [],
             "layout": {
-                "x": 14.0,
-                "y": 712.0,
-                "width": 1426.0,
-                "height": 514.0,
+                "x": 119.0,
+                "y": 692.0,
+                "width": 1414.0,
+                "height": 478.0,
                 "closedWidth": 200.0,
                 "closedHeight": 106.0,
-                "openWidth": 1426.0,
-                "openHeight": 514.0,
+                "openWidth": 1414.0,
+                "openHeight": 478.0,
                 "isExpanded": true
             },
             "fileLayoutStrategyId": "none",
@@ -1117,7 +1130,8 @@
                     "initStatus": "FUNCTIONAL",
                     "endStatus": "IMPLEMENTATION"
                 }
-            ]
+            ],
+            "assignee": null
         },
         {
             "id": "node_f9029721-ad0b-44fd-8b6b-9e7b444ebc5c",
@@ -1132,8 +1146,8 @@
                 "link_823f422e-35dd-4223-be9b-1907694c76cc"
             ],
             "layout": {
-                "x": 623.0,
-                "y": 855.0,
+                "x": 713.0,
+                "y": 833.0,
                 "width": 200.0,
                 "height": 78.0,
                 "closedWidth": 200.0,
@@ -1202,7 +1216,8 @@
                     "initStatus": null,
                     "endStatus": "IMPLEMENTATION"
                 }
-            ]
+            ],
+            "assignee": null
         },
         {
             "id": "node_1d35991b-2da3-40c0-9e05-8b906bc5b74c",
@@ -1217,8 +1232,8 @@
                 "link_6d0f78b9-7a10-4621-955d-331d8934c60d"
             ],
             "layout": {
-                "x": 612.0,
-                "y": 1100.0,
+                "x": 710.0,
+                "y": 1044.0,
                 "width": 214.0,
                 "height": 78.0,
                 "closedWidth": 214.0,
@@ -1287,7 +1302,8 @@
                     "initStatus": null,
                     "endStatus": "IMPLEMENTATION"
                 }
-            ]
+            ],
+            "assignee": null
         },
         {
             "id": "node_b1f4bcc8-d363-4328-9530-b9a155cf531f",
@@ -1302,8 +1318,8 @@
                 "link_9ad4fc83-a96b-4986-9d39-4364f783cd14"
             ],
             "layout": {
-                "x": 625.0,
-                "y": 982.0,
+                "x": 715.0,
+                "y": 940.0,
                 "width": 200.0,
                 "height": 78.0,
                 "closedWidth": 200.0,
@@ -1372,7 +1388,8 @@
                     "initStatus": null,
                     "endStatus": "IMPLEMENTATION"
                 }
-            ]
+            ],
+            "assignee": null
         },
         {
             "id": "node_37b69371-59f6-4a2c-b4eb-29f7edcdbf8d",
@@ -1390,8 +1407,8 @@
             ],
             "outgoingLinks": [],
             "layout": {
-                "x": 194.0,
-                "y": 952.0,
+                "x": 299.0,
+                "y": 860.0,
                 "width": 200.0,
                 "height": 138.0,
                 "closedWidth": 200.0,
@@ -1453,7 +1470,8 @@
                     "initStatus": null,
                     "endStatus": "IMPLEMENTATION"
                 }
-            ]
+            ],
+            "assignee": null
         },
         {
             "id": "link_823f422e-35dd-4223-be9b-1907694c76cc",
@@ -1523,7 +1541,8 @@
             "pluginData": {},
             "nameDetail": "",
             "status": null,
-            "statusChanges": []
+            "statusChanges": [],
+            "assignee": null
         },
         {
             "id": "link_6d0f78b9-7a10-4621-955d-331d8934c60d",
@@ -1593,7 +1612,8 @@
             "pluginData": {},
             "nameDetail": "",
             "status": null,
-            "statusChanges": []
+            "statusChanges": [],
+            "assignee": null
         },
         {
             "id": "link_9ad4fc83-a96b-4986-9d39-4364f783cd14",
@@ -1663,7 +1683,8 @@
             "pluginData": {},
             "nameDetail": "",
             "status": null,
-            "statusChanges": []
+            "statusChanges": [],
+            "assignee": null
         },
         {
             "id": "node_df8b7ff5-b0d7-4fe5-8e6c-eada1a42d0e5",
@@ -1681,8 +1702,8 @@
                 "link_c45a18d4-b741-462e-af71-75a182c0de9a"
             ],
             "layout": {
-                "x": 1060.0,
-                "y": 951.0,
+                "x": 1153.0,
+                "y": 832.0,
                 "width": 200.0,
                 "height": 138.0,
                 "closedWidth": 200.0,
@@ -1751,7 +1772,8 @@
                     "initStatus": null,
                     "endStatus": "IMPLEMENTATION"
                 }
-            ]
+            ],
+            "assignee": null
         },
         {
             "id": "link_15158725-e92f-4fd6-b765-462646956e26",
@@ -1821,7 +1843,8 @@
             "pluginData": {},
             "nameDetail": "",
             "status": null,
-            "statusChanges": []
+            "statusChanges": [],
+            "assignee": null
         },
         {
             "id": "link_092ff7b9-ab6b-4ca5-9fe6-5029ffc1323f",
@@ -1891,7 +1914,8 @@
             "pluginData": {},
             "nameDetail": "",
             "status": null,
-            "statusChanges": []
+            "statusChanges": [],
+            "assignee": null
         },
         {
             "id": "link_c45a18d4-b741-462e-af71-75a182c0de9a",
@@ -1961,7 +1985,8 @@
             "pluginData": {},
             "nameDetail": "",
             "status": null,
-            "statusChanges": []
+            "statusChanges": [],
+            "assignee": null
         },
         {
             "id": "link_a8ce6267-aa95-4362-84e5-c2929e395f3a",
@@ -2033,7 +2058,8 @@
             "pluginData": {},
             "nameDetail": "",
             "status": null,
-            "statusChanges": []
+            "statusChanges": [],
+            "assignee": null
         },
         {
             "id": "link_bcb6f8bc-5916-4184-ab74-0a8dfdbff8c5",
@@ -2103,7 +2129,8 @@
             "pluginData": {},
             "nameDetail": "",
             "status": null,
-            "statusChanges": []
+            "statusChanges": [],
+            "assignee": null
         },
         {
             "id": "link_189bb051-11a0-4914-8cdc-aba75c081412",
@@ -2175,7 +2202,8 @@
             "pluginData": {},
             "nameDetail": "",
             "status": null,
-            "statusChanges": []
+            "statusChanges": [],
+            "assignee": null
         },
         {
             "id": "link_56f247eb-1397-489b-8130-4ddf2d446a15",
@@ -2245,12 +2273,23 @@
             "pluginData": {},
             "nameDetail": "",
             "status": null,
-            "statusChanges": []
+            "statusChanges": [],
+            "assignee": null
         }
     ],
     "metadata": {},
     "masterRevision": {
         "name": "",
         "date": ""
-    }
+    },
+    "users": [
+        {
+            "identifier": "cristian.alferaru@gmail.com",
+            "avatar": ""
+        },
+        {
+            "identifier": "alfu32",
+            "avatar": ""
+        }
+    ]
 }

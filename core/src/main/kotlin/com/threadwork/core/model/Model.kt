@@ -59,9 +59,36 @@ data class ProjectStatusChange(
 
 @Serializable
 data class ModelUser(
-    val identifier: String,
+    /** Legacy/manual identifier, retained as a fallback for older documents. */
+    val identifier: String = "",
     val avatar: String = "",
-)
+    val source: String = "",
+    val userId: String = "",
+    val emailAddress: String = "",
+    val username: String = "",
+    val fullName: String = "",
+    val role: String = "",
+    val refreshedAt: String = "",
+) {
+    /** The stable human-facing identifier selected from provider data. */
+    val designator: String
+        get() = userId.trim()
+            .ifBlank { emailAddress.trim() }
+            .ifBlank { username.trim() }
+            .ifBlank { fullName.trim() }
+            .ifBlank { identifier.trim() }
+            .ifBlank { "local user" }
+
+    /** The persisted identity key used to merge repeated logins. */
+    val uniqueKey: String
+        get() = listOf(source.trim(), designator, role.trim()).joinToString("|")
+
+    fun displayName(): String {
+        val provider = source.trim().ifBlank { "local" }
+        val roleSuffix = role.trim().takeIf(String::isNotBlank)?.let { "($it)" }.orEmpty()
+        return "$provider/$designator$roleSuffix"
+    }
+}
 
 @Serializable
 data class NodeLayout(

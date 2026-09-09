@@ -119,7 +119,19 @@ class JsonDocumentStoreTest {
         val child = repository.createNode(repository.getDocument().rootNodeId, "child", NodeKind.Processor)
         repository.updateNodeResponsible(child.id, "Ada")
         repository.updateNodeAssignee(child.id, "Grace")
-        repository.registerUser(ModelUser("Grace", "https://example.test/grace.png"))
+        repository.registerUser(
+            ModelUser(
+                identifier = "Grace",
+                avatar = "https://example.test/grace.png",
+                source = "github",
+                userId = "github-42",
+                emailAddress = "grace@example.test",
+                username = "grace",
+                fullName = "Grace Hopper",
+                role = "member",
+                refreshedAt = "2026-09-09T10:00:00Z",
+            ),
+        )
         repository.updateNodeNameDetail(child.id, "worker entry point")
         val file = createTempFile(suffix = ".threadwork.json")
         val store = KotlinxJsonDocumentStore()
@@ -133,7 +145,22 @@ class JsonDocumentStoreTest {
         assertEquals(Revision("R4", "2026-08-17"), loaded.masterRevision)
         assertEquals("Ada", loaded.nodes.getValue(child.id).responsible)
         assertEquals("Grace", loaded.nodes.getValue(child.id).assignee)
-        assertEquals(ModelUser("Grace", "https://example.test/grace.png"), loaded.users.single { it.identifier == "Grace" })
+        val loadedUser = loaded.users.single { it.identifier == "Grace" }
+        assertEquals(
+            ModelUser(
+                identifier = "Grace",
+                avatar = "https://example.test/grace.png",
+                source = "github",
+                userId = "github-42",
+                emailAddress = "grace@example.test",
+                username = "grace",
+                fullName = "Grace Hopper",
+                role = "member",
+                refreshedAt = "2026-09-09T10:00:00Z",
+            ),
+            loadedUser,
+        )
+        assertEquals("github/github-42(member)", loadedUser.displayName())
         assertEquals("worker entry point", loaded.nodes.getValue(child.id).nameDetail)
         assertEquals("R4", loaded.nodes.getValue(child.id).revision?.name)
         assertTrue(loaded.nodes.getValue(child.id).modified.date.isNotBlank())

@@ -144,6 +144,8 @@ class DesktopOAuthClient(
             fullName = body.string("name").orEmpty(),
             profilePhotoUrl = photoUrl,
             profilePhotoBytes = downloadImage(photoUrl),
+            userId = body.string("sub").orEmpty(),
+            role = body.string("role").orEmpty(),
         )
     }
 
@@ -158,6 +160,8 @@ class DesktopOAuthClient(
             fullName = body.string("name").orEmpty(),
             profilePhotoUrl = photoUrl,
             profilePhotoBytes = downloadImage(photoUrl),
+            userId = body.string("id").orEmpty(),
+            role = body.string("role") ?: body.string("type").orEmpty(),
         )
     }
 
@@ -173,7 +177,7 @@ class DesktopOAuthClient(
 
     private fun microsoftProfile(token: String): OAuthUserProfile {
         val body = authenticatedJson(
-            "https://graph.microsoft.com/v1.0/me?%24select=displayName,mail,userPrincipalName",
+            "https://graph.microsoft.com/v1.0/me?%24select=id,displayName,mail,userPrincipalName,jobTitle",
             token,
         )
         val username = body.string("userPrincipalName").orEmpty()
@@ -183,6 +187,8 @@ class DesktopOAuthClient(
             username = username,
             fullName = body.string("displayName").orEmpty(),
             profilePhotoBytes = authenticatedBytes("https://graph.microsoft.com/v1.0/me/photo/%24value", token),
+            userId = body.string("id").orEmpty(),
+            role = body.string("jobTitle").orEmpty(),
         )
     }
 

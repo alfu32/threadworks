@@ -32,13 +32,16 @@ data class UserIdentity(
     val fullName: String = "",
     val profilePhotoUrl: String = "",
     val expiresAt: Instant,
+    val userId: String = "",
+    val role: String = "",
 )
 
 fun UserIdentity?.designator(systemUser: String = System.getProperty("user.name").orEmpty()): String = when {
     this == null -> systemUser.ifBlank { "local user" }
+    userId.isNotBlank() -> userId
+    emailAddress.isNotBlank() -> emailAddress
     username.isNotBlank() -> username
     fullName.isNotBlank() -> fullName
-    emailAddress.isNotBlank() -> emailAddress
     else -> systemUser.ifBlank { "local user" }
 }
 
@@ -63,6 +66,8 @@ class UserIdentityStore(
             fullName = preferences.get(FULL_NAME_KEY, ""),
             profilePhotoUrl = preferences.get(PHOTO_URL_KEY, ""),
             expiresAt = expiresAt,
+            userId = preferences.get(USER_ID_KEY, ""),
+            role = preferences.get(ROLE_KEY, ""),
         )
     }
 
@@ -74,12 +79,16 @@ class UserIdentityStore(
             fullName = profile.fullName.trim(),
             profilePhotoUrl = profile.profilePhotoUrl.trim(),
             expiresAt = now().plus(SESSION_DURATION),
+            userId = profile.userId.trim(),
+            role = profile.role.trim(),
         )
         preferences.put(PROVIDER_KEY, identity.provider.name)
         preferences.put(EMAIL_KEY, identity.emailAddress)
         preferences.put(USERNAME_KEY, identity.username)
         preferences.put(FULL_NAME_KEY, identity.fullName)
         preferences.put(PHOTO_URL_KEY, identity.profilePhotoUrl)
+        preferences.put(USER_ID_KEY, identity.userId)
+        preferences.put(ROLE_KEY, identity.role)
         preferences.put(EXPIRES_AT_KEY, identity.expiresAt.toString())
         saveAvatar(profile.profilePhotoBytes)
         preferences.flush()
@@ -92,7 +101,16 @@ class UserIdentityStore(
     }
 
     fun clear() {
-        listOf(PROVIDER_KEY, EMAIL_KEY, USERNAME_KEY, FULL_NAME_KEY, PHOTO_URL_KEY, EXPIRES_AT_KEY)
+        listOf(
+            PROVIDER_KEY,
+            EMAIL_KEY,
+            USERNAME_KEY,
+            FULL_NAME_KEY,
+            PHOTO_URL_KEY,
+            USER_ID_KEY,
+            ROLE_KEY,
+            EXPIRES_AT_KEY,
+        )
             .forEach(preferences::remove)
         runCatching { Files.deleteIfExists(avatarFile) }
         preferences.flush()
@@ -126,6 +144,8 @@ class UserIdentityStore(
         private const val USERNAME_KEY = "username"
         private const val FULL_NAME_KEY = "fullName"
         private const val PHOTO_URL_KEY = "profilePhotoUrl"
+        private const val USER_ID_KEY = "userId"
+        private const val ROLE_KEY = "role"
         private const val EXPIRES_AT_KEY = "expiresAt"
         private const val AVATAR_CACHE_SIZE = 64
         val SESSION_DURATION: Duration = Duration.ofDays(7)
@@ -148,6 +168,8 @@ data class OAuthUserProfile(
     val fullName: String = "",
     val profilePhotoUrl: String = "",
     val profilePhotoBytes: ByteArray? = null,
+    val userId: String = "",
+    val role: String = "",
 )
 
 fun userAvatarIcon(designator: String, profilePhoto: BufferedImage?, size: Int): Icon =

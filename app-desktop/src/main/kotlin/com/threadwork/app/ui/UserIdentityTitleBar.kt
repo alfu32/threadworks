@@ -140,6 +140,12 @@ internal class UserIdentityTitleBar(
                 add(summaryDetail(it))
             }
             add(summaryDetail(identity.provider.label))
+            identity.userId.takeIf(String::isNotBlank)?.let {
+                add(summaryDetail("User ID: $it"))
+            }
+            identity.role.takeIf(String::isNotBlank)?.let {
+                add(summaryDetail("Role: $it"))
+            }
             add(summaryDetail("Login expires ${identity.expiresAt}"))
         }
     }

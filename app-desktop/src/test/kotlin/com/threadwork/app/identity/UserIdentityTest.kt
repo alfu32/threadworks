@@ -18,16 +18,16 @@ import kotlin.test.assertTrue
 
 class UserIdentityTest {
     @Test
-    fun `designator follows username full name email and system user priority`() {
+    fun `designator follows user id email username and fallback priority`() {
         val expiration = Instant.parse("2026-09-15T00:00:00Z")
 
         assertEquals(
-            "octocat",
-            UserIdentity(OAuthProvider.GITHUB, "cat@example.test", "octocat", "The Octocat", expiresAt = expiration)
+            "gh-42",
+            UserIdentity(OAuthProvider.GITHUB, "cat@example.test", "octocat", "The Octocat", expiresAt = expiration, userId = "gh-42")
                 .designator("local"),
         )
         assertEquals(
-            "Ada Lovelace",
+            "ada@example.test",
             UserIdentity(OAuthProvider.GOOGLE, "ada@example.test", fullName = "Ada Lovelace", expiresAt = expiration)
                 .designator("local"),
         )
@@ -57,11 +57,15 @@ class UserIdentityTest {
                     fullName = "Ada Lovelace",
                     profilePhotoUrl = "https://example.test/ada.png",
                     profilePhotoBytes = photoBytes,
+                    userId = "google-42",
+                    role = "member",
                 ),
             )
 
             assertEquals(now.plus(UserIdentityStore.SESSION_DURATION), saved.expiresAt)
             assertEquals(saved, UserIdentityStore(preferences, avatarFile) { now }.load())
+            assertEquals("google-42", saved.userId)
+            assertEquals("member", saved.role)
             assertEquals(64, store.avatarImage()?.width)
 
             now = now.plus(8, ChronoUnit.DAYS)
