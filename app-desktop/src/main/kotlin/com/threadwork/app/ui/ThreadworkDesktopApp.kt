@@ -1180,6 +1180,7 @@ class ThreadworkDesktopApp(
             selectedItem = ThreadworkFonts.optionLabel(ThreadworkFonts.codeFontId, ThreadworkFonts.codeOptions)
         }
         val indentSpaces = JSpinner(SpinnerNumberModel(ThreadworkEditorSettings.indentSpaces, 1, 16, 1))
+        val scrollRows = JSpinner(SpinnerNumberModel(ThreadworkAppearance.scrollRowsPerWheelTick, 1, 12, 1))
         val compositeTargetPx = JSpinner(
             SpinnerNumberModel(ThreadworkDesignerSettings.compositeTitleTargetScreenPx, 8.0, 48.0, 1.0),
         )
@@ -1226,6 +1227,8 @@ class ThreadworkDesktopApp(
             add(codeSelector)
             add(JLabel("Code editor indent spaces").apply { border = BorderFactory.createEmptyBorder(12, 0, 0, 0) })
             add(indentSpaces)
+            add(JLabel("Mouse-wheel scroll rows").apply { border = BorderFactory.createEmptyBorder(12, 0, 0, 0) })
+            add(scrollRows)
         }
         val aiOptions = AiSupportProviders.optionsPanel()
         val content = JTabbedPane().apply {
@@ -1249,6 +1252,7 @@ class ThreadworkDesktopApp(
         ThreadworkFonts.designerFontId = ThreadworkFonts.optionId(designerSelector.selectedItem?.toString().orEmpty(), ThreadworkFonts.designerOptions)
         ThreadworkFonts.codeFontId = ThreadworkFonts.optionId(codeSelector.selectedItem?.toString().orEmpty(), ThreadworkFonts.codeOptions)
         ThreadworkEditorSettings.indentSpaces = (indentSpaces.value as? Int) ?: ThreadworkEditorSettings.indentSpaces
+        ThreadworkAppearance.scrollRowsPerWheelTick = (scrollRows.value as? Int) ?: ThreadworkAppearance.scrollRowsPerWheelTick
         ThreadworkDesignerSettings.compositeTitleTargetScreenPx = (compositeTargetPx.value as Number).toDouble()
         ThreadworkDesignerSettings.compositeReferenceViewportWidth = (compositeReferenceWidth.value as Number).toDouble()
         ThreadworkDesignerSettings.compositeReferenceViewportHeight = (compositeReferenceHeight.value as Number).toDouble()

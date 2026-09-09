@@ -114,6 +114,7 @@ fun DesignerPalette.colorForLink(stereotype: LinkStereotype): Color = when (ster
 object ThreadworkAppearance {
     private const val PREF_NODE = "com/threadwork/app/appearance"
     private const val THEME_KEY = "theme"
+    private const val SCROLL_ROWS_KEY = "scroll.rows.per.wheel.tick"
     private const val SCROLL_LINE_PIXELS = 12
     private val preferences: Preferences = Preferences.userRoot().node(PREF_NODE)
     private var scrollWheelPolicyInstalled = false
@@ -122,6 +123,10 @@ object ThreadworkAppearance {
         get() = runCatching { ApplicationTheme.valueOf(preferences.get(THEME_KEY, ApplicationTheme.Light.name)) }
             .getOrDefault(ApplicationTheme.Light)
         set(value) = preferences.put(THEME_KEY, value.name)
+
+    var scrollRowsPerWheelTick: Int
+        get() = preferences.getInt(SCROLL_ROWS_KEY, 3).coerceIn(1, 12)
+        set(value) = preferences.putInt(SCROLL_ROWS_KEY, value.coerceIn(1, 12))
 
     fun palette(theme: ApplicationTheme = this.theme): DesignerPalette =
         DesignerPalette(
@@ -172,7 +177,7 @@ object ThreadworkAppearance {
                 scrollPane.verticalScrollBar
             }
             val maxValue = (scrollBar.maximum - scrollBar.visibleAmount).coerceAtLeast(scrollBar.minimum)
-            scrollBar.value = (scrollBar.value + rotation * SCROLL_LINE_PIXELS)
+            scrollBar.value = (scrollBar.value + rotation * SCROLL_LINE_PIXELS * scrollRowsPerWheelTick)
                 .coerceIn(scrollBar.minimum, maxValue)
             wheel.consume()
         }, AWTEvent.MOUSE_WHEEL_EVENT_MASK)
