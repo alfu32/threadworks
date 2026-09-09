@@ -6701,9 +6701,11 @@ internal class InspectorPanel(
     private val statusSelector = JComboBox(
         (listOf(NoneProjectStatusChoice) + ProjectStatus.entries.map { it.name }).toTypedArray(),
     ).apply { isEditable = false }
-    private val responsible = JTextField()
+    private val responsible = JComboBox<String>().apply { isEditable = true }
     private val computedResponsible = JLabel()
     private val assignee = JComboBox<String>().apply { isEditable = true }
+    private var responsibleKeyByDisplay = emptyMap<String, String>()
+    private var responsibleUserByDisplay = emptyMap<String, ModelUser>()
     private var assigneeKeyByDisplay = emptyMap<String, String>()
     private var assigneeUserByDisplay = emptyMap<String, ModelUser>()
     private val revisionName = JTextField().apply { isEditable = false }
@@ -6717,6 +6719,16 @@ internal class InspectorPanel(
     private val layoutStrategy = JComboBox(arrayOf(NoneLayoutChoice)).apply { isEditable = false }
     private val computedLayoutStrategy = JLabel()
     private val layoutCompilerCapability = JLabel()
+    private val effectiveLanguage = JLabel()
+    private val effectiveTechnology = JLabel()
+    private val effectiveFileLayout = JLabel()
+    private val statusTransitionsModel = DefaultTableModel(arrayOf("Date", "Status", "Changed by"), 0)
+    private val statusTransitions = JTable(statusTransitionsModel).apply {
+        rowHeight = 22
+        fillsViewportHeight = true
+        preferredScrollableViewportSize = Dimension(320, 110)
+        isEnabled = false
+    }
     private val linkTypeDefinition = JComboBox(arrayOf(NoneTypeChoice)).apply { isEditable = false }
     private var typeIdByDisplay = emptyMap<String, String>()
     private var typeDisplayById = emptyMap<String, String>()
@@ -6735,7 +6747,13 @@ internal class InspectorPanel(
         add(customTransportKind, BorderLayout.CENTER)
         isVisible = false
     }
-    private val metadata = JTextArea(5, 24)
+    private val metadataModel = DefaultTableModel(arrayOf("Key", "Value"), 0)
+    private val metadata = JTable(metadataModel).apply {
+        rowHeight = 24
+        fillsViewportHeight = true
+        preferredScrollableViewportSize = Dimension(320, 130)
+    }
+    private val parentRow = fieldRow("Parent", parentPath)
     private val nameRow = fieldRow("Name", nameField)
     private val nameDetailRow = fieldRow("Name detail", nameDetail)
     private val languageRow = fieldRow("Language", language)
@@ -6753,16 +6771,7 @@ internal class InspectorPanel(
         },
     )
     private val statusRow = fieldRow("Status", statusSelector)
-    private val responsibleRow = fieldRow(
-        "Responsible",
-        JPanel().apply {
-            layout = BoxLayout(this, BoxLayout.Y_AXIS)
-            alignmentX = Component.LEFT_ALIGNMENT
-            add(responsible)
-            add(Box.createVerticalStrut(4))
-            add(computedResponsible)
-        },
-    )
+    private val responsibleRow = fieldRow("Responsible", responsible)
     private val assigneeRow = fieldRow("Assignee", assignee)
     private val revisionNameRow = fieldRow("Effective revision", revisionName)
     private val revisionDateRow = fieldRow("Effective revision date", revisionDate)
@@ -6796,10 +6805,36 @@ internal class InspectorPanel(
             )
         },
     )
-    private val metadataRow = fieldRow("Metadata key=value", JScrollPane(metadata))
+    private val effectiveLanguageRow = fieldRow("Language", effectiveLanguage)
+    private val effectiveTechnologyRow = fieldRow("Technology", effectiveTechnology)
+    private val effectiveFileLayoutRow = fieldRow("FS layout", effectiveFileLayout)
+    private val statusTransitionsRow = fieldRow("State transitions", JScrollPane(statusTransitions))
+    private val metadataRow = fieldRow(
+        "Metadata",
+        JPanel(BorderLayout(0, 4)).apply {
+            add(JScrollPane(metadata), BorderLayout.CENTER)
+            add(
+                JPanel(FlowLayout(FlowLayout.LEFT, 4, 0)).apply {
+                    add(JButton("Add").apply {
+                        addActionListener {
+                            metadataModel.addRow(arrayOf("", ""))
+                            apply()
+                        }
+                    })
+                    add(JButton("Remove").apply {
+                        addActionListener {
+                            metadata.selectedRows.sortedDescending().forEach(metadataModel::removeRow)
+                            apply()
+                        }
+                    })
+                },
+                BorderLayout.SOUTH,
+            )
+        },
+    )
 
     init {
-        assignee.renderer = object : DefaultListCellRenderer() {
+        val userRenderer = object : DefaultListCellRenderer() {
             override fun getListCellRendererComponent(
                 list: JList<*>?,
                 value: Any?,
@@ -6808,19 +6843,21 @@ internal class InspectorPanel(
                 cellHasFocus: Boolean,
             ): Component {
                 val component = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus) as JLabel
-                val user = assigneeUserByDisplay[value?.toString().orEmpty()]
+                val display = value?.toString().orEmpty()
+                val user = assigneeUserByDisplay[display] ?: responsibleUserByDisplay[display]
                 component.icon = user?.let { userAvatarIcon(it.designator, it.avatarData, 22) }
                 component.iconTextGap = 6
                 return component
             }
         }
+        assignee.renderer = userRenderer
+        responsible.renderer = userRenderer
         installNameCompletions()
         listOf(
             nameField,
             nameDetail,
             customLanguage,
             customTechnology,
-            responsible,
             customTransportKind,
             masterRevisionName,
             masterRevisionDate,
@@ -6829,43 +6866,55 @@ internal class InspectorPanel(
         applyOnCommit(technology)
         applyOnCommit(layoutStrategy)
         applyOnCommit(statusSelector)
+        applyOnCommit(responsible)
         applyOnCommit(assignee)
         (assignee.editor?.editorComponent as? JTextField)?.let(::applyOnCommit)
+        (responsible.editor?.editorComponent as? JTextField)?.let(::applyOnCommit)
         applyOnCommit(linkTransportKind)
         applyOnCommit(linkInteractionKind)
         applyOnCommit(linkTypeDefinition)
-        applyOnFocusLost(metadata)
+        metadataModel.addTableModelListener { if (!binding) apply() }
         val form = JPanel().apply {
             layout = BoxLayout(this, BoxLayout.Y_AXIS)
             border = BorderFactory.createEmptyBorder(8, 8, 8, 8)
-            add(nameRow)
-            add(nameDetailRow)
-            add(languageRow)
-            add(customLanguagePanel)
-            add(technologyRow)
-            add(customTechnologyPanel)
-            add(layoutStrategyRow)
-            add(statusRow)
-            add(responsibleRow)
-            add(assigneeRow)
-            add(revisionNameRow)
-            add(revisionDateRow)
-            add(modifiedDateRow)
-            add(modifiedByRow)
-            add(masterRevisionNameRow)
-            add(masterRevisionDateRow)
-            add(linkTransportKindRow)
-            add(linkInteractionKindRow)
-            add(linkTypeDefinitionRow)
-            add(customTransportKindPanel)
-            add(typeFieldsRow)
-            add(metadataRow)
+            add(section("GENERAL", listOf(
+                parentRow,
+                nameRow,
+                nameDetailRow,
+                languageRow,
+                customLanguagePanel,
+                technologyRow,
+                customTechnologyPanel,
+                layoutStrategyRow,
+            )))
+            add(section("EFFECTIVE", listOf(
+                effectiveLanguageRow,
+                effectiveTechnologyRow,
+                effectiveFileLayoutRow,
+            )))
+            add(section("MANAGEMENT", listOf(statusRow, responsibleRow, assigneeRow)))
+            add(section("TRACKING", listOf(
+                revisionNameRow,
+                revisionDateRow,
+                modifiedByRow,
+                modifiedDateRow,
+                statusTransitionsRow,
+                masterRevisionNameRow,
+                masterRevisionDateRow,
+            )))
+            add(section("METADATA", listOf(metadataRow)))
+            add(section("LINK / TYPE", listOf(
+                linkTransportKindRow,
+                linkInteractionKindRow,
+                linkTypeDefinitionRow,
+                customTransportKindPanel,
+                typeFieldsRow,
+            )))
             add(JButton("Apply").apply { addActionListener { apply() } })
         }
         add(
             JPanel().apply {
                 layout = BoxLayout(this, BoxLayout.Y_AXIS)
-                add(parentPath)
                 add(form)
             },
             BorderLayout.NORTH,
@@ -6896,21 +6945,22 @@ internal class InspectorPanel(
         bindTechnology(node?.technology?.technologyId.orEmpty(), forceCustom = boundNodeIsCompiler)
         bindLayoutStrategy(node?.fileLayoutStrategyId.orEmpty())
         statusSelector.selectedItem = node?.status?.name ?: NoneProjectStatusChoice
-        responsible.text = node?.responsible.orEmpty()
+        refreshResponsibleOptions(node?.responsible.orEmpty())
         refreshAssigneeOptions(node?.assignee.orEmpty())
         val effectiveRevision = node?.let { repository.getDocument().effectiveRevision(it.id) }
         revisionName.text = effectiveRevision?.name.orEmpty()
         revisionDate.text = effectiveRevision?.date.orEmpty()
         modifiedDate.text = node?.modified?.date.orEmpty()
         modifiedBy.text = node?.modified?.user.orEmpty()
+        bindTracking(node)
+        bindEffectiveValues(node)
         masterRevisionName.text = if (boundNodeIsRoot) repository.getDocument().masterRevision.name else ""
         masterRevisionDate.text = if (boundNodeIsRoot) repository.getDocument().masterRevision.date else ""
-        refreshResponsibleComputedLabel()
         bindTransportKind(node?.link?.transportKind.orEmpty())
         bindInteractionKind(node?.link?.interactionKind.orEmpty())
         refreshTypeChoices(node?.link?.typeDefinitionId.orEmpty())
         bindTypeFields(node)
-        metadata.text = metadataText(node)
+        bindMetadata(node)
         updateEntityFieldVisibility()
         binding = false
         if (nameField.isFocusOwner) {
@@ -7103,9 +7153,9 @@ internal class InspectorPanel(
 
     private fun parseMetadata(): MutableMap<String, String> {
         val next = mutableMapOf<String, String>()
-        metadata.text.lines().filter { "=" in it }.forEach {
-            val key = it.substringBefore("=").trim()
-            val value = it.substringAfter("=").trim()
+        (0 until metadataModel.rowCount).forEach { row ->
+            val key = metadataModel.getValueAt(row, 0)?.toString()?.trim().orEmpty()
+            val value = metadataModel.getValueAt(row, 1)?.toString()?.trim().orEmpty()
             if (key.isNotBlank()) next[key] = value
         }
         return next
@@ -7134,7 +7184,7 @@ internal class InspectorPanel(
         }
         repository.updateNodeFileLayoutStrategy(id, normalizedLayout)
         repository.updateNodeMetadata(id, parseMetadata())
-        repository.updateNodeResponsible(id, responsible.text)
+        repository.updateNodeResponsible(id, selectedResponsible())
         if (!isLink) {
             val assigneeId = selectedAssignee()
             repository.updateNodeAssignee(id, assigneeId)
@@ -7161,7 +7211,10 @@ internal class InspectorPanel(
         inspectorRefreshTimer.restart()
         val previousBinding = binding
         binding = true
-        bindLayoutStrategy(repository.requireNode(id).fileLayoutStrategyId)
+        val updatedNode = repository.requireNode(id)
+        bindLayoutStrategy(updatedNode.fileLayoutStrategyId)
+        bindEffectiveValues(updatedNode)
+        bindTracking(updatedNode)
         binding = previousBinding
     }
 
@@ -7188,10 +7241,34 @@ internal class InspectorPanel(
             ?.takeUnless { it == NoneProjectStatusChoice }
             ?.let(ProjectStatus::valueOf)
 
+    private fun selectedResponsible(): String? =
+        responsible.editor?.item?.toString()?.trim()?.takeIf(String::isNotBlank)?.let { value ->
+            responsibleKeyByDisplay[value] ?: value
+        }
+
     private fun selectedAssignee(): String? =
         assignee.editor?.item?.toString()?.trim()?.takeIf(String::isNotBlank)?.let { value ->
             assigneeKeyByDisplay[value] ?: value
         }
+
+    private fun refreshResponsibleOptions(selectedId: String) {
+        val users = repository.getDocument().users
+        responsibleKeyByDisplay = users.associate { user -> user.displayName() to user.uniqueKey }
+        responsibleUserByDisplay = users.associateBy { user -> user.displayName() }
+        val selectedDisplay = users.firstOrNull { user ->
+            user.uniqueKey == selectedId || user.identifier == selectedId || user.displayName() == selectedId
+        }?.displayName() ?: selectedId.trim()
+        val displays = buildList {
+            add("")
+            addAll(users.map { it.displayName() }.filter(String::isNotBlank))
+            if (selectedDisplay.isNotBlank()) add(selectedDisplay)
+        }.distinct()
+        val previousBinding = binding
+        binding = true
+        responsible.model = DefaultComboBoxModel(displays.toTypedArray())
+        responsible.selectedItem = selectedDisplay
+        binding = previousBinding
+    }
 
     private fun refreshAssigneeOptions(selectedId: String) {
         val users = repository.getDocument().users
@@ -7417,6 +7494,7 @@ internal class InspectorPanel(
         val showNodeFields = boundHasNode && !boundNodeIsLink
         val showLinkFields = boundHasNode && boundNodeIsLink
         layoutStrategyRow.isVisible = boundHasNode
+        parentRow.isVisible = boundHasNode
         languageRow.isVisible = showNodeFields
         technologyRow.isVisible = showNodeFields
         customTechnologyPanel.isVisible = showNodeFields && (boundNodeIsCompiler || technology.selectedItem == OtherTechnologyChoice)
@@ -7427,6 +7505,11 @@ internal class InspectorPanel(
         revisionDateRow.isVisible = boundHasNode
         modifiedDateRow.isVisible = boundHasNode
         modifiedByRow.isVisible = boundHasNode
+        effectiveLanguageRow.isVisible = boundHasNode
+        effectiveTechnologyRow.isVisible = boundHasNode
+        effectiveFileLayoutRow.isVisible = boundHasNode
+        statusTransitionsRow.isVisible = showNodeFields
+        metadataRow.isVisible = boundHasNode
         masterRevisionNameRow.isVisible = boundNodeIsRoot
         masterRevisionDateRow.isVisible = boundNodeIsRoot
         linkTransportKindRow.isVisible = showLinkFields
@@ -7439,6 +7522,43 @@ internal class InspectorPanel(
     private fun refreshResponsibleComputedLabel() {
         val effective = nodeId?.let { repository.getDocument().effectiveResponsible(it) }.orEmpty()
         computedResponsible.text = "effective: ${effective.ifBlank { "none" }}"
+    }
+
+    private fun bindEffectiveValues(node: Node?) {
+        val document = repository.getDocument()
+        val id = node?.id
+        effectiveLanguage.text = id?.let(document::effectiveLanguageId).orEmpty().ifBlank { "none" }
+        effectiveTechnology.text = id?.let(document::effectiveTechnologyId).orEmpty().ifBlank { "none" }
+        effectiveFileLayout.text = id?.let(document::effectiveLayoutStrategyId)
+            ?.let { layoutDisplayById[it] ?: it }
+            .orEmpty()
+            .ifBlank { "none" }
+    }
+
+    private fun bindTracking(node: Node?) {
+        statusTransitionsModel.rowCount = 0
+        node?.statusChanges.orEmpty().forEach { change ->
+            statusTransitionsModel.addRow(
+                arrayOf(
+                    formatTrackingDate(change.changedDate),
+                    change.endStatus?.name ?: "(none)",
+                    change.userId.ifBlank { "unknown" },
+                ),
+            )
+        }
+    }
+
+    private fun formatTrackingDate(value: String): String =
+        runCatching { Instant.parse(value).atZone(java.time.ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")) }
+            .getOrDefault(value)
+
+    private fun bindMetadata(node: Node?) {
+        metadataModel.rowCount = 0
+        node?.metadata
+            ?.entries
+            ?.filterNot { (key, _) -> key == "state" }
+            ?.sortedBy { (key, _) -> key }
+            ?.forEach { (key, value) -> metadataModel.addRow(arrayOf(key, value)) }
     }
 
     private fun selectedLayoutStrategy(): String =
@@ -7467,13 +7587,6 @@ internal class InspectorPanel(
         layoutCompilerCapability.isVisible = layoutStrategyRow.isVisible
     }
 
-    private fun metadataText(node: Node?): String =
-        node?.metadata
-            ?.entries
-            ?.filterNot { (key, _) -> key == "state" }
-            ?.joinToString("\n") { "${it.key}=${it.value}" }
-            .orEmpty()
-
     private fun proposedCompilerTechnologyId(): String =
         repository.getDocument().name
             .lowercase()
@@ -7495,11 +7608,40 @@ internal class InspectorPanel(
             else -> id
         }
 
-    private fun fieldRow(label: String, component: JComponent): JPanel =
-        JPanel(BorderLayout(0, 4)).apply {
+    private fun section(title: String, components: List<JComponent>): JPanel =
+        JPanel().apply {
+            layout = BoxLayout(this, BoxLayout.Y_AXIS)
             alignmentX = Component.LEFT_ALIGNMENT
-            add(JLabel(label), BorderLayout.NORTH)
-            add(component, BorderLayout.CENTER)
+            add(JLabel(title).apply {
+                font = font.deriveFont(Font.BOLD)
+                border = BorderFactory.createEmptyBorder(10, 0, 4, 0)
+            })
+            components.forEach { component ->
+                component.alignmentX = Component.LEFT_ALIGNMENT
+                add(component)
+            }
+        }
+
+    private fun fieldRow(label: String, component: JComponent): JPanel =
+        JPanel(java.awt.GridBagLayout()).apply {
+            alignmentX = Component.LEFT_ALIGNMENT
+            val labelConstraints = java.awt.GridBagConstraints().apply {
+                gridx = 0
+                gridy = 0
+                anchor = java.awt.GridBagConstraints.NORTHWEST
+                insets = java.awt.Insets(3, 0, 3, 8)
+            }
+            val componentConstraints = java.awt.GridBagConstraints().apply {
+                gridx = 1
+                gridy = 0
+                weightx = 1.0
+                fill = java.awt.GridBagConstraints.HORIZONTAL
+                insets = java.awt.Insets(3, 0, 3, 0)
+            }
+            add(JLabel(label).apply {
+                preferredSize = Dimension(132, preferredSize.height)
+            }, labelConstraints)
+            add(component, componentConstraints)
         }
 
     private companion object {

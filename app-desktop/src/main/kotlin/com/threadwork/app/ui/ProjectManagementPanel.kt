@@ -14,6 +14,9 @@ import java.awt.Dimension
 import java.awt.FlowLayout
 import java.awt.Font
 import java.awt.GridLayout
+import java.awt.datatransfer.DataFlavor
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
 import javax.swing.BorderFactory
 import javax.swing.Box
 import javax.swing.DefaultListCellRenderer
@@ -25,9 +28,11 @@ import javax.swing.JList
 import javax.swing.JPanel
 import javax.swing.JScrollPane
 import javax.swing.JSplitPane
+import javax.swing.JTabbedPane
 import javax.swing.ListSelectionModel
 import javax.swing.SwingConstants
 import javax.swing.SwingUtilities
+import javax.swing.TransferHandler
 import javax.swing.UIManager
 
 internal fun projectTickets(document: ThreadworkDocument): List<Node> =
@@ -176,10 +181,11 @@ internal class ProjectManagementPanel(
                 layout = javax.swing.BoxLayout(this, javax.swing.BoxLayout.Y_AXIS)
                 border = BorderFactory.createEmptyBorder(4, 4, 4, 4)
                 laneTickets.forEachIndexed { index, node ->
-                    add(ticketButton(document, node))
+                    add(ticketCard(document, node, removeFromBoard = true))
                     if (index < laneTickets.lastIndex) add(Box.createVerticalStrut(6))
                 }
             }
+            contents.transferHandler = statusDropHandler(status)
             lanes.add(
                 JPanel(BorderLayout(0, 6)).apply {
                     border = BorderFactory.createCompoundBorder(
@@ -188,6 +194,7 @@ internal class ProjectManagementPanel(
                         ),
                         BorderFactory.createEmptyBorder(4, 4, 4, 4),
                     )
+                    transferHandler = statusDropHandler(status)
                     add(
                         JLabel("${status.name}  ${laneTickets.size}", SwingConstants.LEADING).apply {
                             font = font.deriveFont(Font.BOLD)
@@ -199,37 +206,94 @@ internal class ProjectManagementPanel(
                 },
             )
         }
+        val backlog = JPanel().apply {
+            layout = javax.swing.BoxLayout(this, javax.swing.BoxLayout.Y_AXIS)
+            border = BorderFactory.createEmptyBorder(8, 8, 8, 8)
+            val backlogTickets = document.nodes.values
+                .filter { it.id != document.rootNodeId && !it.isLink && it.status == null }
+                .sortedWith(compareBy<Node> { document.fullyQualifiedName(it.id).lowercase() }.thenBy { it.id.value })
+            backlogTickets.forEachIndexed { index, node ->
+                add(ticketCard(document, node, removeFromBoard = false))
+                if (index < backlogTickets.lastIndex) add(Box.createVerticalStrut(6))
+            }
+            add(Box.createVerticalGlue())
+        }
         board.removeAll()
-        board.add(JScrollPane(lanes).apply { border = BorderFactory.createEmptyBorder() }, BorderLayout.CENTER)
+        board.add(JTabbedPane().apply {
+            addTab("Kanban board", JScrollPane(lanes).apply { border = BorderFactory.createEmptyBorder() })
+            addTab("Backlog", JScrollPane(backlog).apply { border = BorderFactory.createEmptyBorder() })
+        }, BorderLayout.CENTER)
         board.revalidate()
         board.repaint()
     }
 
-    private fun ticketButton(document: ThreadworkDocument, node: Node): JComponent =
+    private fun ticketCard(document: ThreadworkDocument, node: Node, removeFromBoard: Boolean): JComponent =
         ThreadworkAppearance.palette().let { palette ->
             val fill = palette.fillForNode(document, node)
             val stroke = palette.strokeForNode(document, node)
-            JButton(
-                "<html><b>${escapeHtml(node.name.ifBlank { node.id.value })}</b><br>" +
-                    "<font color='${ThreadworkAppearance.colorToHex(palette[DesignerColorKey.TextMuted])}'>" +
-                    "${escapeHtml(document.fullyQualifiedParentName(node.id))}</font></html>",
-            ).apply {
+            JPanel(BorderLayout(4, 0)).apply {
                 background = fill
-                foreground = palette[DesignerColorKey.TextPrimary]
                 isOpaque = true
-                isContentAreaFilled = true
-                horizontalAlignment = SwingConstants.LEADING
-                maximumSize = Dimension(Int.MAX_VALUE, 58)
-                preferredSize = Dimension(LANE_WIDTH - 24, 58)
+                maximumSize = Dimension(Int.MAX_VALUE, 76)
+                preferredSize = Dimension(LANE_WIDTH - 24, 76)
                 alignmentX = Component.LEFT_ALIGNMENT
                 border = BorderFactory.createCompoundBorder(
                     BorderFactory.createLineBorder(stroke, 2),
-                    BorderFactory.createEmptyBorder(5, 7, 5, 7),
+                    BorderFactory.createEmptyBorder(4, 7, 4, 4),
                 )
-                toolTipText = document.fullyQualifiedName(node.id)
-                addActionListener { openTicket(node.id) }
+                val label = JLabel(
+                    "<html><b>${escapeHtml(node.name.ifBlank { node.id.value })}</b><br>" +
+                        "<font color='${ThreadworkAppearance.colorToHex(palette[DesignerColorKey.TextMuted])}'>" +
+                        "${escapeHtml(document.fullyQualifiedParentName(node.id))}<br>" +
+                        "responsible: ${escapeHtml(node.responsible.orEmpty().ifBlank { "(none)" })}<br>" +
+                        "assignee: ${escapeHtml(node.assignee.orEmpty().ifBlank { "(none)" })}</font></html>",
+                ).apply {
+                    foreground = palette[DesignerColorKey.TextPrimary]
+                    toolTipText = document.fullyQualifiedName(node.id)
+                    addMouseListener(object : MouseAdapter() {
+                        override fun mouseClicked(e: MouseEvent) { if (e.clickCount == 1) openTicket(node.id) }
+                    })
+                }
+                add(label, BorderLayout.CENTER)
+                add(JButton(if (removeFromBoard) "x" else "+").apply {
+                    toolTipText = if (removeFromBoard) "Remove from board" else "Add to BUSINESS"
+                    preferredSize = Dimension(28, 28)
+                    addActionListener {
+                        repository.updateNodeStatus(node.id, if (removeFromBoard) null else ProjectStatus.BUSINESS)
+                        refresh()
+                    }
+                }, BorderLayout.EAST)
+                transferHandler = nodeTransferHandler(node.id)
+                label.transferHandler = transferHandler
+                label.addMouseMotionListener(object : MouseAdapter() {
+                    override fun mouseDragged(e: MouseEvent) {
+                        label.transferHandler?.exportAsDrag(label, e, TransferHandler.MOVE)
+                    }
+                })
             }
         }
+
+    private fun nodeTransferHandler(nodeId: NodeId): TransferHandler = object : TransferHandler() {
+        override fun getSourceActions(c: JComponent): Int = MOVE
+
+        override fun createTransferable(c: JComponent): java.awt.datatransfer.Transferable =
+            java.awt.datatransfer.StringSelection(nodeId.value)
+    }
+
+    private fun statusDropHandler(status: ProjectStatus): TransferHandler = object : TransferHandler() {
+        override fun canImport(support: TransferSupport): Boolean =
+            support.isDataFlavorSupported(DataFlavor.stringFlavor)
+
+        override fun importData(support: TransferSupport): Boolean {
+            if (!canImport(support)) return false
+            val id = runCatching {
+                support.transferable.getTransferData(DataFlavor.stringFlavor).toString()
+            }.getOrNull() ?: return false
+            repository.updateNodeStatus(NodeId(id), status)
+            refresh()
+            return true
+        }
+    }
 
     private fun rebuildTicketList(document: ThreadworkDocument, tickets: List<Node>) {
         ticketListModel.clear()
