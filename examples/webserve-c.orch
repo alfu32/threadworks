@@ -412,7 +412,7 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-09T10:13:47.586843235Z",
+                "date": "2026-09-09T12:42:53.554293260Z",
                 "user": "ioan.alferaru@gmail.com"
             },
             "ports": [],
@@ -421,17 +421,17 @@
                 "fields": [
                     {
                         "name": "id",
-                        "typeId": "number",
+                        "typeId": "unsigned long long",
                         "isReference": false
                     },
                     {
                         "name": "timestamp",
-                        "typeId": "number",
+                        "typeId": "long long",
                         "isReference": false
                     },
                     {
                         "name": "text",
-                        "typeId": "string",
+                        "typeId": "char",
                         "isReference": true
                     }
                 ]
@@ -766,7 +766,7 @@
             "username": "",
             "fullName": "Ioan Alferaru",
             "role": "",
-            "refreshedAt": "2026-09-09T10:12:26.782831625Z"
+            "refreshedAt": "2026-09-09T12:42:04.267018141Z"
         },
         {
             "identifier": "ioan.alferaru@gmail.com",
@@ -778,7 +778,7 @@
             "username": "",
             "fullName": "",
             "role": "",
-            "refreshedAt": "2026-09-09T10:13:47.586843235Z"
+            "refreshedAt": "2026-09-09T12:42:53.554293260Z"
         }
     ]
 }

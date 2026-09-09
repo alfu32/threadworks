@@ -94,7 +94,7 @@ class GridCodeEditorAdapter : JPanel(), CodeEditorAdapter {
     private var hoverPoint: Point? = null
     private var hoverPosition: BufferPosition? = null
     private var hoverInfo: EditorHoverInfo? = null
-    private val typeHoverTimer = Timer(1700) { resolveHoverInfo() }.apply { isRepeats = false }
+    private val typeHoverTimer = Timer(800) { resolveHoverInfo() }.apply { isRepeats = false }
     private var cursorVisible = true
     private val menuMask = runCatching { Toolkit.getDefaultToolkit().menuShortcutKeyMaskEx }
         .getOrDefault(InputEvent.CTRL_DOWN_MASK)
@@ -129,7 +129,7 @@ class GridCodeEditorAdapter : JPanel(), CodeEditorAdapter {
         background = Color(0x1e1e1e)
         foreground = Color(0xd4d4d4)
         preferredSize = Dimension(900, 520)
-        toolTipText = "plain text"
+        toolTipText = null
 
         addKeyListener(object : KeyAdapter() {
             override fun keyPressed(e: KeyEvent) = handleKeyPressed(e)
@@ -1302,9 +1302,8 @@ class GridCodeEditorAdapter : JPanel(), CodeEditorAdapter {
     }
 
     private fun updateToolTip() {
-        val language = languageId.ifBlank { "plain text" }
         val diagnosticText = diagnostics.joinToString("\n") { "${it.severity}: ${it.message}" }
-        toolTipText = if (diagnosticText.isBlank()) language else "$language\n$diagnosticText"
+        toolTipText = diagnosticText.ifBlank { null }
     }
 
     private fun updateDiagnosticTooltip(point: Point) {
