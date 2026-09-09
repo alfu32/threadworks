@@ -84,8 +84,6 @@ internal class PreprintDialog(
     private val planPreviewLabel = JLabel("No plan to preview", SwingConstants.CENTER)
     private val planPreviewScroll = JScrollPane(planPreviewLabel).apply {
         border = BorderFactory.createEmptyBorder()
-        verticalScrollBar.unitIncrement = 32
-        horizontalScrollBar.unitIncrement = 32
     }
     private val planPreviewHost = JPanel(BorderLayout())
     private val documentPreviewPanel = JPanel().apply {
@@ -95,8 +93,6 @@ internal class PreprintDialog(
     }
     private val documentPreviewScroll = JScrollPane(documentPreviewPanel).apply {
         border = BorderFactory.createEmptyBorder()
-        verticalScrollBar.unitIncrement = 32
-        horizontalScrollBar.unitIncrement = 32
         viewport.background = documentPreviewPanel.background
     }
     private val documentPreviewHost = JPanel(BorderLayout())
@@ -169,7 +165,6 @@ internal class PreprintDialog(
         add(JLabel("Printers"), BorderLayout.NORTH)
         add(JScrollPane(printerList).apply {
             border = BorderFactory.createEtchedBorder()
-            verticalScrollBar.unitIncrement = 28
         }, BorderLayout.CENTER)
         add(printerDetails, BorderLayout.SOUTH)
     }

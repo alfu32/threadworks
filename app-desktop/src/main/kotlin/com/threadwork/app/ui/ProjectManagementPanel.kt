@@ -234,8 +234,8 @@ internal class ProjectManagementPanel(
             JPanel(BorderLayout(4, 0)).apply {
                 background = fill
                 isOpaque = true
-                maximumSize = Dimension(Int.MAX_VALUE, 76)
-                preferredSize = Dimension(LANE_WIDTH - 24, 76)
+                maximumSize = Dimension(Int.MAX_VALUE, 112)
+                preferredSize = Dimension(LANE_WIDTH - 24, 112)
                 alignmentX = Component.LEFT_ALIGNMENT
                 border = BorderFactory.createCompoundBorder(
                     BorderFactory.createLineBorder(stroke, 2),

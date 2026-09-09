@@ -130,7 +130,7 @@
             },
             "responsible": "alfu32@github",
             "modified": {
-                "date": "2026-09-09T08:24:20.694084354Z",
+                "date": "2026-09-09T09:24:20.532901212Z",
                 "user": "ioan.alferaru@gmail.com"
             },
             "ports": [
@@ -159,6 +159,18 @@
                 {
                     "userId": "devlin",
                     "changedDate": "2026-09-08T14:54:59.900209479Z",
+                    "initStatus": "BUSINESS",
+                    "endStatus": "IMPLEMENTATION"
+                },
+                {
+                    "userId": "ioan.alferaru@gmail.com",
+                    "changedDate": "2026-09-09T09:20:31.167780765Z",
+                    "initStatus": "IMPLEMENTATION",
+                    "endStatus": "BUSINESS"
+                },
+                {
+                    "userId": "ioan.alferaru@gmail.com",
+                    "changedDate": "2026-09-09T09:24:20.532883286Z",
                     "initStatus": "BUSINESS",
                     "endStatus": "IMPLEMENTATION"
                 }
@@ -214,7 +226,7 @@
             },
             "responsible": "alfu32@github",
             "modified": {
-                "date": "2026-09-09T08:24:16.222213389Z",
+                "date": "2026-09-09T09:24:23.429005910Z",
                 "user": "ioan.alferaru@gmail.com"
             },
             "ports": [
@@ -243,6 +255,18 @@
                 {
                     "userId": "devlin",
                     "changedDate": "2026-09-08T14:55:03.573870693Z",
+                    "initStatus": "BUSINESS",
+                    "endStatus": "IMPLEMENTATION"
+                },
+                {
+                    "userId": "ioan.alferaru@gmail.com",
+                    "changedDate": "2026-09-09T09:20:33.310914400Z",
+                    "initStatus": "IMPLEMENTATION",
+                    "endStatus": "BUSINESS"
+                },
+                {
+                    "userId": "ioan.alferaru@gmail.com",
+                    "changedDate": "2026-09-09T09:24:23.428984519Z",
                     "initStatus": "BUSINESS",
                     "endStatus": "IMPLEMENTATION"
                 }
@@ -472,7 +496,7 @@
             },
             "responsible": "alfu32@github",
             "modified": {
-                "date": "2026-09-09T08:24:10.893747078Z",
+                "date": "2026-09-09T09:24:11.974752288Z",
                 "user": "ioan.alferaru@gmail.com"
             },
             "ports": [
@@ -501,6 +525,18 @@
                 {
                     "userId": "devlin",
                     "changedDate": "2026-09-08T14:54:51.887564143Z",
+                    "initStatus": "BUSINESS",
+                    "endStatus": "IMPLEMENTATION"
+                },
+                {
+                    "userId": "ioan.alferaru@gmail.com",
+                    "changedDate": "2026-09-09T09:20:27.777944047Z",
+                    "initStatus": "IMPLEMENTATION",
+                    "endStatus": "BUSINESS"
+                },
+                {
+                    "userId": "ioan.alferaru@gmail.com",
+                    "changedDate": "2026-09-09T09:24:11.974722425Z",
                     "initStatus": "BUSINESS",
                     "endStatus": "IMPLEMENTATION"
                 }
@@ -555,7 +591,7 @@
             },
             "responsible": "alfu32@github",
             "modified": {
-                "date": "2026-09-09T08:23:49.230148671Z",
+                "date": "2026-09-09T09:24:15.947810253Z",
                 "user": "ioan.alferaru@gmail.com"
             },
             "ports": [
@@ -591,6 +627,18 @@
                     "userId": "devlin",
                     "changedDate": "2026-09-08T14:55:11.737933051Z",
                     "initStatus": "FUNCTIONAL",
+                    "endStatus": "IMPLEMENTATION"
+                },
+                {
+                    "userId": "ioan.alferaru@gmail.com",
+                    "changedDate": "2026-09-09T09:20:29.784967431Z",
+                    "initStatus": "IMPLEMENTATION",
+                    "endStatus": "BUSINESS"
+                },
+                {
+                    "userId": "ioan.alferaru@gmail.com",
+                    "changedDate": "2026-09-09T09:24:15.947787817Z",
+                    "initStatus": "BUSINESS",
                     "endStatus": "IMPLEMENTATION"
                 }
             ],
@@ -711,10 +759,10 @@
                 "name": "",
                 "date": ""
             },
-            "responsible": null,
+            "responsible": "github|ioan.alferaru@gmail.com|",
             "modified": {
-                "date": "2026-09-08T15:03:14.404596376Z",
-                "user": "devlin"
+                "date": "2026-09-09T09:23:33.197340728Z",
+                "user": "ioan.alferaru@gmail.com"
             },
             "ports": [],
             "link": {
@@ -1104,10 +1152,10 @@
                 "name": "",
                 "date": ""
             },
-            "responsible": "alferio",
+            "responsible": "github|ioan.alferaru@gmail.com|",
             "modified": {
-                "date": "2026-09-08T21:17:17.621871404Z",
-                "user": "alfu32"
+                "date": "2026-09-09T09:22:51.039317352Z",
+                "user": "ioan.alferaru@gmail.com"
             },
             "ports": [],
             "link": null,
@@ -1131,7 +1179,7 @@
                     "endStatus": "IMPLEMENTATION"
                 }
             ],
-            "assignee": null
+            "assignee": "google|alferaru.ioan@gmail.com|"
         },
         {
             "id": "node_f9029721-ad0b-44fd-8b6b-9e7b444ebc5c",
@@ -2389,7 +2437,7 @@
             "username": "ioan.alferaru@gmail.com",
             "fullName": "Ioan Alferaru",
             "role": "",
-            "refreshedAt": "2026-09-09T08:45:58.325446483Z"
+            "refreshedAt": "2026-09-09T09:19:05.245497228Z"
         },
         {
             "identifier": "cristian.alferaru@gmail.com",
@@ -2425,7 +2473,7 @@
             "username": "",
             "fullName": "",
             "role": "",
-            "refreshedAt": "2026-09-09T08:46:42.575281299Z"
+            "refreshedAt": "2026-09-09T09:24:23.429005910Z"
         },
         {
             "identifier": "cristian.alferaru@gmail.com",

@@ -135,6 +135,8 @@ object ThreadworkAppearance {
         UIManager.put("Component.arc", 6)
         UIManager.put("Button.arc", 6)
         UIManager.put("TextComponent.arc", 4)
+        UIManager.put("ScrollBar.unitIncrement", 24)
+        UIManager.put("ScrollBar.blockIncrement", 96)
         UIManager.put("TitlePane.centerTitle", false)
         UIManager.put("TitlePane.centerTitleIfMenuBarEmbedded", false)
         UIManager.put("TitlePane.showIcon", false)
