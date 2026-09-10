@@ -86,6 +86,7 @@ func (runner *ThreadworkRunner) InstallShutdownSignalHandlers() {
 		for received := range signals {
 			if number, ok := received.(syscall.Signal); ok {
 				runner.shutdownSignal.Store(int64(number))
+				runner.ShutdownRequest()
 			}
 		}
 	}()

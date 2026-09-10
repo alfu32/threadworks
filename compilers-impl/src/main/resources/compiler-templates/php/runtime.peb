@@ -67,6 +67,7 @@ final class ThreadworkRunner
         pcntl_async_signals(true);
         $handleSignal = function (int $signal): void {
             $this->shutdownSignal = $signal;
+            $this->shutdownRequest();
         };
         pcntl_signal(SIGINT, $handleSignal);
         pcntl_signal(SIGTERM, $handleSignal);

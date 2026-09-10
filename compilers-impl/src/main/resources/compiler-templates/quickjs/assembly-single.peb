@@ -12,6 +12,7 @@
 
 function threadworkRun() {
   const context = createRuntimeContext();
+  threadworkRunner.installShutdownHandlers();
   {{ initializerSymbol }}(context);
 
   while (threadworkRunner.isRunning()) {

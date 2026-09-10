@@ -9,6 +9,18 @@ class ThreadworkRunner {
     this.shutdownRemainingTicks = 0;
   }
 
+  /** Install optional QuickJS host signal handlers and request network shutdown. */
+  installShutdownHandlers() {
+    const hostOs = globalThis.os;
+    if (!hostOs || typeof hostOs.signal !== "function") return;
+    const requestShutdown = (signalNumber) => {
+      this.shutdownSignal = signalNumber;
+      this.shutdownRequest();
+    };
+    hostOs.signal(2, () => requestShutdown(2));
+    hostOs.signal(15, () => requestShutdown(15));
+  }
+
   /** Request shutdown; modeled nodes decide whether they continue emitting packets. */
   shutdownRequest() {
     this.running = false;
