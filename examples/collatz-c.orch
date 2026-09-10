@@ -14,7 +14,10 @@
                 "link_69ae0228-8851-4f15-abef-fc9ee9624576",
                 "node_ec1dc20c-43db-40d1-8311-453ed6cfe30a",
                 "link_54b2bbd9-a2b9-47c6-af76-5536c969e1a8",
-                "node_8fb309c8-9b7e-4fae-941f-fc6768aafbb7"
+                "node_8fb309c8-9b7e-4fae-941f-fc6768aafbb7",
+                "node_632467d5-da17-40a5-be22-eadc561cec73",
+                "link_808f18f6-fd98-44f7-8016-37c8240aae0a",
+                "link_640d5e8b-c744-49b4-9c10-c32c4af0777c"
             ],
             "incomingLinks": [],
             "outgoingLinks": [],
@@ -56,7 +59,7 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-10T06:55:51.451104229Z",
+                "date": "2026-09-10T10:34:04.881408992Z",
                 "user": "ioan.alferaru@gmail.com"
             },
             "ports": [],
@@ -72,7 +75,7 @@
         },
         {
             "id": "node_ebf3fbfd-9f5f-40ee-9520-71ef19988478",
-            "name": "ping",
+            "name": "iter",
             "kind": "Processor",
             "parentId": "root",
             "children": [],
@@ -80,23 +83,25 @@
                 "link_69ae0228-8851-4f15-abef-fc9ee9624576",
                 "link_54b2bbd9-a2b9-47c6-af76-5536c969e1a8"
             ],
-            "outgoingLinks": [],
+            "outgoingLinks": [
+                "link_808f18f6-fd98-44f7-8016-37c8240aae0a"
+            ],
             "layout": {
-                "x": 194.0,
-                "y": 202.0,
+                "x": 207.0,
+                "y": 190.0,
                 "width": 200.0,
-                "height": 70.0,
+                "height": 78.0,
                 "closedWidth": 200.0,
-                "closedHeight": 70.0,
+                "closedHeight": 78.0,
                 "openWidth": 200.0,
-                "openHeight": 70.0,
+                "openHeight": 78.0,
                 "isExpanded": true
             },
             "fileLayoutStrategyId": "single-file",
             "text": {
                 "initialization": "",
                 "initializationLanguageId": "",
-                "source": "int shutdown_signal = 0;\nif (\n    threadwork_runner__get_shutdown_signal(&threadwork_runner, &shutdown_signal) != THREADWORK_OK \n){\n    // threadwork_runner__shutdown_request(&threadwork_runner);\n    return THREADWORK_ERROR;\n}\nif (shutdown_signal > 0) {\n    return 0;// threadwork_runner__shutdown_request(&threadwork_runner);\n}\n\n\nif( has_ended() ) {\n    if(series_index==1)printf(\"{start:1,data:[\");\n    printf(\"1],length:%llu},\\n\",current_term_index);\n    next_series();\n    fflush(stdout);\n    printf(\"{start:%llu,[\",current_term);\n}\n\nprintf(\"%llu,\",current_term);\n\nnext_item();\n\n\n\n// push(fwd,  &current_term);\n\n// usleep(5000);",
+                "source": "if (threadwork_runner.shutdown_signal > 0) {\n    return THREADWORK_OK;\n}\n\nif( has_ended() ) {\n    push(stat, &((SeriesStat){last_term,current_term_index}));\n} else {\n    printf(\"%llu,\",current_term);\n    fflush(stdout);\n    next_item(3);\n}\n// this_series__next();cl\n\n\n\n// push(fwd,  &current_term);\n\n// usleep(5000);",
                 "sourceLanguageId": "",
                 "specification": "",
                 "specificationLanguageId": "markdown",
@@ -119,7 +124,7 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-10T07:05:56.852466917Z",
+                "date": "2026-09-10T10:38:33.836592202Z",
                 "user": "ioan.alferaru@gmail.com"
             },
             "ports": [
@@ -163,7 +168,8 @@
             "children": [],
             "incomingLinks": [],
             "outgoingLinks": [
-                "link_69ae0228-8851-4f15-abef-fc9ee9624576"
+                "link_69ae0228-8851-4f15-abef-fc9ee9624576",
+                "link_640d5e8b-c744-49b4-9c10-c32c4af0777c"
             ],
             "layout": {
                 "x": 207.0,
@@ -180,7 +186,7 @@
             "text": {
                 "initialization": "",
                 "initializationLanguageId": "",
-                "source": "\nunsigned long long series_index=1;\nunsigned long long last_term=1;\nunsigned long long current_term=1;\nunsigned long long current_term_index=1;\n\nvoid next_item(){\n  if( (current_term % 2) == 0 ){\n    current_term = current_term >> 1;\n  } else {\n    current_term = 3*current_term+1;\n  }\n  current_term_index+=1;\n}\n\nint has_ended(){\n    return current_term <= 1;\n}\nvoid next_series(){\n    series_index+=1;\n    last_term+=1;\n    current_term=last_term;\n    current_term_index=1;\n}\n",
+                "source": "\nunsigned long long series_index=1;\nunsigned long long last_term=1;\nunsigned long long current_term=1;\nunsigned long long current_term_index=1;\n#define H_LENGTH 2048\nunsigned long long history[H_LENGTH];\nunsigned char hist_index=0;\nvoid history__add(unsigned long long value){\n    hist_index = (hist_index == H_LENGTH)?0:hist_index+1;\n    history[hist_index]=value;\n}\n\nint history__contains(unsigned long long value){\n    for(int ix=0;ix<H_LENGTH;ix++){\n        if(history[ix]==value){\n            return 1;\n        }\n    }\n    return 0;\n}\nvoid history__init(){\n    for(int ix=0;ix<H_LENGTH;ix++){\n        history[ix]=0;\n    }\n    hist_index=0;\n}\n\n// typedef struct series_t {\n//     unsigned long long series_index;\n//     unsigned long long last_term;\n//     unsigned long long current_term;\n//     unsigned long long current_term_index;\n// } series_t;\n// \n// series_t this=(series_t){1,1,1,1};\n\n// void this_series__next(){\n//   if(this.current_term <= 1){\n//     series_index+=1;\n//     last_term+=1;\n//     current_term=last_term;\n//     current_term_index=1;\n//   }\n//   if( (this.current_term % 2) == 0 ){\n//     this.current_term = this.current_term >> 1;\n//   } else {\n//     this.current_term = 3*this.current_term+1;\n//   }\n//   this.current_term_index+=1;\n// }\n\nvoid next_item(unsigned long long multiplier){\n  history__add(current_term);\n  if( (current_term % 2) == 0 ){\n    current_term = current_term >> 1;\n  } else {\n    current_term = multiplier*current_term+1;\n  }\n  current_term_index+=1;\n}\n\nint has_ended(){\n    return history__contains(current_term) == 1;\n}\nvoid next_series(){\n    series_index+=1;\n    last_term+=1;\n    current_term=last_term;\n    current_term_index=1;\n    history__init();\n}\n",
                 "sourceLanguageId": "",
                 "specification": "",
                 "specificationLanguageId": "markdown",
@@ -203,7 +209,7 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-09T22:52:14.076850230Z",
+                "date": "2026-09-10T10:34:04.881408992Z",
                 "user": "ioan.alferaru@gmail.com"
             },
             "ports": [
@@ -321,7 +327,7 @@
                 "link_54b2bbd9-a2b9-47c6-af76-5536c969e1a8"
             ],
             "layout": {
-                "x": 209.0,
+                "x": 207.0,
                 "y": -85.0,
                 "width": 560.0,
                 "height": 70.0,
@@ -460,21 +466,21 @@
         },
         {
             "id": "node_8fb309c8-9b7e-4fae-941f-fc6768aafbb7",
-            "name": "Series",
+            "name": "SeriesStat",
             "kind": "Type",
             "parentId": "root",
             "children": [],
             "incomingLinks": [],
             "outgoingLinks": [],
             "layout": {
-                "x": 675.0,
-                "y": -9.0,
-                "width": 220.0,
-                "height": 102.0,
-                "closedWidth": 220.0,
-                "closedHeight": 102.0,
-                "openWidth": 220.0,
-                "openHeight": 102.0,
+                "x": 591.0,
+                "y": 21.0,
+                "width": 233.0,
+                "height": 86.0,
+                "closedWidth": 233.0,
+                "closedHeight": 86.0,
+                "openWidth": 233.0,
+                "openHeight": 86.0,
                 "isExpanded": true
             },
             "fileLayoutStrategyId": "single-file",
@@ -504,7 +510,7 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-09T21:17:30.321179366Z",
+                "date": "2026-09-10T10:16:45.323034400Z",
                 "user": "ioan.alferaru@gmail.com"
             },
             "ports": [],
@@ -512,17 +518,12 @@
             "typeDefinition": {
                 "fields": [
                     {
-                        "name": "count",
+                        "name": "number",
                         "typeId": "unsigned long long",
                         "isReference": false
                     },
                     {
-                        "name": "start",
-                        "typeId": "unsigned long long",
-                        "isReference": false
-                    },
-                    {
-                        "name": "current",
+                        "name": "iterations",
                         "typeId": "unsigned long long",
                         "isReference": false
                     }
@@ -542,6 +543,226 @@
                 }
             ],
             "assignee": null
+        },
+        {
+            "id": "node_632467d5-da17-40a5-be22-eadc561cec73",
+            "name": "log",
+            "kind": "Processor",
+            "parentId": "root",
+            "children": [],
+            "incomingLinks": [
+                "link_808f18f6-fd98-44f7-8016-37c8240aae0a",
+                "link_640d5e8b-c744-49b4-9c10-c32c4af0777c"
+            ],
+            "outgoingLinks": [],
+            "layout": {
+                "x": 601.0,
+                "y": 193.0,
+                "width": 200.0,
+                "height": 78.0,
+                "closedWidth": 200.0,
+                "closedHeight": 78.0,
+                "openWidth": 200.0,
+                "openHeight": 78.0,
+                "isExpanded": true
+            },
+            "fileLayoutStrategyId": "single-file",
+            "text": {
+                "initialization": "",
+                "initializationLanguageId": "",
+                "source": "SeriesStat item;\nint status=pop(stat, &item);\n\nif(status != THREADWORK_ERROR){\n    if(series_index==1)printf(\"{start:1,data:[\");\n    printf(\"1],length:%llu},\\n\",current_term_index);\n    printf(\"\\nstatus(%d) : %llu,%llu\\n\",status,item.number,item.iterations);\n    next_series();\n    printf(\"{start:%llu,[\",current_term);\n    fflush(stdout);\n}",
+                "sourceLanguageId": "",
+                "specification": "",
+                "specificationLanguageId": "markdown",
+                "tests": "",
+                "testsLanguageId": "json",
+                "aiInstructions": "",
+                "aiInstructionsLanguageId": "markdown"
+            },
+            "binaryContent": null,
+            "technology": {
+                "languageId": "",
+                "technologyId": "",
+                "compilerId": "",
+                "fileExtension": "",
+                "contentType": ""
+            },
+            "revision": {
+                "name": "",
+                "date": ""
+            },
+            "responsible": null,
+            "modified": {
+                "date": "2026-09-10T14:10:21.960178524Z",
+                "user": "ioan.alferaru@gmail.com"
+            },
+            "ports": [
+                {
+                    "id": "input_in",
+                    "name": "in",
+                    "direction": "Input",
+                    "dataType": "",
+                    "metadata": {}
+                }
+            ],
+            "link": null,
+            "typeDefinition": null,
+            "diagnostics": [],
+            "metadata": {},
+            "pluginData": {},
+            "nameDetail": "",
+            "status": "BUSINESS",
+            "statusChanges": [
+                {
+                    "userId": "ioan.alferaru@gmail.com",
+                    "changedDate": "2026-09-10T10:11:23.277367019Z",
+                    "initStatus": null,
+                    "endStatus": "BUSINESS"
+                }
+            ],
+            "assignee": null
+        },
+        {
+            "id": "link_808f18f6-fd98-44f7-8016-37c8240aae0a",
+            "name": "stat",
+            "kind": "Link",
+            "parentId": "root",
+            "children": [],
+            "incomingLinks": [],
+            "outgoingLinks": [],
+            "layout": {
+                "x": 0.0,
+                "y": 0.0,
+                "width": 200.0,
+                "height": 70.0,
+                "closedWidth": 200.0,
+                "closedHeight": 70.0,
+                "openWidth": 200.0,
+                "openHeight": 70.0,
+                "isExpanded": true
+            },
+            "fileLayoutStrategyId": "single-file",
+            "text": {
+                "initialization": "",
+                "initializationLanguageId": "",
+                "source": "",
+                "sourceLanguageId": "",
+                "specification": "",
+                "specificationLanguageId": "markdown",
+                "tests": "",
+                "testsLanguageId": "json",
+                "aiInstructions": "",
+                "aiInstructionsLanguageId": "markdown"
+            },
+            "binaryContent": null,
+            "technology": {
+                "languageId": "",
+                "technologyId": "",
+                "compilerId": "",
+                "fileExtension": "",
+                "contentType": ""
+            },
+            "revision": {
+                "name": "",
+                "date": ""
+            },
+            "responsible": null,
+            "modified": {
+                "date": "2026-09-10T10:13:15.350785059Z",
+                "user": "ioan.alferaru@gmail.com"
+            },
+            "ports": [],
+            "link": {
+                "sourceNodeId": "node_ebf3fbfd-9f5f-40ee-9520-71ef19988478",
+                "sourcePortName": "out",
+                "targetNodeId": "node_632467d5-da17-40a5-be22-eadc561cec73",
+                "targetPortName": "in",
+                "transportKind": "in-process",
+                "typeName": "",
+                "payloadDefinition": "",
+                "typeDefinitionId": "node_8fb309c8-9b7e-4fae-941f-fc6768aafbb7",
+                "compositeBoundaryIds": [],
+                "interactionKind": "data"
+            },
+            "typeDefinition": null,
+            "diagnostics": [],
+            "metadata": {},
+            "pluginData": {},
+            "nameDetail": "",
+            "status": null,
+            "statusChanges": [],
+            "assignee": null
+        },
+        {
+            "id": "link_640d5e8b-c744-49b4-9c10-c32c4af0777c",
+            "name": "lib_collatz -> log",
+            "kind": "Link",
+            "parentId": "root",
+            "children": [],
+            "incomingLinks": [],
+            "outgoingLinks": [],
+            "layout": {
+                "x": 0.0,
+                "y": 0.0,
+                "width": 200.0,
+                "height": 70.0,
+                "closedWidth": 200.0,
+                "closedHeight": 70.0,
+                "openWidth": 200.0,
+                "openHeight": 70.0,
+                "isExpanded": true
+            },
+            "fileLayoutStrategyId": "none",
+            "text": {
+                "initialization": "",
+                "initializationLanguageId": "",
+                "source": "",
+                "sourceLanguageId": "",
+                "specification": "",
+                "specificationLanguageId": "markdown",
+                "tests": "",
+                "testsLanguageId": "json",
+                "aiInstructions": "",
+                "aiInstructionsLanguageId": "markdown"
+            },
+            "binaryContent": null,
+            "technology": {
+                "languageId": "",
+                "technologyId": "",
+                "compilerId": "",
+                "fileExtension": "",
+                "contentType": ""
+            },
+            "revision": {
+                "name": "",
+                "date": ""
+            },
+            "responsible": null,
+            "modified": {
+                "date": "2026-09-10T10:34:04.881408992Z",
+                "user": "ioan.alferaru@gmail.com"
+            },
+            "ports": [],
+            "link": {
+                "sourceNodeId": "node_7bb44cd3-9983-496c-a7ed-1315ebab056c",
+                "sourcePortName": "out",
+                "targetNodeId": "node_632467d5-da17-40a5-be22-eadc561cec73",
+                "targetPortName": "in",
+                "transportKind": "in-process",
+                "typeName": "",
+                "payloadDefinition": "",
+                "typeDefinitionId": "",
+                "compositeBoundaryIds": [],
+                "interactionKind": "lib"
+            },
+            "typeDefinition": null,
+            "diagnostics": [],
+            "metadata": {},
+            "pluginData": {},
+            "nameDetail": "",
+            "status": null,
+            "statusChanges": [],
+            "assignee": null
         }
     ],
     "metadata": {},
@@ -560,7 +781,7 @@
             "username": "",
             "fullName": "Ioan Alferaru",
             "role": "",
-            "refreshedAt": "2026-09-10T06:55:43.273387927Z"
+            "refreshedAt": "2026-09-10T07:09:35.853406313Z"
         },
         {
             "identifier": "ioan.alferaru@gmail.com",
@@ -572,7 +793,7 @@
             "username": "",
             "fullName": "",
             "role": "",
-            "refreshedAt": "2026-09-10T07:05:56.852466917Z"
+            "refreshedAt": "2026-09-10T14:10:21.960178524Z"
         }
     ]
 }

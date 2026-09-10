@@ -4,7 +4,10 @@ typedef int threadwork_error_t;
 
 enum {
     THREADWORK_OK = 0,
-    THREADWORK_ERROR = 1
+    THREADWORK_ERROR = 1,
+    THREADWORK_QUEUE_OK = THREADWORK_OK,
+    THREADWORK_QUEUE_ERROR = 2,
+    THREADWORK_QUEUE_FULL = 3
 };
 
 /** @brief Execution state for one generated Threadwork application. */
@@ -206,6 +209,8 @@ typedef struct ThreadworkArray {
 typedef struct threadwork_buffer {
     threadwork_queue queue;
     size_t element_size;
+    size_t count;
+    size_t capacity;
 } threadwork_buffer;
 
 /** @brief Named runtime endpoint storage. */
@@ -378,7 +383,11 @@ static threadwork_error_t threadwork_buffer_transport(threadwork_buffer *source,
     }
     packet = source->queue.head;
     if (packet == NULL) {
-        return THREADWORK_OK;
+        return THREADWORK_QUEUE_OK;
+    }
+    if (target->capacity > 0U &&
+        (target->count > target->capacity || source->count > target->capacity - target->count)) {
+        return THREADWORK_QUEUE_FULL;
     }
     source->queue.head = packet->next;
     if (source->queue.head == NULL) {
@@ -391,7 +400,9 @@ static threadwork_error_t threadwork_buffer_transport(threadwork_buffer *source,
         target->queue.tail->next = packet;
     }
     target->queue.tail = packet;
-    return THREADWORK_OK;
+    target->count += source->count;
+    source->count = 0U;
+    return THREADWORK_QUEUE_OK;
 }
 
 /** @brief Copy one packet into a typed buffer. */
@@ -401,6 +412,9 @@ threadwork_error_t threadwork_buffer_push(threadwork_buffer *buffer, const void 
 
     if (buffer == NULL || data == NULL || size != buffer->element_size) {
         return THREADWORK_ERROR;
+    }
+    if (buffer->capacity > 0U && buffer->count >= buffer->capacity) {
+        return THREADWORK_QUEUE_FULL;
     }
     packet = (threadwork_packet *)calloc(1U, sizeof(*packet));
     if (packet == NULL) {
@@ -419,7 +433,8 @@ threadwork_error_t threadwork_buffer_push(threadwork_buffer *buffer, const void 
         buffer->queue.tail->next = packet;
     }
     buffer->queue.tail = packet;
-    return THREADWORK_OK;
+    buffer->count++;
+    return THREADWORK_QUEUE_OK;
 }
 
 /** @brief Remove one packet from a typed buffer into caller-owned storage. */
@@ -432,7 +447,7 @@ threadwork_error_t threadwork_buffer_pop(threadwork_buffer *buffer, void *destin
     }
     packet = buffer->queue.head;
     if (packet == NULL || packet->size != size) {
-        return THREADWORK_ERROR;
+        return THREADWORK_QUEUE_ERROR;
     }
     memcpy(destination, packet->data, size);
     buffer->queue.head = packet->next;
@@ -440,7 +455,8 @@ threadwork_error_t threadwork_buffer_pop(threadwork_buffer *buffer, void *destin
         buffer->queue.tail = NULL;
     }
     threadwork_packet_destroy(packet);
-    return THREADWORK_OK;
+    buffer->count--;
+    return THREADWORK_QUEUE_OK;
 }
 
 /** @brief Generated-node convenience operation for pushing one modeled packet. */
@@ -468,18 +484,23 @@ threadwork_error_t pop(void *target, void *package)
 /** @brief Count packets currently waiting in a modeled buffer. */
 size_t threadwork_buffer_count(const threadwork_buffer *buffer)
 {
-    const threadwork_packet *packet;
-    size_t result = 0U;
-
     if (buffer == NULL) {
         return 0U;
     }
-    packet = buffer->queue.head;
-    while (packet != NULL) {
-        result++;
-        packet = packet->next;
+    return buffer->count;
+}
+
+/** @brief Set a queue capacity; zero keeps the queue unbounded. */
+threadwork_error_t threadwork_buffer_set_capacity(threadwork_buffer *buffer, size_t capacity)
+{
+    if (buffer == NULL) {
+        return THREADWORK_ERROR;
     }
-    return result;
+    if (capacity > 0U && buffer->count > capacity) {
+        return THREADWORK_QUEUE_FULL;
+    }
+    buffer->capacity = capacity;
+    return THREADWORK_QUEUE_OK;
 }
 
 static void threadwork_endpoint_list_destroy(threadwork_endpoint *head)
