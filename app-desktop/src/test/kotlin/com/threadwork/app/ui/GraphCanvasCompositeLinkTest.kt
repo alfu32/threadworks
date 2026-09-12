@@ -14,6 +14,25 @@ import kotlin.math.roundToInt
 
 class GraphCanvasCompositeLinkTest {
     @Test
+    fun `self link routes around its node`() {
+        val repository = InMemoryDocumentRepository(newDocument("self link"))
+        val root = repository.getDocument().rootNodeId
+        val node = repository.createNode(root, "loop", NodeKind.Processor)
+        position(repository, node, 400, 300)
+        repository.addPort(node.id, NodePort("out", "out", PortDirection.Output))
+        repository.addPort(node.id, NodePort("in", "in", PortDirection.Input))
+        val link = repository.createLink(root, "loopback", node.id, "out", node.id, "in")
+        val canvas = GraphCanvas(repository, linkedSetOf(), {}, {}, {})
+        canvas.refreshBoundsFromChildren()
+
+        val points = canvas.renderedLinkPoints(link.id)
+
+        assertTrue(points.size >= 6)
+        assertTrue(points.any { it.x > node.layout.x.roundToInt() + node.layout.width.roundToInt() })
+        assertTrue(points.any { it.y < node.layout.y.roundToInt() })
+    }
+
+    @Test
     fun `collapsed composite preserves the external part of a piercing link`() {
         val repository = InMemoryDocumentRepository(newDocument("collapsed link"))
         val root = repository.getDocument().rootNodeId

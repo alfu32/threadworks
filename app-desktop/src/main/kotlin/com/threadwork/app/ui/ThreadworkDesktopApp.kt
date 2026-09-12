@@ -5629,6 +5629,9 @@ class GraphCanvas(
     }
 
     private fun routedRoute(linkNode: Node, anchors: LinkAnchors, routedSegments: List<RouteSegment>): LinkRoute {
+        if (anchors.sourceNodeId == anchors.targetNodeId) {
+            return selfLoopRoute(anchors)
+        }
         val source = anchors.source
         val target = anchors.target
         val sourceStub = Point(source.point.x + PORT_STUB_LENGTH * source.xDirection, source.point.y)
@@ -5656,6 +5659,60 @@ class GraphCanvas(
         points += bestRouteBetween(cursor, targetStub, obstacles, routedSegments, linkNode.id, container)
         points += target.point
 
+        return LinkRoute(
+            source.point,
+            target.point,
+            source.xDirection,
+            target.xDirection,
+            anchors.boundaryPorts,
+            compact(points),
+        )
+    }
+
+    private fun selfLoopRoute(anchors: LinkAnchors): LinkRoute {
+        val source = anchors.source
+        val target = anchors.target
+        val node = repository.getNode(anchors.sourceNodeId)
+        val bounds = node?.layout?.rect()
+        if (bounds == null) {
+            return LinkRoute(
+                source.point,
+                target.point,
+                source.xDirection,
+                target.xDirection,
+                anchors.boundaryPorts,
+                compact(listOf(source.point, target.point)),
+            )
+        }
+
+        val sourceStub = Point(
+            source.point.x + PORT_STUB_LENGTH * source.xDirection,
+            source.point.y,
+        )
+        val targetStub = Point(
+            target.point.x + PORT_STUB_LENGTH * target.xDirection,
+            target.point.y,
+        )
+        val clearance = PORT_STUB_LENGTH + ROUTING_STEP
+        val outerX = if (source.xDirection > 0) {
+            bounds.x + bounds.width + clearance
+        } else {
+            bounds.x - clearance
+        }
+        val loopY = if (source.point.y <= bounds.y + bounds.height / 2) {
+            bounds.y - clearance
+        } else {
+            bounds.y + bounds.height + clearance
+        }
+        val points = listOf(
+            source.point,
+            sourceStub,
+            Point(outerX, source.point.y),
+            Point(outerX, loopY),
+            Point(outerX, target.point.y),
+            targetStub,
+            target.point,
+        )
         return LinkRoute(
             source.point,
             target.point,
