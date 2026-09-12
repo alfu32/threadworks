@@ -3429,7 +3429,7 @@ class GraphCanvas(
                     )
                     parent.layout.openHeight = parent.layout.closedHeight + compactMetrics.topPadding - COMPOSITE_TOP_PADDING
                 }
-                parent.layout.width = if (parent.layout.isExpanded) parent.layout.openWidth else parent.layout.closedWidth
+                parent.layout.width = parent.layout.openWidth
                 parent.layout.height = if (parent.layout.isExpanded) parent.layout.openHeight else parent.layout.closedHeight
             }
         scheduleReroute()
@@ -3446,7 +3446,7 @@ class GraphCanvas(
         } else {
             node.layout.openHeight = max(node.layout.openHeight, node.layout.closedHeight + COMPOSITE_HEADER_EXTRA_HEIGHT)
         }
-        node.layout.width = if (node.layout.isExpanded || !node.isComposite) node.layout.openWidth else node.layout.closedWidth
+        node.layout.width = node.layout.openWidth
         node.layout.height = if (node.layout.isExpanded || !node.isComposite) node.layout.openHeight else node.layout.closedHeight
     }
 
@@ -5277,7 +5277,7 @@ class GraphCanvas(
         val node = repository.getNode(nodeId) ?: return
         if (!node.isComposite) return
         node.layout.isExpanded = !node.layout.isExpanded
-        node.layout.width = if (node.layout.isExpanded) node.layout.openWidth else node.layout.closedWidth
+        node.layout.width = node.layout.openWidth
         node.layout.height = if (node.layout.isExpanded) node.layout.openHeight else node.layout.closedHeight
         if (!node.layout.isExpanded) {
             selection.retainAll { selectedId ->

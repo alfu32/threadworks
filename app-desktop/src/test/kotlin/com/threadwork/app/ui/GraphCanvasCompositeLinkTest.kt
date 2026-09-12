@@ -14,6 +14,23 @@ import kotlin.math.roundToInt
 
 class GraphCanvasCompositeLinkTest {
     @Test
+    fun `collapsing a composite keeps its expanded width`() {
+        val repository = InMemoryDocumentRepository(newDocument("wide collapsed group"))
+        val root = repository.getDocument().rootNodeId
+        val composite = repository.createNode(root, "group", NodeKind.Group)
+        val child = repository.createNode(composite.id, "child", NodeKind.Processor)
+        position(repository, child, 400, 300)
+        val canvas = GraphCanvas(repository, linkedSetOf(), {}, {}, {})
+        canvas.refreshBoundsFromChildren()
+        val expandedWidth = composite.layout.openWidth
+
+        composite.layout.isExpanded = false
+        canvas.refreshBoundsFromChildren()
+
+        assertEquals(expandedWidth, composite.layout.width)
+    }
+
+    @Test
     fun `self link routes around its node`() {
         val repository = InMemoryDocumentRepository(newDocument("self link"))
         val root = repository.getDocument().rootNodeId
