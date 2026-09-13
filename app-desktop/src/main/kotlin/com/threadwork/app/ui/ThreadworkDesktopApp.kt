@@ -2759,6 +2759,13 @@ class GraphCanvas(
     var mode: CanvasMode = CanvasMode.Select
         private set
     private var dragStart: Point? = null
+    private var dragScreenStart: Point? = null
+    private var pressHitNode: NodeId? = null
+    private var pressHitLink: NodeId? = null
+    private var pressCompositeToggle: NodeId? = null
+    private var pressShiftDown = false
+    private var pressControlDown = false
+    private var dragThresholdExceeded = false
     private var selectionDragLeftToRight = true
     private var contextMenuPending = false
     private var contextMenuShown = false
@@ -2906,6 +2913,7 @@ class GraphCanvas(
         const val ROUTING_LANE_SPAN = 7
         const val SNAP_GRID_STEP = 40
         const val SNAP_RADIUS_PX = 5.0
+        const val SELECTION_DRAG_THRESHOLD_PX = 5.0
         const val MIN_ZOOM = 0.02
         const val MAX_ZOOM = 2.5
         const val ZOOM_STEP = 1.12
@@ -3043,7 +3051,7 @@ class GraphCanvas(
     fun setMode(nextMode: CanvasMode) {
         if (mode != nextMode) {
             linkSource = null
-            selectionRect = null
+            resetPointerGesture()
         }
         mode = nextMode
         onModeChanged(mode)
@@ -6136,16 +6144,23 @@ class GraphCanvas(
             return
         }
         val point = modelPoint(e.point)
-        if (!e.isAltDown) hitCompositeToggle(point)?.let {
-            toggleCompositeExpansion(it)
-            return
-        }
         dragStart = point
+        dragScreenStart = Point(e.point)
+        pressShiftDown = e.isShiftDown
+        pressControlDown = e.isControlDown
+        dragThresholdExceeded = false
         moveDragReference = null
         selectionDragLeftToRight = true
-        val pickSelectionEnabled = mode != CanvasMode.Select || !e.isAltDown
-        val hit = if (pickSelectionEnabled) hitNode(point) else null
-        val hitLink = if (pickSelectionEnabled) hitLink(point) else null
+        pressCompositeToggle = hitCompositeToggle(point)
+        pressHitNode = hitNode(point)
+        pressHitLink = hitLink(point)
+        if (mode != CanvasMode.Select && !e.isAltDown) pressCompositeToggle?.let {
+            toggleCompositeExpansion(it)
+            resetPointerGesture()
+            return
+        }
+        val hit = pressHitNode
+        val hitLink = pressHitLink
         when (mode) {
             CanvasMode.CreateNode -> {
                 val parent = hit?.takeIf { candidate ->
@@ -6220,32 +6235,7 @@ class GraphCanvas(
                 }
             }
             CanvasMode.Select -> {
-                val hitNode = hit?.let(repository::getNode)
-                if (hitLink != null && hitNode?.isComposite == true) {
-                    if (!e.isShiftDown) selection.clear()
-                    selection += hitLink
-                    dragAllowsReparent = false
-                    onSelectionChanged()
-                } else if (hit != null) {
-                    if (hit !in selection) {
-                        if (!e.isShiftDown) selection.clear()
-                        selection += hit
-                    }
-                    dragAllowsReparent = e.isControlDown
-                    hitNode?.let { moveDragReference = initialMoveReference(point, it.layout.rect()) }
-                    onSelectionChanged()
-                } else if (hitLink != null) {
-                    if (!e.isShiftDown) selection.clear()
-                    selection += hitLink
-                    dragAllowsReparent = false
-                    onSelectionChanged()
-                } else {
-                    selection.clear()
-                    selectionRect = Rectangle(point)
-                    selectionDragLeftToRight = true
-                    dragAllowsReparent = false
-                    onSelectionChanged()
-                }
+                // Selection is committed on release, after the gesture can be classified as a click or window.
             }
         }
     }
@@ -6259,11 +6249,17 @@ class GraphCanvas(
             return
         }
         val point = modelPoint(e.point)
+        if (mode == CanvasMode.Select && !dragThresholdExceeded) {
+            val start = dragScreenStart
+            if (start != null && start.distance(e.point) >= SELECTION_DRAG_THRESHOLD_PX) {
+                beginSelectionDrag()
+            }
+        }
         if (selectionRect != null) {
             val start = dragStart ?: return
             selectionDragLeftToRight = point.x >= start.x
             selectionRect = Rectangle(min(start.x, point.x), min(start.y, point.y), kotlin.math.abs(point.x - start.x), kotlin.math.abs(point.y - start.y))
-        } else if (selection.isNotEmpty() && mode == CanvasMode.Select) {
+        } else if (moveDragReference != null && mode == CanvasMode.Select) {
             val start = moveDragReference ?: dragStart ?: return
             val snappedPoint = snapMoveReferenceToGrid(point)
             val dx = snappedPoint.x - start.x
@@ -6285,6 +6281,7 @@ class GraphCanvas(
             panDragStart = null
             return
         }
+        val wasDrag = dragThresholdExceeded
         selectionRect?.let { rect ->
             selection.clear()
             val containsOnly = selectionDragLeftToRight
@@ -6296,11 +6293,68 @@ class GraphCanvas(
                 .forEach { selection += it.id }
             selectionRect = null
         }
-        if (selection.isNotEmpty() && dragAllowsReparent) updateParentAfterDrag(modelPoint(e.point))
+        if (!wasDrag && mode == CanvasMode.Select) selectAtPress()
+        if (wasDrag && moveDragReference != null && selection.isNotEmpty() && dragAllowsReparent) {
+            updateParentAfterDrag(modelPoint(e.point))
+        }
+        resetPointerGesture()
+        refreshAll()
+    }
+
+    private fun beginSelectionDrag() {
+        dragThresholdExceeded = true
+        val start = dragStart ?: return
+        val movingSelectedNode = pressHitNode
+            ?.takeIf { it in selection && pressHitLink == null }
+            ?.let(repository::getNode)
+        if (movingSelectedNode != null) {
+            dragAllowsReparent = pressControlDown
+            moveDragReference = initialMoveReference(start, movingSelectedNode.layout.rect())
+        } else {
+            selection.clear()
+            selectionRect = Rectangle(start)
+            selectionDragLeftToRight = true
+            dragAllowsReparent = false
+        }
+    }
+
+    private fun selectAtPress() {
+        val hitNodeId = pressHitNode
+        val hitNode = hitNodeId?.let(repository::getNode)
+        val hitLinkId = pressHitLink
+        pressCompositeToggle?.let {
+            toggleCompositeExpansion(it)
+            return
+        }
+        if (hitLinkId != null && hitNode?.isComposite == true) {
+            if (!pressShiftDown) selection.clear()
+            selection += hitLinkId
+        } else if (hitNodeId != null) {
+            if (hitNodeId !in selection) {
+                if (!pressShiftDown) selection.clear()
+                selection += hitNodeId
+            }
+        } else if (hitLinkId != null) {
+            if (!pressShiftDown) selection.clear()
+            selection += hitLinkId
+        } else {
+            selection.clear()
+        }
+        onSelectionChanged()
+    }
+
+    private fun resetPointerGesture() {
+        selectionRect = null
         dragAllowsReparent = false
         dragStart = null
+        dragScreenStart = null
+        pressHitNode = null
+        pressHitLink = null
+        pressCompositeToggle = null
+        pressShiftDown = false
+        pressControlDown = false
+        dragThresholdExceeded = false
         moveDragReference = null
-        refreshAll()
     }
 
     private fun createLink(sourceId: NodeId, targetId: NodeId) {
