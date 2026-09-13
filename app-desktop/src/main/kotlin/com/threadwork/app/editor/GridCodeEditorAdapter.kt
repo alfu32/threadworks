@@ -72,6 +72,7 @@ class GridCodeEditorAdapter : JPanel(), CodeEditorAdapter {
     )
 
     private var editorFont = ThreadworkFonts.codeFont(14f)
+    private var palette = EditorPalette.dark()
     private val lines = mutableListOf("")
     private val cursors = mutableListOf(CaretState(BufferPosition(0, 0)))
     private val undoStack = ArrayDeque<Snapshot>()
@@ -126,8 +127,8 @@ class GridCodeEditorAdapter : JPanel(), CodeEditorAdapter {
     init {
         isFocusable = true
         focusTraversalKeysEnabled = false
-        background = Color(0x1e1e1e)
-        foreground = Color(0xd4d4d4)
+        background = palette.background
+        foreground = palette.defaultText
         preferredSize = Dimension(900, 520)
         toolTipText = null
 
@@ -268,6 +269,13 @@ class GridCodeEditorAdapter : JPanel(), CodeEditorAdapter {
         repaint()
     }
 
+    fun setEditorPalette(next: EditorPalette) {
+        palette = next
+        background = next.background
+        foreground = next.defaultText
+        repaint()
+    }
+
     override fun setPinnedHeader(text: String?) {
         val next = text.orEmpty().lineSequence().joinToString(" ") { it.trim() }.trim()
         if (pinnedHeader == next) return
@@ -323,7 +331,7 @@ class GridCodeEditorAdapter : JPanel(), CodeEditorAdapter {
         val visualRows = visualRows(metrics, charWidth, gutterWidth)
         scrollVisualRow = scrollVisualRow.coerceIn(0, maxScrollVisualRow(visualRows))
 
-        g2.color = Color(0x1e1e1e)
+        g2.color = palette.background
         g2.fillRect(0, 0, width, height)
         if (pinnedHeader.isNotBlank()) {
             drawPinnedHeader(g2, metrics, lineHeight, charWidth, gutterWidth)
@@ -352,13 +360,13 @@ class GridCodeEditorAdapter : JPanel(), CodeEditorAdapter {
         charWidth: Int,
         gutterWidth: Int,
     ) {
-        g2.color = Color(0x252526)
+        g2.color = palette.gutterBackground
         g2.fillRect(0, 0, gutterWidth, lineHeight)
-        g2.color = Color(0x3c3c3c)
+        g2.color = palette.separator
         g2.drawLine(gutterWidth - 1, 0, gutterWidth - 1, lineHeight)
         drawHighlightedText(g2, pinnedHeader, gutterWidth, metrics.ascent)
         if (scrollVisualRow > 0) {
-            g2.color = Color(0x5a5a5a)
+            g2.color = palette.border
             g2.drawLine(0, lineHeight - 1, width, lineHeight - 1)
         }
     }
@@ -369,6 +377,7 @@ class GridCodeEditorAdapter : JPanel(), CodeEditorAdapter {
             text,
             declarationSymbols,
             semanticIdentifierColors,
+            palette.syntax,
         )
         var cursor = 0
         var drawX = x
@@ -379,11 +388,11 @@ class GridCodeEditorAdapter : JPanel(), CodeEditorAdapter {
             drawX += g2.fontMetrics.stringWidth(segment)
         }
         tokens.forEach { token ->
-            if (cursor < token.start) draw(text.substring(cursor, token.start), RegexSyntaxHighlighter.Default)
+            if (cursor < token.start) draw(text.substring(cursor, token.start), palette.defaultText)
             draw(text.substring(token.start, token.endExclusive), token.color)
             cursor = token.endExclusive
         }
-        if (cursor < text.length) draw(text.substring(cursor), RegexSyntaxHighlighter.Default)
+        if (cursor < text.length) draw(text.substring(cursor), palette.defaultText)
     }
 
     private fun handleKeyPressed(e: KeyEvent) {
@@ -788,26 +797,26 @@ class GridCodeEditorAdapter : JPanel(), CodeEditorAdapter {
         visibleRows: Int,
         visualRows: List<VisualRow>,
     ) {
-        g2.color = Color(0x252526)
+        g2.color = palette.gutterBackground
         g2.fillRect(0, 0, gutterWidth, bodyHeight())
-        g2.color = Color(0x858585)
+        g2.color = palette.mutedText
         for (row in 0 until visibleRows) {
             val visualRow = visualRows.getOrNull(scrollVisualRow + row) ?: break
             if (visualRow.startColumn != 0) continue
             diagnostics.firstOrNull { it.line == visualRow.lineIndex + 1 }?.let { diagnostic ->
                 g2.color = when (diagnostic.severity) {
-                    DiagnosticSeverity.Error -> Color(0xff5555)
-                    DiagnosticSeverity.Warning -> Color(0xd7ba7d)
-                    DiagnosticSeverity.Info -> Color(0x75beff)
+                    DiagnosticSeverity.Error -> palette.diagnosticError
+                    DiagnosticSeverity.Warning -> palette.diagnosticWarning
+                    DiagnosticSeverity.Info -> palette.diagnosticInfo
                 }
                 val markerSize = (lineHeight / 2).coerceAtLeast(6)
                 g2.fillOval(4, row * lineHeight + (lineHeight - markerSize) / 2, markerSize, markerSize)
-                g2.color = Color(0x858585)
+                g2.color = palette.mutedText
             }
             val label = (visualRow.lineIndex + 1).toString().padStart((lines.size + 1).toString().length)
             g2.drawString(label, charWidth, row * lineHeight + metrics.ascent)
         }
-        g2.color = Color(0x3c3c3c)
+        g2.color = palette.separator
         g2.drawLine(gutterWidth - 1, 0, gutterWidth - 1, bodyHeight())
     }
 
@@ -831,15 +840,15 @@ class GridCodeEditorAdapter : JPanel(), CodeEditorAdapter {
             }
             if (startX < width) {
                 g2.color = when (diagnostic.severity) {
-                    DiagnosticSeverity.Error -> Color(0x24ff5555, true)
-                    DiagnosticSeverity.Warning -> Color(0x24d7ba7d, true)
-                    DiagnosticSeverity.Info -> Color(0x2475beff, true)
+                    DiagnosticSeverity.Error -> Color(palette.diagnosticError.red, palette.diagnosticError.green, palette.diagnosticError.blue, 0x24)
+                    DiagnosticSeverity.Warning -> Color(palette.diagnosticWarning.red, palette.diagnosticWarning.green, palette.diagnosticWarning.blue, 0x24)
+                    DiagnosticSeverity.Info -> Color(palette.diagnosticInfo.red, palette.diagnosticInfo.green, palette.diagnosticInfo.blue, 0x24)
                 }
                 g2.fillRect(startX, row * lineHeight, width - startX, lineHeight)
             }
         }
         if (visualRows.indexOfCaret(caret) == scrollVisualRow + row) {
-            g2.color = Color(0x50282828, true)
+            g2.color = Color(palette.caret.red, palette.caret.green, palette.caret.blue, 0x20)
             g2.fillRect(gutterWidth, row * lineHeight, width - gutterWidth, lineHeight)
         }
     }
@@ -860,6 +869,7 @@ class GridCodeEditorAdapter : JPanel(), CodeEditorAdapter {
             line,
             declarationSymbols,
             semanticIdentifierColors,
+            palette.syntax,
         )
         var cursor = start
 
@@ -874,13 +884,13 @@ class GridCodeEditorAdapter : JPanel(), CodeEditorAdapter {
             val tokenStart = token.start.coerceAtLeast(start)
             val tokenEnd = token.endExclusive.coerceAtMost(end)
             if (tokenEnd <= tokenStart) return@forEach
-            if (cursor < tokenStart) drawSegment(cursor, tokenStart, RegexSyntaxHighlighter.Default)
+            if (cursor < tokenStart) drawSegment(cursor, tokenStart, palette.defaultText)
             drawSegment(tokenStart, tokenEnd, token.color)
             cursor = tokenEnd.coerceAtLeast(cursor)
         }
-        if (cursor < end) drawSegment(cursor, end, RegexSyntaxHighlighter.Default)
+        if (cursor < end) drawSegment(cursor, end, palette.defaultText)
         if (diagnostics.any { it.line == visualRow.lineIndex + 1 }) {
-            g2.color = Color(0xff6b68)
+            g2.color = palette.diagnosticError
             g2.fillRect(gutterWidth, baseline + 3, max(1, (end - start) * charWidth), 2)
         }
     }
@@ -901,7 +911,7 @@ class GridCodeEditorAdapter : JPanel(), CodeEditorAdapter {
             val visibleStart = start.coerceAtLeast(visualRow.startColumn)
             val visibleEnd = end.coerceAtMost(visualRow.endColumn)
             if (visibleEnd <= visibleStart) return@forEach
-            g2.color = Color(0x3a5f8a)
+            g2.color = palette.selection
             g2.fillRect(
                 gutterWidth + (visibleStart - visualRow.startColumn) * charWidth,
                 row * lineHeight,
@@ -922,9 +932,9 @@ class GridCodeEditorAdapter : JPanel(), CodeEditorAdapter {
         val lineIndex = visualRow.lineIndex
         val diagnostic = diagnostics.firstOrNull { it.line == lineIndex + 1 } ?: return
         g2.color = when (diagnostic.severity) {
-            DiagnosticSeverity.Error -> Color(0xff5555)
-            DiagnosticSeverity.Warning -> Color(0xd7ba7d)
-            DiagnosticSeverity.Info -> Color(0x75beff)
+            DiagnosticSeverity.Error -> palette.diagnosticError
+            DiagnosticSeverity.Warning -> palette.diagnosticWarning
+            DiagnosticSeverity.Info -> palette.diagnosticInfo
         }
         val column = (diagnostic.column ?: 1).coerceAtLeast(1) - 1
         if (column in visualRow.startColumn until visualRow.endColumn) {
@@ -944,7 +954,7 @@ class GridCodeEditorAdapter : JPanel(), CodeEditorAdapter {
         visualRows: List<VisualRow>,
     ) {
         if (!hasFocus() || !cursorVisible) return
-        g2.color = Color(0xf2f2f2)
+        g2.color = palette.caret
         cursorStates().forEach { state ->
             val visualIndex = visualRows.indexOfCaret(state.caret)
             val row = visualIndex - scrollVisualRow
@@ -1016,13 +1026,13 @@ class GridCodeEditorAdapter : JPanel(), CodeEditorAdapter {
         val x = point.x.coerceIn(4, max(4, width - popupWidth - 4))
         val bodyPointY = (point.y - pinnedHeaderHeight(metrics)).coerceAtLeast(0)
         val y = (bodyPointY + lineHeight).coerceIn(4, max(4, bodyHeight() - popupHeight - 4))
-        g2.color = Color(0x252526)
+        g2.color = palette.popupBackground
         g2.fillRoundRect(x, y, popupWidth, popupHeight, 6, 6)
-        g2.color = Color(0x5f5f5f)
+        g2.color = palette.popupBorder
         g2.drawRoundRect(x, y, popupWidth, popupHeight, 6, 6)
-        g2.color = Color(0x9cdcfe)
+        g2.color = palette.popupTitle
         g2.drawString(info.title, x + 10, y + metrics.ascent + 5)
-        g2.color = Color(0xd4d4d4)
+        g2.color = palette.popupDetail
         bodyLines.forEachIndexed { index, line ->
             g2.drawString(line, x + 10, y + (index + 2) * lineHeight + 5)
         }
@@ -1066,21 +1076,21 @@ class GridCodeEditorAdapter : JPanel(), CodeEditorAdapter {
         val visibleItems = completionItems
             .drop(completionScrollOffset)
             .take(geometry.visibleItemCount)
-        g2.color = Color(0x252526)
+        g2.color = palette.popupBackground
         g2.fillRect(x, y, popupWidth, popupHeight)
-        g2.color = Color(0x5f5f5f)
+        g2.color = palette.popupBorder
         g2.drawRect(x, y, popupWidth, popupHeight)
         visibleItems.forEachIndexed { visibleIndex, item ->
             val index = completionScrollOffset + visibleIndex
             val rowY = y + 3 + visibleIndex * lineHeight
             if (index == completionIndex) {
-                g2.color = Color(0x094771)
+                g2.color = palette.completionSelection
                 g2.fillRect(x + 1, rowY, popupWidth - 2, lineHeight)
             }
-            g2.color = semanticColorFor(item.label) ?: Color(0xd4d4d4)
+            g2.color = semanticColorFor(item.label) ?: palette.defaultText
             g2.drawString(item.label.take(72), x + 8, rowY + metrics.ascent)
             if (item.detail.isNotBlank()) {
-                g2.color = Color(0x9cdcfe)
+                g2.color = palette.popupDetail
                 g2.drawString(item.detail.take(84), detailX, rowY + metrics.ascent)
             }
         }
@@ -1101,15 +1111,15 @@ class GridCodeEditorAdapter : JPanel(), CodeEditorAdapter {
         val maxOffset = maxCompletionScrollOffset()
         val thumbTravel = (trackHeight - thumbHeight).coerceAtLeast(1)
         val thumbY = trackY + if (maxOffset == 0) 0 else thumbTravel * completionScrollOffset / maxOffset
-        g2.color = Color(0x3c3c3c)
+        g2.color = palette.scrollbarTrack
         g2.fillRect(trackX, trackY, 4, trackHeight)
-        g2.color = Color(0x858585)
+        g2.color = palette.scrollbarThumb
         g2.fillRect(trackX, thumbY, 4, thumbHeight)
     }
 
     private fun drawEditorStatus(g2: Graphics2D, metrics: FontMetrics) {
         val text = "${languageId.ifBlank { "plain" }}  ${caret.line + 1}:${caret.column + 1}${if (readOnly) "  read-only" else ""}"
-        g2.color = Color(0x858585)
+        g2.color = palette.mutedText
         g2.drawString(text, width - metrics.stringWidth(text) - 10, height - 8)
     }
 

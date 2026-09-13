@@ -18,6 +18,18 @@ data class RegexLanguageSyntax(
     val color: Color = RegexSyntaxHighlighter.Keyword,
 )
 
+data class SyntaxColorPalette(
+    val default: Color,
+    val keyword: Color,
+    val comment: Color,
+    val stringLiteral: Color,
+    val numberLiteral: Color,
+    val pebbleExpression: Color,
+    val functionSymbol: Color,
+    val typeSymbol: Color,
+    val valueSymbol: Color,
+)
+
 object RegexSyntaxHighlighter {
     val Default = Color(0xd4d4d4)
     val Keyword = Color(0xcc7832)
@@ -28,6 +40,19 @@ object RegexSyntaxHighlighter {
     private val FunctionSymbol = Color(0xdcdcaa)
     private val TypeSymbol = Color(0x4ec9b0)
     private val ValueSymbol = Color(0x9cdcfe)
+
+    val DarkPalette = SyntaxColorPalette(Default, Keyword, Comment, StringLiteral, NumberLiteral, PebbleExpression, FunctionSymbol, TypeSymbol, ValueSymbol)
+    val LightPalette = SyntaxColorPalette(
+        default = Color(0x24292f),
+        keyword = Color(0x8250df),
+        comment = Color(0x6a737d),
+        stringLiteral = Color(0x0a3069),
+        numberLiteral = Color(0x0550ae),
+        pebbleExpression = Color(0x953800),
+        functionSymbol = Color(0x6f42c1),
+        typeSymbol = Color(0x007c83),
+        valueSymbol = Color(0x005cc5),
+    )
 
     private val stringPattern = Regex(""""(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'""")
     private val blockCommentPattern = Regex("""/\*.*?\*/""")
@@ -58,6 +83,7 @@ object RegexSyntaxHighlighter {
         line: String,
         declarationSymbols: List<DeclarationSymbol> = emptyList(),
         semanticIdentifierColors: Map<String, Color> = emptyMap(),
+        palette: SyntaxColorPalette = DarkPalette,
     ): List<SyntaxToken> {
         if (line.isEmpty()) return emptyList()
         val tokens = mutableListOf<SyntaxToken>()
@@ -73,11 +99,11 @@ object RegexSyntaxHighlighter {
 
         // Pebble delimiters may appear inside any target language, so reserve
         // them before language-specific strings, comments, and keywords.
-        pebblePattern.findAll(line).forEach { add(it.range.first, it.range.last + 1, PebbleExpression) }
-        stringPattern.findAll(line).forEach { add(it.range.first, it.range.last + 1, StringLiteral) }
-        blockCommentPattern.findAll(line).forEach { add(it.range.first, it.range.last + 1, Comment) }
-        lineCommentPattern.find(line)?.let { add(it.range.first, it.range.last + 1, Comment) }
-        numberPattern.findAll(line).forEach { add(it.range.first, it.range.last + 1, NumberLiteral) }
+        pebblePattern.findAll(line).forEach { add(it.range.first, it.range.last + 1, palette.pebbleExpression) }
+        stringPattern.findAll(line).forEach { add(it.range.first, it.range.last + 1, palette.stringLiteral) }
+        blockCommentPattern.findAll(line).forEach { add(it.range.first, it.range.last + 1, palette.comment) }
+        lineCommentPattern.find(line)?.let { add(it.range.first, it.range.last + 1, palette.comment) }
+        numberPattern.findAll(line).forEach { add(it.range.first, it.range.last + 1, palette.numberLiteral) }
 
         languages[normalizeLanguage(languageId).normalizedLanguageKey()]?.let { syntax ->
             syntax.regex.findAll(line).forEach { match ->
@@ -87,7 +113,7 @@ object RegexSyntaxHighlighter {
                     .maxByOrNull { it.range.last - it.range.first }
                     ?.range
                     ?: match.range
-                add(range.first, range.last + 1, syntax.color)
+                add(range.first, range.last + 1, if (syntax.color == Keyword) palette.keyword else syntax.color)
             }
         }
         fun addIdentifier(name: String, color: Color) {
@@ -104,20 +130,20 @@ object RegexSyntaxHighlighter {
         semanticIdentifierColors.entries
             .sortedByDescending { it.key.length }
             .forEach { (name, color) -> addIdentifier(name, color) }
-        declarationSymbols.forEach { symbol -> addIdentifier(symbol.name, semanticColor(symbol.kind)) }
+        declarationSymbols.forEach { symbol -> addIdentifier(symbol.name, semanticColor(symbol.kind, palette)) }
         return tokens.sortedBy { it.start }
     }
 
-    private fun semanticColor(kind: DeclarationSymbolKind): Color = when (kind) {
-        DeclarationSymbolKind.Function -> FunctionSymbol
+    private fun semanticColor(kind: DeclarationSymbolKind, palette: SyntaxColorPalette): Color = when (kind) {
+        DeclarationSymbolKind.Function -> palette.functionSymbol
         DeclarationSymbolKind.Class,
         DeclarationSymbolKind.Interface,
         DeclarationSymbolKind.Struct,
         DeclarationSymbolKind.Union,
         DeclarationSymbolKind.Enum,
-        DeclarationSymbolKind.TypeAlias -> TypeSymbol
+        DeclarationSymbolKind.TypeAlias -> palette.typeSymbol
         DeclarationSymbolKind.Constant,
-        DeclarationSymbolKind.Variable -> ValueSymbol
+        DeclarationSymbolKind.Variable -> palette.valueSymbol
     }
 
     private fun String.isIdentifierBoundary(index: Int): Boolean =

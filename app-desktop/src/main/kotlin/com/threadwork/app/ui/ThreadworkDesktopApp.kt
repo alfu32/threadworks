@@ -5,6 +5,7 @@ import com.threadwork.app.editor.EditorCompletionContext
 import com.threadwork.app.editor.EditorHoverInfo
 import com.threadwork.app.editor.EditorHoverRequest
 import com.threadwork.app.editor.GridCodeEditorAdapter
+import com.threadwork.app.editor.EditorPalette
 import com.threadwork.app.editor.ThreadworkEditorSettings
 import com.threadwork.app.editor.RegexSyntaxHighlighter
 import com.threadwork.app.fonts.ThreadworkFonts
@@ -301,6 +302,7 @@ class ThreadworkDesktopApp(
         ::openNodeInEntityEditor,
         ::showCommandContextMenu,
         ::importDroppedFiles,
+        ::checkpointHistory,
     )
     private val hierarchyTree = JTree()
     private val detailsHierarchyTree = JTree()
@@ -611,8 +613,7 @@ class ThreadworkDesktopApp(
             )
             addTab("Project Management", projectManagementPanel)
             archetypesPanel = WorkflowArchetypesPanel(store) { archetype ->
-                canvas.insertArchetype(archetype)
-                checkpointHistory()
+                armArchetypeInsertion(archetype)
             }
             addTab(
                 "Archetypes",
@@ -847,7 +848,51 @@ class ThreadworkDesktopApp(
                 })
                 previousGroup = group
             }
+        val canvasComponent = component as? GraphCanvas
+        val contextualNode = canvasComponent?.nodeAtScreen(Point(x, y))
+        val archetypeEntries = archetypesPanel.availableTemplates()
+            .filter { contextualNode == null || archetypeMatchesTechnology(it.document, contextualNode) }
+        if (archetypeEntries.isNotEmpty()) {
+            popup.addSeparator()
+            val archetypes = JMenu("Archetypes")
+            archetypeEntries.groupBy(WorkflowArchetypeTemplate::group).forEach { (group, entries) ->
+                val groupMenu = if (archetypeEntries.map(WorkflowArchetypeTemplate::group).distinct().size > 1) {
+                    JMenu(group.replace('-', ' ').replaceFirstChar { it.uppercase() })
+                } else {
+                    archetypes
+                }
+                entries.forEach { template ->
+                    groupMenu.add(JMenuItem(template.label).apply {
+                        toolTipText = template.description
+                        addActionListener { armArchetypeInsertion(template) }
+                    })
+                }
+                if (groupMenu !== archetypes) archetypes.add(groupMenu)
+            }
+            popup.add(archetypes)
+        }
         if (popup.componentCount > 0) popup.show(component, x, y)
+    }
+
+    private fun armArchetypeInsertion(template: WorkflowArchetypeTemplate) {
+        projectPanels.selectedIndex = 0
+        canvas.armArchetypeInsertion(template.document)
+        status.text = "Choose a placement for ${template.label}."
+    }
+
+    private fun archetypeMatchesTechnology(document: ThreadworkDocument, node: Node): Boolean {
+        val targetTechnologies = setOf(node.technology.technologyId, document.effectiveTechnologyId(node.id))
+            .map(String::trim)
+            .filter(String::isNotBlank)
+            .toSet()
+        if (targetTechnologies.isEmpty()) return true
+        val archetypeTechnologies = document.nodes.values.flatMap { archetypeNode ->
+            listOf(
+                archetypeNode.technology.technologyId,
+                document.effectiveTechnologyId(archetypeNode.id),
+            )
+        }.map(String::trim).filter(String::isNotBlank).toSet()
+        return archetypeTechnologies.isEmpty() || targetTechnologies.any(archetypeTechnologies::contains)
     }
 
     private fun updateTileProgress(done: Int, total: Int, active: Boolean) {
@@ -2755,6 +2800,7 @@ class GraphCanvas(
     private val onNodeDoubleClicked: (NodeId) -> Unit = {},
     private val onContextMenu: (Component, Int, Int) -> Unit = { _, _, _ -> },
     private val onFilesDropped: (List<Path>, Point) -> Unit = { _, _ -> },
+    private val onArchetypeInserted: () -> Unit = {},
 ) : JPanel() {
     var mode: CanvasMode = CanvasMode.Select
         private set
@@ -2775,6 +2821,8 @@ class GraphCanvas(
     private var selectionRect: Rectangle? = null
     private var linkSource: NodeId? = null
     private var linkPreviewPoint: Point? = null
+    private var archetypePreview: ThreadworkDocument? = null
+    private var archetypePreviewPoint: Point? = null
     private var clipboard: List<Node> = emptyList()
     private var zoom = 1.0
     private var panX = 0.0
@@ -3052,6 +3100,8 @@ class GraphCanvas(
     }
 
     fun setMode(nextMode: CanvasMode) {
+        archetypePreview = null
+        archetypePreviewPoint = null
         if (mode != nextMode) {
             linkSource = null
             linkPreviewPoint = null
@@ -3242,19 +3292,26 @@ class GraphCanvas(
         pasteEntities(clipboard, preserveStatus = true)
     }
 
-    fun insertArchetype(document: ThreadworkDocument) {
+    fun insertArchetype(document: ThreadworkDocument, placement: Point? = null) {
         val entities = document.nodes.values
             .filter { it.id != document.rootNodeId }
             .map(::clipboardCopy)
-        pasteEntities(entities, preserveStatus = false)
-        zoomExtentsAfterLayout()
+        pasteEntities(entities, preserveStatus = false, placement = placement)
+        if (placement == null) zoomExtentsAfterLayout()
     }
 
-    private fun pasteEntities(entities: List<Node>, preserveStatus: Boolean) {
+    private fun pasteEntities(entities: List<Node>, preserveStatus: Boolean, placement: Point? = null) {
         val root = repository.getDocument().rootNodeId
         val pasted = mutableListOf<NodeId>()
         val snapshots = entities.associateBy(Node::id)
         val copiedIds = linkedMapOf<NodeId, NodeId>()
+        val placementOffset = placement?.let { point ->
+            entities.filterNot(Node::isLink)
+                .map(Node::layout)
+                .map { it.rect() }
+                .reduceOrNull { left, right -> left.union(right) }
+                ?.let { bounds -> point.x - bounds.x.toDouble() to point.y - bounds.y.toDouble() }
+        } ?: (40.0 to 40.0)
         val selectedNodes = entities.filterNot(Node::isLink).sortedBy { snapshot ->
             generateSequence(snapshot.parentId) { snapshots[it]?.parentId }.count()
         }
@@ -3262,7 +3319,7 @@ class GraphCanvas(
             val parentId = node.parentId?.let(copiedIds::get) ?: root
             val copy = repository.createNode(parentId, node.name, node.kind)
             copiedIds[node.id] = copy.id
-            applyClipboardNode(copy, node, copiedIds, preserveStatus)
+            applyClipboardNode(copy, node, copiedIds, preserveStatus, placementOffset)
             pasted += copy.id
         }
         entities.filter(Node::isLink).forEach { node ->
@@ -3278,7 +3335,7 @@ class GraphCanvas(
                 targetPortName = link.targetPortName,
             )
             copiedIds[node.id] = copy.id
-            applyClipboardNode(copy, node, copiedIds, preserveStatus)
+            applyClipboardNode(copy, node, copiedIds, preserveStatus, placementOffset)
             repository.updateLinkData(
                 copy.id,
                 link.copy(
@@ -3319,10 +3376,14 @@ class GraphCanvas(
         source: Node,
         copiedIds: Map<NodeId, NodeId>,
         preserveStatus: Boolean,
+        placementOffset: Pair<Double, Double> = 40.0 to 40.0,
     ) {
         repository.updateNodeLayout(
             copy.id,
-            source.layout.copy(x = source.layout.x + 40, y = source.layout.y + 40),
+            source.layout.copy(
+                x = source.layout.x + placementOffset.first,
+                y = source.layout.y + placementOffset.second,
+            ),
         )
         repository.updateNodeText(copy.id, source.text.copy())
         repository.updateNodeBinaryContent(copy.id, source.binaryContent?.copyOf())
@@ -3623,6 +3684,7 @@ class GraphCanvas(
             g2.draw(screenRect)
         }
         drawLinkPreview(g2)
+        drawArchetypePreview(g2)
         drawSelectionBounds(g2)
         drawViewportHierarchyPath(g2)
         g2.stroke = previousStroke
@@ -3653,6 +3715,59 @@ class GraphCanvas(
             drawPortMarker(g2, anchor.point, anchor.xDirection, outgoing = true)
             drawPreviewTargetMarker(g2, cursor)
             drawPreviewLinkLabel(g2, source, pointAlongRoute(points, 0.5), color)
+        } finally {
+            g2.transform = previousTransform
+            g2.color = previousColor
+            g2.stroke = previousStroke
+            g2.font = previousFont
+        }
+    }
+
+    private fun drawArchetypePreview(g2: Graphics2D) {
+        val document = archetypePreview ?: return
+        val cursor = archetypePreviewPoint ?: return
+        val nodes = document.nodes.values.filter { it.id != document.rootNodeId && !it.isLink }
+        val bounds = nodes.map(Node::layout).map { it.rect() }.reduceOrNull { left, right -> left.union(right) } ?: return
+        val dx = cursor.x - bounds.x
+        val dy = cursor.y - bounds.y
+        val previousTransform = g2.transform
+        val previousColor = g2.color
+        val previousStroke = g2.stroke
+        val previousFont = g2.font
+        try {
+            g2.translate(panX * zoom, panY * zoom)
+            g2.scale(zoom, zoom)
+            val ghostFill = activePalette[DesignerColorKey.Selection].let {
+                Color(it.red, it.green, it.blue, 0x38)
+            }
+            val ghostStroke = activePalette[DesignerColorKey.Selection].let {
+                Color(it.red, it.green, it.blue, 0xb0)
+            }
+            g2.stroke = BasicStroke(2f)
+            document.nodes.values.filter(Node::isLink).forEach { linkNode ->
+                val link = linkNode.link ?: return@forEach
+                val source = document.nodes[link.sourceNodeId] ?: return@forEach
+                val target = document.nodes[link.targetNodeId] ?: return@forEach
+                val sourceCenter = source.layout.center()
+                val targetCenter = target.layout.center()
+                g2.color = ghostStroke
+                g2.drawLine(
+                    sourceCenter.x + dx,
+                    sourceCenter.y + dy,
+                    targetCenter.x + dx,
+                    targetCenter.y + dy,
+                )
+            }
+            nodes.forEach { node ->
+                val rect = node.layout.rect().apply { translate(dx, dy) }
+                g2.color = ghostFill
+                g2.fillRect(rect.x, rect.y, rect.width, rect.height)
+                g2.color = ghostStroke
+                g2.drawRect(rect.x, rect.y, rect.width, rect.height)
+                g2.color = activePalette[DesignerColorKey.TextPrimary]
+                g2.font = designerFont
+                g2.drawString(nodeDisplayName(node).ifBlank { node.kind.name }, rect.x + 12, rect.y + 22)
+            }
         } finally {
             g2.transform = previousTransform
             g2.color = previousColor
@@ -6256,6 +6371,17 @@ class GraphCanvas(
             return
         }
         val point = modelPoint(e.point)
+        if (mode == CanvasMode.Select && archetypePreview != null && SwingUtilities.isLeftMouseButton(e)) {
+            val document = archetypePreview
+            archetypePreview = null
+            archetypePreviewPoint = null
+            if (document != null) {
+                insertArchetype(document, point)
+                onArchetypeInserted()
+            }
+            repaint()
+            return
+        }
         dragStart = point
         dragScreenStart = Point(e.point)
         pressShiftDown = e.isShiftDown
@@ -6398,6 +6524,11 @@ class GraphCanvas(
     }
 
     private fun handleMoved(e: MouseEvent) {
+        if (archetypePreview != null) {
+            archetypePreviewPoint = modelPoint(e.point)
+            repaint()
+            return
+        }
         if (mode != CanvasMode.CreateLink) return
         updateLinkPreview(modelPoint(e.point))
         repaint()
@@ -6409,6 +6540,15 @@ class GraphCanvas(
             repaint()
         }
     }
+
+    fun armArchetypeInsertion(document: ThreadworkDocument) {
+        if (mode != CanvasMode.Select) setMode(CanvasMode.Select)
+        archetypePreview = document
+        archetypePreviewPoint = null
+        repaint()
+    }
+
+    fun nodeAtScreen(point: Point): Node? = hitNode(modelPoint(point))?.let(repository::getNode)
 
     private fun updateLinkPreview(point: Point) {
         linkPreviewPoint = linkSource
@@ -6424,15 +6564,24 @@ class GraphCanvas(
         }
         val wasDrag = dragThresholdExceeded
         selectionRect?.let { rect ->
-            selection.clear()
+            val windowSelection = linkedSetOf<NodeId>()
             val containsOnly = selectionDragLeftToRight
             visibleNodes()
                 .filter { if (containsOnly) rect.contains(it.layout.rect()) else it.layout.rect().intersects(rect) }
-                .forEach { selection += it.id }
+                .forEach { windowSelection += it.id }
             visibleLinks()
                 .filter { linkInsideSelection(it, rect, containsOnly) }
-                .forEach { selection += it.id }
+                .forEach { windowSelection += it.id }
+            if (!pressShiftDown) {
+                selection.clear()
+                selection += windowSelection
+            } else {
+                windowSelection.forEach { id ->
+                    if (!selection.add(id)) selection.remove(id)
+                }
+            }
             selectionRect = null
+            onSelectionChanged()
         }
         if (!wasDrag && mode == CanvasMode.Select) selectAtPress()
         if (wasDrag && moveDragReference != null && selection.isNotEmpty() && dragAllowsReparent) {
@@ -6452,7 +6601,7 @@ class GraphCanvas(
             dragAllowsReparent = pressControlDown
             moveDragReference = initialMoveReference(start, movingSelectedNode.layout.rect())
         } else {
-            selection.clear()
+            if (!pressShiftDown) selection.clear()
             selectionRect = Rectangle(start)
             selectionDragLeftToRight = true
             dragAllowsReparent = false
@@ -6468,20 +6617,24 @@ class GraphCanvas(
             return
         }
         if (hitLinkId != null && hitNode?.isComposite == true) {
-            if (!pressShiftDown) selection.clear()
-            selection += hitLinkId
+            toggleSelectionAtPress(hitLinkId)
         } else if (hitNodeId != null) {
-            if (hitNodeId !in selection) {
-                if (!pressShiftDown) selection.clear()
-                selection += hitNodeId
-            }
+            toggleSelectionAtPress(hitNodeId)
         } else if (hitLinkId != null) {
-            if (!pressShiftDown) selection.clear()
-            selection += hitLinkId
-        } else {
+            toggleSelectionAtPress(hitLinkId)
+        } else if (!pressShiftDown) {
             selection.clear()
         }
         onSelectionChanged()
+    }
+
+    private fun toggleSelectionAtPress(id: NodeId) {
+        if (pressShiftDown) {
+            if (!selection.add(id)) selection.remove(id)
+        } else if (id !in selection) {
+            selection.clear()
+            selection += id
+        }
     }
 
     private fun resetPointerGesture() {
@@ -8205,8 +8358,12 @@ private class NodeTextEditor(
 
     fun applyPalette(palette: DesignerPalette) {
         activePalette = palette
+        editorPalette().let { next -> editorsBySection.values.forEach { it.setEditorPalette(next) } }
         editorsBySection.values.forEach(::applySemanticIdentifierPresentation)
     }
+
+    private fun editorPalette(): EditorPalette =
+        if (ThreadworkAppearance.theme == ApplicationTheme.Light) EditorPalette.light() else EditorPalette.dark()
 
     fun setNativeDiagnostics(diagnostics: List<Diagnostic>) {
         editorsBySection.forEach { (section, editor) ->
@@ -8299,6 +8456,7 @@ private class NodeTextEditor(
 
     private fun addTextTab(spec: TextTabSpec) {
         val editor = GridCodeEditorAdapter()
+        editor.setEditorPalette(editorPalette())
         editor.setEditorFont(ThreadworkFonts.codeFont(14f))
         val node = repository.requireNode(nodeId)
         val languageSelector = JComboBox(languageChoices(spec).toTypedArray()).apply {
@@ -8380,6 +8538,7 @@ private class NodeTextEditor(
 
     private fun addTestsTab() {
         val editor = GridCodeEditorAdapter()
+        editor.setEditorPalette(editorPalette())
         editor.setEditorFont(ThreadworkFonts.codeFont(14f))
         val node = repository.requireNode(nodeId)
         val languageSelector = JComboBox(languageChoicesForTests().toTypedArray()).apply {

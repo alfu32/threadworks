@@ -34,7 +34,7 @@ internal data class WorkflowArchetypeTemplate(
 
 internal class WorkflowArchetypesPanel(
     private val store: KotlinxJsonDocumentStore,
-    onInsert: (ThreadworkDocument) -> Unit,
+    onInsert: (WorkflowArchetypeTemplate) -> Unit,
 ) : JPanel(BorderLayout()) {
     private var templates = emptyList<WorkflowArchetypeTemplate>()
     private val snapshotJson = Json { encodeDefaults = true }
@@ -59,7 +59,7 @@ internal class WorkflowArchetypesPanel(
             onModeChanged = {},
         )
         insertButton.addActionListener {
-            selectedTemplate?.let { template -> onInsert(template.document) }
+            selectedTemplate?.let(onInsert)
         }
         val left = JPanel(BorderLayout()).apply {
             border = BorderFactory.createEmptyBorder(6, 6, 6, 6)
@@ -86,6 +86,8 @@ internal class WorkflowArchetypesPanel(
         insertButton.isEnabled = false
         templates.firstOrNull()?.let(::selectTemplate)
     }
+
+    fun availableTemplates(): List<WorkflowArchetypeTemplate> = templates
 
     private fun createAccordion(): JComponent {
         val selectionGroup = ButtonGroup()

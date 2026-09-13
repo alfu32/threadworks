@@ -29,8 +29,8 @@
                 "node_718e99d5-14cd-4e91-a38c-9681d806b3fa",
                 "link_1288a22f-f546-4975-a5f1-00518d9f48e7",
                 "node_3fcc850e-744b-4b6b-812c-35983aad4a82",
-                "link_e015747c-e326-4abb-aa72-85a5098293aa",
-                "link_e2173d13-86b1-440b-88f8-77a1c4628b9c"
+                "link_e2173d13-86b1-440b-88f8-77a1c4628b9c",
+                "link_7997954b-3628-42ef-bdfd-1146684c6a6c"
             ],
             "incomingLinks": [],
             "outgoingLinks": [],
@@ -72,7 +72,7 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-13T09:36:24.525339605Z",
+                "date": "2026-09-13T09:44:58.188710411Z",
                 "user": "ioan.alferaru@gmail.com"
             },
             "ports": [],
@@ -1125,9 +1125,7 @@
                 "link_092ff7b9-ab6b-4ca5-9fe6-5029ffc1323f",
                 "link_c45a18d4-b741-462e-af71-75a182c0de9a"
             ],
-            "incomingLinks": [
-                "link_e015747c-e326-4abb-aa72-85a5098293aa"
-            ],
+            "incomingLinks": [],
             "outgoingLinks": [],
             "layout": {
                 "x": 3.0,
@@ -1167,7 +1165,7 @@
             },
             "responsible": "github|ioan.alferaru@gmail.com|",
             "modified": {
-                "date": "2026-09-13T09:36:18.750913755Z",
+                "date": "2026-09-13T09:44:52.560954316Z",
                 "user": "ioan.alferaru@gmail.com"
             },
             "ports": [
@@ -1480,7 +1478,9 @@
                 "link_a8ce6267-aa95-4362-84e5-c2929e395f3a",
                 "link_189bb051-11a0-4914-8cdc-aba75c081412"
             ],
-            "outgoingLinks": [],
+            "outgoingLinks": [
+                "link_7997954b-3628-42ef-bdfd-1146684c6a6c"
+            ],
             "layout": {
                 "x": 183.0,
                 "y": 880.0,
@@ -1519,7 +1519,7 @@
             },
             "responsible": "alfu32",
             "modified": {
-                "date": "2026-09-09T10:04:33.623107045Z",
+                "date": "2026-09-13T09:44:58.188710411Z",
                 "user": "ioan.alferaru@gmail.com"
             },
             "ports": [
@@ -1527,6 +1527,13 @@
                     "id": "input_in",
                     "name": "in",
                     "direction": "Input",
+                    "dataType": "",
+                    "metadata": {}
+                },
+                {
+                    "id": "output_out",
+                    "name": "out",
+                    "direction": "Output",
                     "dataType": "",
                     "metadata": {}
                 }
@@ -2504,20 +2511,20 @@
         },
         {
             "id": "node_3fcc850e-744b-4b6b-812c-35983aad4a82",
-            "name": "selfmem",
+            "name": "memory_example",
             "kind": "Processor",
             "parentId": "root",
             "children": [],
             "incomingLinks": [
-                "link_e2173d13-86b1-440b-88f8-77a1c4628b9c"
+                "link_e2173d13-86b1-440b-88f8-77a1c4628b9c",
+                "link_7997954b-3628-42ef-bdfd-1146684c6a6c"
             ],
             "outgoingLinks": [
-                "link_e015747c-e326-4abb-aa72-85a5098293aa",
                 "link_e2173d13-86b1-440b-88f8-77a1c4628b9c"
             ],
             "layout": {
-                "x": -429.0,
-                "y": 925.0,
+                "x": -727.0,
+                "y": 945.0,
                 "width": 200.0,
                 "height": 108.0,
                 "closedWidth": 200.0,
@@ -2530,11 +2537,11 @@
             "text": {
                 "initialization": "",
                 "initializationLanguageId": "",
-                "source": "",
+                "source": "// todo",
                 "sourceLanguageId": "",
-                "specification": "",
+                "specification": "# purpose\n\nthis node is supposed to exemplify how to use a self targeting link to memorize data between execution passes.\n\nmemory for that data is allocated naturally by the threadwork links implementation ( the ones that do allocate and deallocate most of the actual memory /buffers\n\n\n## case\n\nin our case we will simply increment the integer value received in $mem and push it back to  $mem, $lnk will not be used",
                 "specificationLanguageId": "markdown",
-                "tests": "",
+                "tests": "[\n    {\n        \"case\": \"1\",\n        \"input.mem\": \"1\",\n        \"input.lnk\": \"1\",\n        \"expected.mem\": \"2\"\n    },\n    {\n        \"case\": \"2\",\n        \"input.mem\": \"1\",\n        \"input.lnk\": \"1\",\n        \"expected.mem\": \"3\"\n    },\n    {\n        \"case\": \"1000\",\n        \"input.mem\": \"1\",\n        \"input.lnk\": \"1\",\n        \"expected.mem\": \"1001\"\n    }\n]",
                 "testsLanguageId": "json",
                 "aiInstructions": "",
                 "aiInstructionsLanguageId": "markdown"
@@ -2553,7 +2560,7 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-13T09:36:24.525339605Z",
+                "date": "2026-09-13T09:57:29.457762707Z",
                 "user": "ioan.alferaru@gmail.com"
             },
             "ports": [
@@ -2578,20 +2585,26 @@
             "metadata": {},
             "pluginData": {},
             "nameDetail": "",
-            "status": "BUSINESS",
+            "status": "FUNCTIONAL",
             "statusChanges": [
                 {
                     "userId": "ioan.alferaru@gmail.com",
                     "changedDate": "2026-09-13T09:10:00.470416526Z",
                     "initStatus": null,
                     "endStatus": "BUSINESS"
+                },
+                {
+                    "userId": "ioan.alferaru@gmail.com",
+                    "changedDate": "2026-09-13T09:50:10.151063717Z",
+                    "initStatus": "BUSINESS",
+                    "endStatus": "FUNCTIONAL"
                 }
             ],
-            "assignee": null
+            "assignee": "google|ioan.alferaru@gmail.com|"
         },
         {
-            "id": "link_e015747c-e326-4abb-aa72-85a5098293aa",
-            "name": "selfmem -> routes",
+            "id": "link_e2173d13-86b1-440b-88f8-77a1c4628b9c",
+            "name": "mem",
             "kind": "Link",
             "parentId": "root",
             "children": [],
@@ -2635,19 +2648,19 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-13T09:36:18.750913755Z",
+                "date": "2026-09-13T09:44:21.092078521Z",
                 "user": "ioan.alferaru@gmail.com"
             },
             "ports": [],
             "link": {
                 "sourceNodeId": "node_3fcc850e-744b-4b6b-812c-35983aad4a82",
                 "sourcePortName": "out",
-                "targetNodeId": "node_6fe0a353-135a-4433-b77b-4521da00d728",
+                "targetNodeId": "node_3fcc850e-744b-4b6b-812c-35983aad4a82",
                 "targetPortName": "in",
                 "transportKind": "in-process",
                 "typeName": "",
                 "payloadDefinition": "",
-                "typeDefinitionId": "",
+                "typeDefinitionId": "string",
                 "compositeBoundaryIds": [],
                 "interactionKind": "data"
             },
@@ -2661,8 +2674,8 @@
             "assignee": null
         },
         {
-            "id": "link_e2173d13-86b1-440b-88f8-77a1c4628b9c",
-            "name": "selfmem -> selfmem",
+            "id": "link_7997954b-3628-42ef-bdfd-1146684c6a6c",
+            "name": "lnk",
             "kind": "Link",
             "parentId": "root",
             "children": [],
@@ -2706,12 +2719,12 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-13T09:36:24.525339605Z",
+                "date": "2026-09-13T09:54:05.722827668Z",
                 "user": "ioan.alferaru@gmail.com"
             },
             "ports": [],
             "link": {
-                "sourceNodeId": "node_3fcc850e-744b-4b6b-812c-35983aad4a82",
+                "sourceNodeId": "node_37b69371-59f6-4a2c-b4eb-29f7edcdbf8d",
                 "sourcePortName": "out",
                 "targetNodeId": "node_3fcc850e-744b-4b6b-812c-35983aad4a82",
                 "targetPortName": "in",
@@ -2719,7 +2732,9 @@
                 "typeName": "",
                 "payloadDefinition": "",
                 "typeDefinitionId": "",
-                "compositeBoundaryIds": [],
+                "compositeBoundaryIds": [
+                    "node_6fe0a353-135a-4433-b77b-4521da00d728"
+                ],
                 "interactionKind": "data"
             },
             "typeDefinition": null,
@@ -2748,7 +2763,7 @@
             "username": "",
             "fullName": "Ioan Alferaru",
             "role": "",
-            "refreshedAt": "2026-09-13T09:35:52.164807366Z"
+            "refreshedAt": "2026-09-13T09:48:08.518449922Z"
         },
         {
             "identifier": "alferaru.ioan@gmail.com",
@@ -2844,7 +2859,7 @@
             "username": "",
             "fullName": "",
             "role": "",
-            "refreshedAt": "2026-09-13T09:36:24.525339605Z"
+            "refreshedAt": "2026-09-13T09:57:29.457762707Z"
         }
     ]
 }
