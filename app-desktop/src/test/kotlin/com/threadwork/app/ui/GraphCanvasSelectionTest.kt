@@ -13,6 +13,24 @@ import kotlin.test.assertTrue
 
 class GraphCanvasSelectionTest {
     @Test
+    fun `link mode permits selecting the same entity as source and target`() {
+        val repository = InMemoryDocumentRepository(newDocument("self link creation"))
+        val root = repository.getDocument().rootNodeId
+        val node = repository.createNode(root, "node", NodeKind.Processor)
+        position(repository, node, 100, 100)
+        val canvas = GraphCanvas(repository, linkedSetOf(), {}, {}, {})
+        canvas.setMode(CanvasMode.CreateLink)
+        canvas.refreshBoundsFromChildren()
+
+        click(canvas, 120, 120)
+        click(canvas, 120, 120)
+
+        val link = repository.getDocument().nodes.values.single { it.isLink }
+        assertEquals(node.id, link.link?.sourceNodeId)
+        assertEquals(node.id, link.link?.targetNodeId)
+    }
+
+    @Test
     fun `selection click is committed on release`() {
         val repository = InMemoryDocumentRepository(newDocument("selection click"))
         val root = repository.getDocument().rootNodeId
@@ -50,6 +68,11 @@ class GraphCanvasSelectionTest {
         val modifiers = if (alt) InputEvent.ALT_DOWN_MASK else 0
         val event = MouseEvent(canvas, MouseEvent.MOUSE_PRESSED, 0, modifiers, x, y, 1, false, MouseEvent.BUTTON1)
         canvas.mouseListeners.forEach { it.mousePressed(event) }
+    }
+
+    private fun click(canvas: GraphCanvas, x: Int, y: Int) {
+        press(canvas, x, y)
+        release(canvas, x, y)
     }
 
     private fun drag(canvas: GraphCanvas, x: Int, y: Int) {

@@ -2774,6 +2774,7 @@ class GraphCanvas(
     private var panDragStart: Point? = null
     private var selectionRect: Rectangle? = null
     private var linkSource: NodeId? = null
+    private var linkPreviewPoint: Point? = null
     private var clipboard: List<Node> = emptyList()
     private var zoom = 1.0
     private var panX = 0.0
@@ -2981,6 +2982,8 @@ class GraphCanvas(
                 handlePressed(e)
             }
             override fun mouseDragged(e: MouseEvent) = handleDragged(e)
+            override fun mouseMoved(e: MouseEvent) = handleMoved(e)
+            override fun mouseExited(e: MouseEvent) = handleExited()
             override fun mouseReleased(e: MouseEvent) {
                 if (contextMenuPending || contextMenuShown || e.isPopupTrigger) {
                     if (!contextMenuShown) showContextMenu(e)
@@ -3051,6 +3054,7 @@ class GraphCanvas(
     fun setMode(nextMode: CanvasMode) {
         if (mode != nextMode) {
             linkSource = null
+            linkPreviewPoint = null
             resetPointerGesture()
         }
         mode = nextMode
@@ -3618,9 +3622,108 @@ class GraphCanvas(
             }
             g2.draw(screenRect)
         }
+        drawLinkPreview(g2)
         drawSelectionBounds(g2)
         drawViewportHierarchyPath(g2)
         g2.stroke = previousStroke
+        g2.font = previousFont
+    }
+
+    private fun drawLinkPreview(g2: Graphics2D) {
+        if (mode != CanvasMode.CreateLink) return
+        val source = linkSource?.let(repository::getNode) ?: return
+        val cursor = linkPreviewPoint ?: return
+        if (source.isLink || source.isType || !isVisibleInCanvas(source)) return
+        val anchor = previewSourceAnchor(source, cursor)
+        val points = previewLinkPoints(source, anchor, cursor)
+        if (points.size < 2) return
+
+        val previousTransform = g2.transform
+        val previousColor = g2.color
+        val previousStroke = g2.stroke
+        val previousFont = g2.font
+        try {
+            g2.translate(panX * zoom, panY * zoom)
+            g2.scale(zoom, zoom)
+            val color = activePalette[DesignerColorKey.Selection]
+            g2.color = color
+            g2.stroke = BasicStroke(2f)
+            points.zipWithNext().forEach { (a, b) -> g2.drawLine(a.x, a.y, b.x, b.y) }
+            drawArrowAlongRoute(g2, points)
+            drawPortMarker(g2, anchor.point, anchor.xDirection, outgoing = true)
+            drawPreviewTargetMarker(g2, cursor)
+            drawPreviewLinkLabel(g2, source, pointAlongRoute(points, 0.5), color)
+        } finally {
+            g2.transform = previousTransform
+            g2.color = previousColor
+            g2.stroke = previousStroke
+            g2.font = previousFont
+        }
+    }
+
+    private fun previewSourceAnchor(source: Node, cursor: Point): PortAnchor {
+        val rect = source.layout.rect()
+        val side = if (cursor.x >= source.layout.center().x) 1 else -1
+        val existing = source.outgoingLinks
+            .mapNotNull(repository::getNode)
+            .filter(::isVisibleLink)
+            .filterNot(::isDependencyAnnotation)
+            .filter { portSide(source, it) == side }
+        val cursorOrder = previewPortOrderValue(source, cursor, side)
+        val index = existing.count { portOrderValue(source, it, side) <= cursorOrder }
+        return PortAnchor(
+            Point(
+                if (side > 0) rect.x + rect.width + PORT_OUTSIDE_OFFSET else rect.x - PORT_OUTSIDE_OFFSET,
+                rect.y + portTopSpacing(source) + index * PORT_SPACING,
+            ),
+            side,
+        )
+    }
+
+    private fun previewPortOrderValue(source: Node, cursor: Point, side: Int): Double {
+        val center = source.layout.center()
+        val dx = cursor.x - center.x
+        if (dx == 0) return (center.y + cursor.y) / 2.0
+        val edgeX = if (side < 0) source.layout.x else source.layout.x + source.layout.width
+        val ratio = (edgeX - center.x) / dx
+        return center.y + (cursor.y - center.y) * ratio
+    }
+
+    private fun previewLinkPoints(source: Node, anchor: PortAnchor, cursor: Point): List<Point> {
+        val sourceStub = Point(anchor.point.x + PORT_STUB_LENGTH * anchor.xDirection, anchor.point.y)
+        val bounds = source.layout.rect()
+        return if (bounds.contains(cursor)) {
+            val clearance = PORT_STUB_LENGTH + ROUTING_STEP
+            val outerX = if (anchor.xDirection > 0) bounds.x + bounds.width + clearance else bounds.x - clearance
+            compact(
+                listOf(
+                    anchor.point,
+                    sourceStub,
+                    Point(outerX, sourceStub.y),
+                    Point(outerX, cursor.y),
+                    cursor,
+                ),
+            )
+        } else {
+            compact(listOf(anchor.point, sourceStub, Point(cursor.x, sourceStub.y), cursor))
+        }
+    }
+
+    private fun drawPreviewTargetMarker(g2: Graphics2D, point: Point) {
+        g2.stroke = BasicStroke(1.5f)
+        g2.drawOval(point.x - 5, point.y - 5, 10, 10)
+        g2.drawLine(point.x - 8, point.y, point.x + 8, point.y)
+        g2.drawLine(point.x, point.y - 8, point.x, point.y + 8)
+    }
+
+    private fun drawPreviewLinkLabel(g2: Graphics2D, source: Node, point: Point?, color: Color) {
+        if (point == null || source.name.isBlank()) return
+        val previousFont = g2.font
+        g2.font = g2.font.deriveFont(10f)
+        val label = "${source.name} ->"
+        val x = point.x - g2.fontMetrics.stringWidth(label) / 2
+        g2.color = color
+        g2.drawString(label, x, point.y - 8)
         g2.font = previousFont
     }
 
@@ -6217,6 +6320,7 @@ class GraphCanvas(
                     // A Type gesture only assigns an existing link; it never creates a data-flow edge.
                 } else if (clickedType != null) {
                     linkSource = clickedType.id
+                    linkPreviewPoint = null
                     selection.clear()
                     selection += clickedType.id
                     onSelectionChanged()
@@ -6225,11 +6329,14 @@ class GraphCanvas(
                     if (endpoint == null) return
                     if (linkSource == null) {
                         linkSource = endpoint
+                        updateLinkPreview(point)
                         selection.clear()
                         selection += endpoint
-                    } else if (linkSource != endpoint) {
-                        createLink(linkSource!!, endpoint)
+                    } else {
+                        val source = linkSource!!
+                        createLink(source, endpoint)
                         linkSource = null
+                        linkPreviewPoint = null
                     }
                     onSelectionChanged()
                 }
@@ -6249,6 +6356,11 @@ class GraphCanvas(
             return
         }
         val point = modelPoint(e.point)
+        if (mode == CanvasMode.CreateLink) {
+            updateLinkPreview(point)
+            repaint()
+            return
+        }
         if (mode == CanvasMode.Select && !dragThresholdExceeded) {
             val start = dragScreenStart
             if (start != null && start.distance(e.point) >= SELECTION_DRAG_THRESHOLD_PX) {
@@ -6274,6 +6386,26 @@ class GraphCanvas(
             moveDragReference = snappedPoint
         }
         repaint()
+    }
+
+    private fun handleMoved(e: MouseEvent) {
+        if (mode != CanvasMode.CreateLink) return
+        updateLinkPreview(modelPoint(e.point))
+        repaint()
+    }
+
+    private fun handleExited() {
+        if (linkPreviewPoint != null) {
+            linkPreviewPoint = null
+            repaint()
+        }
+    }
+
+    private fun updateLinkPreview(point: Point) {
+        linkPreviewPoint = linkSource
+            ?.let(repository::getNode)
+            ?.takeUnless { it.isLink || it.isType }
+            ?.let { point }
     }
 
     private fun handleReleased(e: MouseEvent) {
