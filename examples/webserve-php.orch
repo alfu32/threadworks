@@ -28,7 +28,9 @@
                 "link_56f247eb-1397-489b-8130-4ddf2d446a15",
                 "node_718e99d5-14cd-4e91-a38c-9681d806b3fa",
                 "link_1288a22f-f546-4975-a5f1-00518d9f48e7",
-                "node_3fcc850e-744b-4b6b-812c-35983aad4a82"
+                "node_3fcc850e-744b-4b6b-812c-35983aad4a82",
+                "link_e015747c-e326-4abb-aa72-85a5098293aa",
+                "link_e2173d13-86b1-440b-88f8-77a1c4628b9c"
             ],
             "incomingLinks": [],
             "outgoingLinks": [],
@@ -70,7 +72,7 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-13T09:21:19.685454479Z",
+                "date": "2026-09-13T09:36:24.525339605Z",
                 "user": "ioan.alferaru@gmail.com"
             },
             "ports": [],
@@ -1123,7 +1125,9 @@
                 "link_092ff7b9-ab6b-4ca5-9fe6-5029ffc1323f",
                 "link_c45a18d4-b741-462e-af71-75a182c0de9a"
             ],
-            "incomingLinks": [],
+            "incomingLinks": [
+                "link_e015747c-e326-4abb-aa72-85a5098293aa"
+            ],
             "outgoingLinks": [],
             "layout": {
                 "x": 3.0,
@@ -1131,7 +1135,7 @@
                 "width": 1423.0,
                 "height": 481.0,
                 "closedWidth": 200.0,
-                "closedHeight": 108.0,
+                "closedHeight": 138.0,
                 "openWidth": 1423.0,
                 "openHeight": 481.0,
                 "isExpanded": true
@@ -1163,7 +1167,7 @@
             },
             "responsible": "github|ioan.alferaru@gmail.com|",
             "modified": {
-                "date": "2026-09-13T09:21:19.684577534Z",
+                "date": "2026-09-13T09:36:18.750913755Z",
                 "user": "ioan.alferaru@gmail.com"
             },
             "ports": [
@@ -2504,11 +2508,98 @@
             "kind": "Processor",
             "parentId": "root",
             "children": [],
-            "incomingLinks": [],
-            "outgoingLinks": [],
+            "incomingLinks": [
+                "link_e2173d13-86b1-440b-88f8-77a1c4628b9c"
+            ],
+            "outgoingLinks": [
+                "link_e015747c-e326-4abb-aa72-85a5098293aa",
+                "link_e2173d13-86b1-440b-88f8-77a1c4628b9c"
+            ],
             "layout": {
                 "x": -429.0,
                 "y": 925.0,
+                "width": 200.0,
+                "height": 108.0,
+                "closedWidth": 200.0,
+                "closedHeight": 108.0,
+                "openWidth": 200.0,
+                "openHeight": 108.0,
+                "isExpanded": true
+            },
+            "fileLayoutStrategyId": "none",
+            "text": {
+                "initialization": "",
+                "initializationLanguageId": "",
+                "source": "",
+                "sourceLanguageId": "",
+                "specification": "",
+                "specificationLanguageId": "markdown",
+                "tests": "",
+                "testsLanguageId": "json",
+                "aiInstructions": "",
+                "aiInstructionsLanguageId": "markdown"
+            },
+            "binaryContent": null,
+            "technology": {
+                "languageId": "",
+                "technologyId": "",
+                "compilerId": "",
+                "fileExtension": "",
+                "contentType": ""
+            },
+            "revision": {
+                "name": "",
+                "date": ""
+            },
+            "responsible": null,
+            "modified": {
+                "date": "2026-09-13T09:36:24.525339605Z",
+                "user": "ioan.alferaru@gmail.com"
+            },
+            "ports": [
+                {
+                    "id": "output_out",
+                    "name": "out",
+                    "direction": "Output",
+                    "dataType": "",
+                    "metadata": {}
+                },
+                {
+                    "id": "input_in",
+                    "name": "in",
+                    "direction": "Input",
+                    "dataType": "",
+                    "metadata": {}
+                }
+            ],
+            "link": null,
+            "typeDefinition": null,
+            "diagnostics": [],
+            "metadata": {},
+            "pluginData": {},
+            "nameDetail": "",
+            "status": "BUSINESS",
+            "statusChanges": [
+                {
+                    "userId": "ioan.alferaru@gmail.com",
+                    "changedDate": "2026-09-13T09:10:00.470416526Z",
+                    "initStatus": null,
+                    "endStatus": "BUSINESS"
+                }
+            ],
+            "assignee": null
+        },
+        {
+            "id": "link_e015747c-e326-4abb-aa72-85a5098293aa",
+            "name": "selfmem -> routes",
+            "kind": "Link",
+            "parentId": "root",
+            "children": [],
+            "incomingLinks": [],
+            "outgoingLinks": [],
+            "layout": {
+                "x": 0.0,
+                "y": 0.0,
                 "width": 200.0,
                 "height": 70.0,
                 "closedWidth": 200.0,
@@ -2544,33 +2635,100 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-13T09:21:19.684577534Z",
+                "date": "2026-09-13T09:36:18.750913755Z",
                 "user": "ioan.alferaru@gmail.com"
             },
-            "ports": [
-                {
-                    "id": "output_out",
-                    "name": "out",
-                    "direction": "Output",
-                    "dataType": "",
-                    "metadata": {}
-                }
-            ],
-            "link": null,
+            "ports": [],
+            "link": {
+                "sourceNodeId": "node_3fcc850e-744b-4b6b-812c-35983aad4a82",
+                "sourcePortName": "out",
+                "targetNodeId": "node_6fe0a353-135a-4433-b77b-4521da00d728",
+                "targetPortName": "in",
+                "transportKind": "in-process",
+                "typeName": "",
+                "payloadDefinition": "",
+                "typeDefinitionId": "",
+                "compositeBoundaryIds": [],
+                "interactionKind": "data"
+            },
             "typeDefinition": null,
             "diagnostics": [],
             "metadata": {},
             "pluginData": {},
             "nameDetail": "",
-            "status": "BUSINESS",
-            "statusChanges": [
-                {
-                    "userId": "ioan.alferaru@gmail.com",
-                    "changedDate": "2026-09-13T09:10:00.470416526Z",
-                    "initStatus": null,
-                    "endStatus": "BUSINESS"
-                }
-            ],
+            "status": null,
+            "statusChanges": [],
+            "assignee": null
+        },
+        {
+            "id": "link_e2173d13-86b1-440b-88f8-77a1c4628b9c",
+            "name": "selfmem -> selfmem",
+            "kind": "Link",
+            "parentId": "root",
+            "children": [],
+            "incomingLinks": [],
+            "outgoingLinks": [],
+            "layout": {
+                "x": 0.0,
+                "y": 0.0,
+                "width": 200.0,
+                "height": 70.0,
+                "closedWidth": 200.0,
+                "closedHeight": 70.0,
+                "openWidth": 200.0,
+                "openHeight": 70.0,
+                "isExpanded": true
+            },
+            "fileLayoutStrategyId": "none",
+            "text": {
+                "initialization": "",
+                "initializationLanguageId": "",
+                "source": "",
+                "sourceLanguageId": "",
+                "specification": "",
+                "specificationLanguageId": "markdown",
+                "tests": "",
+                "testsLanguageId": "json",
+                "aiInstructions": "",
+                "aiInstructionsLanguageId": "markdown"
+            },
+            "binaryContent": null,
+            "technology": {
+                "languageId": "",
+                "technologyId": "",
+                "compilerId": "",
+                "fileExtension": "",
+                "contentType": ""
+            },
+            "revision": {
+                "name": "",
+                "date": ""
+            },
+            "responsible": null,
+            "modified": {
+                "date": "2026-09-13T09:36:24.525339605Z",
+                "user": "ioan.alferaru@gmail.com"
+            },
+            "ports": [],
+            "link": {
+                "sourceNodeId": "node_3fcc850e-744b-4b6b-812c-35983aad4a82",
+                "sourcePortName": "out",
+                "targetNodeId": "node_3fcc850e-744b-4b6b-812c-35983aad4a82",
+                "targetPortName": "in",
+                "transportKind": "in-process",
+                "typeName": "",
+                "payloadDefinition": "",
+                "typeDefinitionId": "",
+                "compositeBoundaryIds": [],
+                "interactionKind": "data"
+            },
+            "typeDefinition": null,
+            "diagnostics": [],
+            "metadata": {},
+            "pluginData": {},
+            "nameDetail": "",
+            "status": null,
+            "statusChanges": [],
             "assignee": null
         }
     ],
@@ -2590,7 +2748,7 @@
             "username": "",
             "fullName": "Ioan Alferaru",
             "role": "",
-            "refreshedAt": "2026-09-13T09:23:11.428417550Z"
+            "refreshedAt": "2026-09-13T09:35:52.164807366Z"
         },
         {
             "identifier": "alferaru.ioan@gmail.com",
@@ -2686,7 +2844,7 @@
             "username": "",
             "fullName": "",
             "role": "",
-            "refreshedAt": "2026-09-13T09:21:19.685454479Z"
+            "refreshedAt": "2026-09-13T09:36:24.525339605Z"
         }
     ]
 }

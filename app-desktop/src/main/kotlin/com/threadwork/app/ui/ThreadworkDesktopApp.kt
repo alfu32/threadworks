@@ -5805,22 +5805,16 @@ class GraphCanvas(
             target.point.y,
         )
         val clearance = PORT_STUB_LENGTH + ROUTING_STEP
-        val outerX = if (source.xDirection > 0) {
-            bounds.x + bounds.width + clearance
-        } else {
-            bounds.x - clearance
-        }
-        val loopY = if (source.point.y <= bounds.y + bounds.height / 2) {
-            bounds.y - clearance
-        } else {
-            bounds.y + bounds.height + clearance
-        }
+        val rightOuterX = bounds.x + bounds.width + clearance
+        val leftOuterX = bounds.x - clearance
+        val loopY = bounds.y - clearance
         val points = listOf(
             source.point,
             sourceStub,
-            Point(outerX, source.point.y),
-            Point(outerX, loopY),
-            Point(outerX, target.point.y),
+            Point(rightOuterX, source.point.y),
+            Point(rightOuterX, loopY),
+            Point(leftOuterX, loopY),
+            Point(leftOuterX, target.point.y),
             targetStub,
             target.point,
         )
@@ -6026,7 +6020,11 @@ class GraphCanvas(
         val r = node.layout.rect()
         val side = linkSide(node, linkNode, outgoing)
         val sorted = portLinksOnSide(node, side)
-            .sortedWith(compareBy<Node> { portOrderValue(node, it, side) }.thenBy { it.id.value })
+            .sortedWith(
+                compareBy<Node> { if (isSelfLink(it)) 0 else 1 }
+                    .thenBy { portOrderValue(node, it, side) }
+                    .thenBy { it.id.value },
+            )
         val index = sorted.indexOfFirst { it.id == linkNode.id }.takeIf { it >= 0 } ?: 0
         val x = when {
             outgoing && side > 0 -> r.x + r.width + PORT_OUTSIDE_OFFSET
@@ -6083,9 +6081,17 @@ class GraphCanvas(
         return ids.distinct().mapNotNull(document.nodes::get)
             .filterNot(::isDependencyAnnotation)
             .filter { linkNode ->
-                isVisibleLink(linkNode) && portSide(node, linkNode) == side
+                isVisibleLink(linkNode) &&
+                    (if (isSelfLink(linkNode) && linkNode.link?.sourceNodeId == node.id) {
+                        true
+                    } else {
+                        portSide(node, linkNode) == side
+                    })
             }
     }
+
+    private fun isSelfLink(linkNode: Node): Boolean =
+        linkNode.link?.let { it.sourceNodeId == it.targetNodeId } == true
 
     private fun portSide(node: Node, linkNode: Node): Int? {
         val link = linkNode.link ?: return null
@@ -6120,6 +6126,9 @@ class GraphCanvas(
     }
 
     private fun linkSide(node: Node, linkNode: Node, outgoing: Boolean): Int {
+        if (isSelfLink(linkNode) && linkNode.link?.sourceNodeId == node.id) {
+            return if (outgoing) 1 else -1
+        }
         val center = node.layout.center()
         val otherPoint = linkedEndpointReferencePoint(linkNode, outgoing, center)
         return if (otherPoint.x >= center.x) 1 else -1

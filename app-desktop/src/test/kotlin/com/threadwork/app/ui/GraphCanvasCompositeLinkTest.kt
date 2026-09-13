@@ -44,9 +44,39 @@ class GraphCanvasCompositeLinkTest {
 
         val points = canvas.renderedLinkPoints(link.id)
 
-        assertTrue(points.size >= 6)
+        assertTrue(points.size >= 8)
+        assertEquals(node.layout.x.roundToInt() + node.layout.width.roundToInt() + 20, points.first().x)
+        assertEquals(node.layout.x.roundToInt(), points.last().x)
         assertTrue(points.any { it.x > node.layout.x.roundToInt() + node.layout.width.roundToInt() })
         assertTrue(points.any { it.y < node.layout.y.roundToInt() })
+    }
+
+    @Test
+    fun `self link gets the first port row on both sides`() {
+        val repository = InMemoryDocumentRepository(newDocument("self link port priority"))
+        val root = repository.getDocument().rootNodeId
+        val left = repository.createNode(root, "left", NodeKind.Processor)
+        val node = repository.createNode(root, "loop", NodeKind.Processor)
+        val right = repository.createNode(root, "right", NodeKind.Processor)
+        position(repository, left, 0, 300)
+        position(repository, node, 400, 300)
+        position(repository, right, 900, 300)
+        listOf(left, node, right).forEach {
+            repository.addPort(it.id, NodePort("in", "in", PortDirection.Input))
+            repository.addPort(it.id, NodePort("out", "out", PortDirection.Output))
+        }
+        val self = repository.createLink(root, "loopback", node.id, "out", node.id, "in")
+        val outgoing = repository.createLink(root, "outgoing", node.id, "out", right.id, "in")
+        val incoming = repository.createLink(root, "incoming", left.id, "out", node.id, "in")
+        val canvas = GraphCanvas(repository, linkedSetOf(), {}, {}, {})
+        canvas.refreshBoundsFromChildren()
+
+        val selfPoints = canvas.renderedLinkPoints(self.id)
+        val outgoingPoints = canvas.renderedLinkPoints(outgoing.id)
+        val incomingPoints = canvas.renderedLinkPoints(incoming.id)
+
+        assertTrue(selfPoints.first().y < outgoingPoints.first().y)
+        assertTrue(selfPoints.last().y < incomingPoints.last().y)
     }
 
     @Test
