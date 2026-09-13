@@ -853,11 +853,15 @@ class GridCodeEditorAdapter : JPanel(), CodeEditorAdapter {
         for (row in 0 until visibleRows) {
             val visualRow = visualRows.getOrNull(scrollVisualRow + row) ?: break
             if (visualRow.startColumn != 0) continue
+            val label = (visualRow.lineIndex + 1).toString().padStart((lines.size + 1).toString().length)
+            val labelX = charWidth * 2
+            g2.color = palette.mutedText
+            g2.drawString(label, labelX, row * lineHeight + metrics.ascent)
             foldRangeStartingAt(visualRow.lineIndex)?.let { fold ->
                 g2.color = palette.foldMarker
                 g2.drawString(
                     if (collapsedFoldStarts.contains(fold.startLine)) "+" else "-",
-                    3,
+                    labelX + metrics.stringWidth(label) + max(2, charWidth / 3),
                     row * lineHeight + metrics.ascent,
                 )
             }
@@ -871,8 +875,6 @@ class GridCodeEditorAdapter : JPanel(), CodeEditorAdapter {
                 g2.fillOval(charWidth + 2, row * lineHeight + (lineHeight - markerSize) / 2, markerSize, markerSize)
                 g2.color = palette.mutedText
             }
-            val label = (visualRow.lineIndex + 1).toString().padStart((lines.size + 1).toString().length)
-            g2.drawString(label, charWidth * 2, row * lineHeight + metrics.ascent)
         }
         g2.color = palette.separator
         g2.drawLine(gutterWidth - 1, 0, gutterWidth - 1, bodyHeight())
