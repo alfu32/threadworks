@@ -2390,8 +2390,8 @@
             ],
             "outgoingLinks": [],
             "layout": {
-                "x": 1626.0,
-                "y": 813.0,
+                "x": 1575.0,
+                "y": 721.0,
                 "width": 200.0,
                 "height": 78.0,
                 "closedWidth": 200.0,
@@ -2543,8 +2543,8 @@
                 "link_e2173d13-86b1-440b-88f8-77a1c4628b9c"
             ],
             "layout": {
-                "x": -727.0,
-                "y": 945.0,
+                "x": -561.0,
+                "y": 1018.0,
                 "width": 200.0,
                 "height": 108.0,
                 "closedWidth": 200.0,
@@ -2783,7 +2783,7 @@
             "username": "",
             "fullName": "Ioan Alferaru",
             "role": "",
-            "refreshedAt": "2026-09-13T10:04:13.415142747Z"
+            "refreshedAt": "2026-09-13T10:23:45.610277352Z"
         },
         {
             "identifier": "alferaru.ioan@gmail.com",

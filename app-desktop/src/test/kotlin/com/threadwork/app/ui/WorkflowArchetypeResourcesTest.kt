@@ -93,6 +93,9 @@ class WorkflowArchetypeResourcesTest {
             assertTrue(document.nodes.values.filter { it.id != document.rootNodeId }.all {
                 it.text.specification.isNotBlank()
             })
+            assertTrue(document.nodes.values.filter { it.id != document.rootNodeId }.all {
+                it.text.declaration.isNotBlank()
+            })
         }
         starterLanguages.forEach { language ->
             val document = store.loadText(requireNotNull(javaClass.getResourceAsStream(

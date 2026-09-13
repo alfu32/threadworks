@@ -34,6 +34,7 @@
         "compilerId": "go-compiler"
       },
       "text": {
+        "source": "func ReadConfig(path string) (string, error) {\n    info, err := os.Stat(path)\n    if err != nil {\n        return \"\", err\n    }\n    if !info.Mode().IsRegular() {\n        return \"\", fmt.Errorf(\"configuration path is not a regular file: %s\", path)\n    }\n    content, err := os.ReadFile(path)\n    return string(content), err\n}",
         "specification": "Service library that reads the complete content of a caller-supplied file path and returns it as text. It must distinguish an empty file from a read failure, close resources deterministically, preserve UTF-8 content, reject directories, and report the path in errors without exposing unrelated filesystem data. Parsing JSON, YAML, properties, or another configuration syntax belongs to the caller.",
         "aiInstructions": "Expose a small `read_config(path)`-style API in the effective language. Return file text; do not silently parse or substitute defaults."
       }
