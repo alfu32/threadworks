@@ -16,6 +16,7 @@ import java.awt.FontMetrics
 import java.awt.Graphics
 import java.awt.Graphics2D
 import java.awt.Point
+import java.awt.Rectangle
 import java.awt.RenderingHints
 import java.awt.Toolkit
 import java.awt.datatransfer.DataFlavor
@@ -49,6 +50,17 @@ class GridCodeEditorAdapter : JPanel(), CodeEditorAdapter {
         val lineIndex: Int,
         val startColumn: Int,
         val endColumn: Int,
+        val foldedEndLine: Int = lineIndex,
+    )
+
+    private data class FoldRange(
+        val startLine: Int,
+        val endLine: Int,
+    )
+
+    private data class FoldedSummary(
+        val prefix: String,
+        val suffix: String,
     )
 
     private data class CaretState(
@@ -74,6 +86,8 @@ class GridCodeEditorAdapter : JPanel(), CodeEditorAdapter {
     private var editorFont = ThreadworkFonts.codeFont(14f)
     private var palette = EditorPalette.dark()
     private val lines = mutableListOf("")
+    private val collapsedFoldStarts = mutableSetOf<Int>()
+    private var foldRangesCache: List<FoldRange>? = null
     private val cursors = mutableListOf(CaretState(BufferPosition(0, 0)))
     private val undoStack = ArrayDeque<Snapshot>()
     private val redoStack = ArrayDeque<Snapshot>()
@@ -140,6 +154,10 @@ class GridCodeEditorAdapter : JPanel(), CodeEditorAdapter {
             override fun mousePressed(e: MouseEvent) {
                 requestFocusInWindow()
                 clearHover()
+                if (toggleFoldAt(e.point)) {
+                    e.consume()
+                    return
+                }
                 completionIndexAt(e.point)?.let { index ->
                     completionIndex = index
                     applyCompletion(completionItems[index])
@@ -222,6 +240,8 @@ class GridCodeEditorAdapter : JPanel(), CodeEditorAdapter {
         if (lines.isEmpty()) lines += ""
         cursors.clear()
         cursors += CaretState(BufferPosition(0, 0))
+        collapsedFoldStarts.clear()
+        foldRangesCache = null
         scrollVisualRow = 0
         undoStack.clear()
         redoStack.clear()
@@ -294,8 +314,14 @@ class GridCodeEditorAdapter : JPanel(), CodeEditorAdapter {
         if (targetLine !in lines.indices) return
         val metrics = getFontMetrics(editorFont)
         val charWidth = max(1, metrics.charWidth('M'))
-        val rows = visualRows(metrics, charWidth, gutterWidth(metrics, charWidth))
-        val visualIndex = rows.indexOfFirst { it.lineIndex == targetLine }
+        var rows = visualRows(metrics, charWidth, gutterWidth(metrics, charWidth))
+        var visualIndex = rows.indexOfFirst { it.lineIndex == targetLine }
+        if (visualIndex < 0) {
+            foldRanges().firstOrNull { targetLine in (it.startLine + 1)..it.endLine }
+                ?.let { collapsedFoldStarts.remove(it.startLine) }
+            rows = visualRows(metrics, charWidth, gutterWidth(metrics, charWidth))
+            visualIndex = rows.indexOfFirst { it.lineIndex == targetLine }
+        }
         if (visualIndex < 0) return
         scrollVisualRow = visualIndex.coerceIn(0, maxScrollVisualRow(rows))
         repaint()
@@ -586,6 +612,7 @@ class GridCodeEditorAdapter : JPanel(), CodeEditorAdapter {
         while (undoStack.size > 100) undoStack.removeFirst()
         redoStack.clear()
         operation()
+        foldRangesCache = null
         hideCompletions()
         scheduleDeclarationSymbolsRefresh()
         notifyTextChanged()
@@ -713,7 +740,7 @@ class GridCodeEditorAdapter : JPanel(), CodeEditorAdapter {
             val target = if (word) nextWordPosition(state.caret, delta) else stepHorizontal(state.caret, delta)
             if (expand && state.anchor == null) state.anchor = state.caret
             if (!expand) state.anchor = null
-            state.caret = clamp(target)
+            state.caret = skipCollapsedPosition(clamp(target), delta)
         }
         ensureCaretVisible()
         notifyCursor()
@@ -722,7 +749,7 @@ class GridCodeEditorAdapter : JPanel(), CodeEditorAdapter {
 
     private fun moveVertical(delta: Int, expand: Boolean) {
         cursorStates().forEach { state ->
-            val line = (state.caret.line + delta).coerceIn(0, lines.lastIndex)
+            val line = visibleVerticalTarget(state.caret.line, delta)
             val column = state.caret.column.coerceAtMost(lines[line].length)
             if (expand && state.anchor == null) state.anchor = state.caret
             if (!expand) state.anchor = null
@@ -731,6 +758,29 @@ class GridCodeEditorAdapter : JPanel(), CodeEditorAdapter {
         ensureCaretVisible()
         notifyCursor()
         repaint()
+    }
+
+    private fun visibleVerticalTarget(currentLine: Int, delta: Int): Int {
+        val target = (currentLine + delta).coerceIn(0, lines.lastIndex)
+        val fold = foldRanges().firstOrNull {
+            collapsedFoldStarts.contains(it.startLine) && target in (it.startLine + 1)..it.endLine
+        } ?: return target
+        return if (delta < 0) {
+            fold.startLine
+        } else {
+            (fold.endLine + 1).coerceAtMost(lines.lastIndex)
+        }
+    }
+
+    private fun skipCollapsedPosition(position: BufferPosition, delta: Int): BufferPosition {
+        val fold = foldRanges().firstOrNull {
+            collapsedFoldStarts.contains(it.startLine) && position.line in (it.startLine + 1)..it.endLine
+        } ?: return position
+        return if (delta < 0) {
+            BufferPosition(fold.startLine, lines[fold.startLine].length)
+        } else {
+            BufferPosition((fold.endLine + 1).coerceAtMost(lines.lastIndex), 0)
+        }
     }
 
     private fun moveToLineBoundary(start: Boolean, expand: Boolean) {
@@ -803,6 +853,14 @@ class GridCodeEditorAdapter : JPanel(), CodeEditorAdapter {
         for (row in 0 until visibleRows) {
             val visualRow = visualRows.getOrNull(scrollVisualRow + row) ?: break
             if (visualRow.startColumn != 0) continue
+            foldRangeStartingAt(visualRow.lineIndex)?.let { fold ->
+                g2.color = palette.foldMarker
+                g2.drawString(
+                    if (collapsedFoldStarts.contains(fold.startLine)) "+" else "-",
+                    3,
+                    row * lineHeight + metrics.ascent,
+                )
+            }
             diagnostics.firstOrNull { it.line == visualRow.lineIndex + 1 }?.let { diagnostic ->
                 g2.color = when (diagnostic.severity) {
                     DiagnosticSeverity.Error -> palette.diagnosticError
@@ -810,11 +868,11 @@ class GridCodeEditorAdapter : JPanel(), CodeEditorAdapter {
                     DiagnosticSeverity.Info -> palette.diagnosticInfo
                 }
                 val markerSize = (lineHeight / 2).coerceAtLeast(6)
-                g2.fillOval(4, row * lineHeight + (lineHeight - markerSize) / 2, markerSize, markerSize)
+                g2.fillOval(charWidth + 2, row * lineHeight + (lineHeight - markerSize) / 2, markerSize, markerSize)
                 g2.color = palette.mutedText
             }
             val label = (visualRow.lineIndex + 1).toString().padStart((lines.size + 1).toString().length)
-            g2.drawString(label, charWidth, row * lineHeight + metrics.ascent)
+            g2.drawString(label, charWidth * 2, row * lineHeight + metrics.ascent)
         }
         g2.color = palette.separator
         g2.drawLine(gutterWidth - 1, 0, gutterWidth - 1, bodyHeight())
@@ -861,6 +919,10 @@ class GridCodeEditorAdapter : JPanel(), CodeEditorAdapter {
         baseline: Int,
         charWidth: Int,
     ) {
+        if (visualRow.foldedEndLine > visualRow.lineIndex) {
+            drawFoldedLine(g2, visualRow, gutterWidth, baseline, charWidth)
+            return
+        }
         val start = visualRow.startColumn.coerceAtMost(line.length)
         val end = visualRow.endColumn.coerceAtMost(line.length)
         if (start >= end) return
@@ -892,6 +954,31 @@ class GridCodeEditorAdapter : JPanel(), CodeEditorAdapter {
         if (diagnostics.any { it.line == visualRow.lineIndex + 1 }) {
             g2.color = palette.diagnosticError
             g2.fillRect(gutterWidth, baseline + 3, max(1, (end - start) * charWidth), 2)
+        }
+    }
+
+    private fun drawFoldedLine(
+        g2: Graphics2D,
+        visualRow: VisualRow,
+        gutterWidth: Int,
+        baseline: Int,
+        charWidth: Int,
+    ) {
+        val summary = foldedSummary(visualRow, charWidth, gutterWidth)
+        var drawX = gutterWidth
+        if (summary.prefix.isNotEmpty()) {
+            drawHighlightedText(g2, summary.prefix, drawX, baseline)
+            drawX += g2.fontMetrics.stringWidth(summary.prefix)
+        }
+        val markerWidth = g2.fontMetrics.stringWidth("...")
+        val markerTop = baseline - g2.fontMetrics.ascent
+        g2.color = palette.foldMarkerBackground
+        g2.fillRect(drawX, markerTop, markerWidth, g2.fontMetrics.height)
+        g2.color = palette.foldMarker
+        g2.drawString("...", drawX, baseline)
+        drawX += markerWidth
+        if (summary.suffix.isNotEmpty()) {
+            drawHighlightedText(g2, summary.suffix, drawX, baseline)
         }
     }
 
@@ -1155,8 +1242,20 @@ class GridCodeEditorAdapter : JPanel(), CodeEditorAdapter {
 
     private fun visualRows(metrics: FontMetrics, charWidth: Int, gutterWidth: Int): List<VisualRow> {
         val wrapColumns = max(1, (width - gutterWidth - charWidth) / charWidth)
+        val foldsByStart = foldRanges()
+            .filter { collapsedFoldStarts.contains(it.startLine) }
+            .groupBy(FoldRange::startLine)
+            .mapValues { (_, ranges) -> ranges.maxBy(FoldRange::endLine) }
         return buildList {
-            lines.forEachIndexed { lineIndex, line ->
+            var lineIndex = 0
+            while (lineIndex < lines.size) {
+                val fold = foldsByStart[lineIndex]
+                if (fold != null) {
+                    add(VisualRow(lineIndex, 0, lines[lineIndex].length, fold.endLine))
+                    lineIndex = fold.endLine + 1
+                    continue
+                }
+                val line = lines[lineIndex]
                 if (line.isEmpty()) {
                     add(VisualRow(lineIndex, 0, 0))
                 } else {
@@ -1167,8 +1266,161 @@ class GridCodeEditorAdapter : JPanel(), CodeEditorAdapter {
                         start = end
                     }
                 }
+                lineIndex++
             }
         }
+    }
+
+    private fun foldRanges(): List<FoldRange> = foldRangesCache ?: computeFoldRanges().also { foldRangesCache = it }
+
+    private fun computeFoldRanges(): List<FoldRange> {
+        val ranges = mutableListOf<FoldRange>()
+        val braceStarts = mutableListOf<Int>()
+        var inBlockComment = false
+
+        lines.forEachIndexed { lineIndex, line ->
+            var quote: Char? = null
+            var escaped = false
+            var index = 0
+            while (index < line.length) {
+                val character = line[index]
+                val next = line.getOrNull(index + 1)
+                if (inBlockComment) {
+                    if (character == '*' && next == '/') {
+                        inBlockComment = false
+                        index += 2
+                        continue
+                    }
+                    index++
+                    continue
+                }
+                if (quote != null) {
+                    if (escaped) {
+                        escaped = false
+                    } else if (character == '\\') {
+                        escaped = true
+                    } else if (character == quote) {
+                        quote = null
+                    }
+                    index++
+                    continue
+                }
+                if (character == '/' && next == '*') {
+                    inBlockComment = true
+                    index += 2
+                    continue
+                }
+                if (character == '/' && next == '/') break
+                if (languageId == "python" && character == '#') break
+                if (character == '"' || character == '\'' || character == '`') {
+                    quote = character
+                } else if (character == '{') {
+                    braceStarts += lineIndex
+                } else if (character == '}' && braceStarts.isNotEmpty()) {
+                    val startLine = braceStarts.removeAt(braceStarts.lastIndex)
+                    if (lineIndex > startLine) ranges += FoldRange(startLine, lineIndex)
+                }
+                index++
+            }
+        }
+
+        if (languageId == "python") {
+            lines.forEachIndexed { lineIndex, line ->
+                if (line.substringBefore('#').trimEnd().endsWith(":")) {
+                    val indentation = indentationWidth(line)
+                    val firstChild = (lineIndex + 1 until lines.size)
+                        .firstOrNull { lines[it].isNotBlank() }
+                        ?: return@forEachIndexed
+                    if (indentationWidth(lines[firstChild]) > indentation) {
+                        var endLine = firstChild
+                        var probe = firstChild + 1
+                        while (probe < lines.size) {
+                            if (lines[probe].isNotBlank()) {
+                                if (indentationWidth(lines[probe]) <= indentation) break
+                                endLine = probe
+                            }
+                            probe++
+                        }
+                        if (endLine > lineIndex) ranges += FoldRange(lineIndex, endLine)
+                    }
+                }
+            }
+        }
+        return ranges.distinct().sortedWith(compareBy(FoldRange::startLine, FoldRange::endLine))
+    }
+
+    private fun indentationWidth(line: String): Int =
+        line.takeWhile { it == ' ' || it == '\t' }.sumOf { if (it == '\t') 4 else 1 }
+
+    private fun foldRangeStartingAt(lineIndex: Int): FoldRange? =
+        foldRanges().filter { it.startLine == lineIndex }.maxByOrNull(FoldRange::endLine)
+
+    private fun foldedSummary(visualRow: VisualRow, charWidth: Int, gutterWidth: Int): FoldedSummary {
+        val firstLine = lines[visualRow.lineIndex].trimEnd()
+        val lastLine = lines[visualRow.foldedEndLine].trimStart()
+        val availableCharacters = ((width - gutterWidth) / charWidth).coerceAtLeast(5)
+        val fullCharacters = firstLine.length + lastLine.length + 5
+        if (fullCharacters <= availableCharacters) {
+            return FoldedSummary(
+                prefix = firstLine.takeIf(String::isNotEmpty)?.let { "$it " }.orEmpty(),
+                suffix = lastLine.takeIf(String::isNotEmpty)?.let { " $it" }.orEmpty(),
+            )
+        }
+        val contentCharacters = (availableCharacters - 3).coerceAtLeast(0)
+        val prefixCharacters = contentCharacters / 2
+        val suffixCharacters = contentCharacters - prefixCharacters
+        return FoldedSummary(
+            prefix = firstLine.take(prefixCharacters).trimEnd()
+                .takeIf(String::isNotEmpty)?.let { "$it " }.orEmpty(),
+            suffix = lastLine.takeLast(suffixCharacters).trimStart()
+                .takeIf(String::isNotEmpty)?.let { " $it" }.orEmpty(),
+        )
+    }
+
+    private fun toggleFoldAt(point: Point): Boolean {
+        val metrics = getFontMetrics(editorFont)
+        val lineHeight = metrics.height.coerceAtLeast(1)
+        val charWidth = max(1, metrics.charWidth('M'))
+        val gutter = gutterWidth(metrics, charWidth)
+        val bodyY = point.y - pinnedHeaderHeight(metrics)
+        if (bodyY < 0) return false
+        val rows = visualRows(metrics, charWidth, gutter)
+        val rowIndex = (scrollVisualRow + bodyY / lineHeight).coerceIn(0, rows.lastIndex)
+        val row = rows.getOrNull(rowIndex) ?: return false
+        val fold = foldRangeStartingAt(row.lineIndex) ?: return false
+        val gutterMarker = point.x in 0..charWidth && bodyY / lineHeight == rowIndex - scrollVisualRow
+        val summaryMarker = if (row.foldedEndLine > row.lineIndex) {
+            val summary = foldedSummary(row, charWidth, gutter)
+            val markerX = gutter + metrics.stringWidth(summary.prefix)
+            Rectangle(
+                markerX,
+                (rowIndex - scrollVisualRow) * lineHeight,
+                metrics.stringWidth("..."),
+                lineHeight,
+            ).contains(point.x, bodyY)
+        } else {
+            false
+        }
+        if (!gutterMarker && !summaryMarker) return false
+
+        if (!collapsedFoldStarts.add(fold.startLine)) {
+            collapsedFoldStarts.remove(fold.startLine)
+        }
+        val collapsed = collapsedFoldStarts.contains(fold.startLine)
+        if (collapsed) {
+            cursorStates().forEach { state ->
+                if (state.caret.line in (fold.startLine + 1)..fold.endLine) {
+                    state.caret = BufferPosition(fold.startLine, lines[fold.startLine].length)
+                }
+                if (state.anchor?.line in (fold.startLine + 1)..fold.endLine) {
+                    state.anchor = BufferPosition(fold.startLine, lines[fold.startLine].length)
+                }
+            }
+        }
+        ensureCaretVisible()
+        notifyCursor()
+        repaint()
+        return true
     }
 
     private fun List<VisualRow>.indexOfCaret(position: BufferPosition): Int {
@@ -1298,6 +1550,7 @@ class GridCodeEditorAdapter : JPanel(), CodeEditorAdapter {
     private fun restore(snapshot: Snapshot) {
         lines.clear()
         lines += snapshot.lines
+        foldRangesCache = null
         cursors.clear()
         cursors += snapshot.cursors.map { CaretState(it.caret, it.anchor) }
         if (cursors.isEmpty()) cursors += CaretState(BufferPosition(0, 0))

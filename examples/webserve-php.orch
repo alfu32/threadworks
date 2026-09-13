@@ -30,7 +30,9 @@
                 "link_1288a22f-f546-4975-a5f1-00518d9f48e7",
                 "node_3fcc850e-744b-4b6b-812c-35983aad4a82",
                 "link_e2173d13-86b1-440b-88f8-77a1c4628b9c",
-                "link_7997954b-3628-42ef-bdfd-1146684c6a6c"
+                "link_7997954b-3628-42ef-bdfd-1146684c6a6c",
+                "node_d3143aee-4f6c-47a4-81dd-4e3bfe61789c",
+                "link_8dae3e7b-5a21-40e9-aa13-3d16ffa183fe"
             ],
             "incomingLinks": [],
             "outgoingLinks": [],
@@ -72,7 +74,7 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-13T10:06:51.825616068Z",
+                "date": "2026-09-13T10:55:33.645686255Z",
                 "user": "ioan.alferaru@gmail.com"
             },
             "ports": [],
@@ -145,7 +147,7 @@
             },
             "responsible": "alfu32@github",
             "modified": {
-                "date": "2026-09-09T09:24:20.532901212Z",
+                "date": "2026-09-13T16:33:41.647629088Z",
                 "user": "ioan.alferaru@gmail.com"
             },
             "ports": [
@@ -163,7 +165,7 @@
             "metadata": {},
             "pluginData": {},
             "nameDetail": "",
-            "status": "IMPLEMENTATION",
+            "status": "DEPLOYED",
             "statusChanges": [
                 {
                     "userId": "devlin",
@@ -188,6 +190,24 @@
                     "changedDate": "2026-09-09T09:24:20.532883286Z",
                     "initStatus": "BUSINESS",
                     "endStatus": "IMPLEMENTATION"
+                },
+                {
+                    "userId": "ioan.alferaru@gmail.com",
+                    "changedDate": "2026-09-13T16:32:49.874441122Z",
+                    "initStatus": "IMPLEMENTATION",
+                    "endStatus": "TESTING"
+                },
+                {
+                    "userId": "ioan.alferaru@gmail.com",
+                    "changedDate": "2026-09-13T16:33:05.565120772Z",
+                    "initStatus": "TESTING",
+                    "endStatus": "FUNCTIONAL"
+                },
+                {
+                    "userId": "ioan.alferaru@gmail.com",
+                    "changedDate": "2026-09-13T16:33:41.647602465Z",
+                    "initStatus": "FUNCTIONAL",
+                    "endStatus": "DEPLOYED"
                 }
             ],
             "assignee": "github|ioan.alferaru@gmail.com|User"
@@ -241,7 +261,7 @@
             },
             "responsible": "alfu32@github",
             "modified": {
-                "date": "2026-09-09T09:24:23.429005910Z",
+                "date": "2026-09-13T16:33:32.478019904Z",
                 "user": "ioan.alferaru@gmail.com"
             },
             "ports": [
@@ -259,7 +279,7 @@
             "metadata": {},
             "pluginData": {},
             "nameDetail": "",
-            "status": "IMPLEMENTATION",
+            "status": "TESTING",
             "statusChanges": [
                 {
                     "userId": "devlin",
@@ -284,6 +304,48 @@
                     "changedDate": "2026-09-09T09:24:23.428984519Z",
                     "initStatus": "BUSINESS",
                     "endStatus": "IMPLEMENTATION"
+                },
+                {
+                    "userId": "ioan.alferaru@gmail.com",
+                    "changedDate": "2026-09-13T16:32:51.248258337Z",
+                    "initStatus": "IMPLEMENTATION",
+                    "endStatus": "TESTING"
+                },
+                {
+                    "userId": "ioan.alferaru@gmail.com",
+                    "changedDate": "2026-09-13T16:33:12.940423253Z",
+                    "initStatus": "TESTING",
+                    "endStatus": "IMPLEMENTATION"
+                },
+                {
+                    "userId": "ioan.alferaru@gmail.com",
+                    "changedDate": "2026-09-13T16:33:16.518711717Z",
+                    "initStatus": "IMPLEMENTATION",
+                    "endStatus": "TESTING"
+                },
+                {
+                    "userId": "ioan.alferaru@gmail.com",
+                    "changedDate": "2026-09-13T16:33:22.984796545Z",
+                    "initStatus": "TESTING",
+                    "endStatus": "IMPLEMENTATION"
+                },
+                {
+                    "userId": "ioan.alferaru@gmail.com",
+                    "changedDate": "2026-09-13T16:33:25.872100686Z",
+                    "initStatus": "IMPLEMENTATION",
+                    "endStatus": "TESTING"
+                },
+                {
+                    "userId": "ioan.alferaru@gmail.com",
+                    "changedDate": "2026-09-13T16:33:29.302212533Z",
+                    "initStatus": "TESTING",
+                    "endStatus": "IMPLEMENTATION"
+                },
+                {
+                    "userId": "ioan.alferaru@gmail.com",
+                    "changedDate": "2026-09-13T16:33:32.477993860Z",
+                    "initStatus": "IMPLEMENTATION",
+                    "endStatus": "TESTING"
                 }
             ],
             "assignee": "github|ioan.alferaru@gmail.com|User"
@@ -433,7 +495,7 @@
             },
             "responsible": "alfu32@github",
             "modified": {
-                "date": "2026-09-09T08:24:57.758461994Z",
+                "date": "2026-09-13T16:33:10.427901877Z",
                 "user": "ioan.alferaru@gmail.com"
             },
             "ports": [
@@ -458,13 +520,19 @@
             "metadata": {},
             "pluginData": {},
             "nameDetail": "amc",
-            "status": "IMPLEMENTATION",
+            "status": "TESTING",
             "statusChanges": [
                 {
                     "userId": "devlin",
                     "changedDate": "2026-09-08T14:53:15.168982116Z",
                     "initStatus": null,
                     "endStatus": "IMPLEMENTATION"
+                },
+                {
+                    "userId": "ioan.alferaru@gmail.com",
+                    "changedDate": "2026-09-13T16:33:10.427879403Z",
+                    "initStatus": "IMPLEMENTATION",
+                    "endStatus": "TESTING"
                 }
             ],
             "assignee": "google|alferaru.ioan@gmail.com|"
@@ -517,7 +585,7 @@
             },
             "responsible": "alfu32@github",
             "modified": {
-                "date": "2026-09-09T09:24:11.974752288Z",
+                "date": "2026-09-13T16:33:36.984919130Z",
                 "user": "ioan.alferaru@gmail.com"
             },
             "ports": [
@@ -535,7 +603,7 @@
             "metadata": {},
             "pluginData": {},
             "nameDetail": "",
-            "status": "IMPLEMENTATION",
+            "status": "DEPLOYED",
             "statusChanges": [
                 {
                     "userId": "devlin",
@@ -560,6 +628,24 @@
                     "changedDate": "2026-09-09T09:24:11.974722425Z",
                     "initStatus": "BUSINESS",
                     "endStatus": "IMPLEMENTATION"
+                },
+                {
+                    "userId": "ioan.alferaru@gmail.com",
+                    "changedDate": "2026-09-13T16:32:47.473485525Z",
+                    "initStatus": "IMPLEMENTATION",
+                    "endStatus": "TESTING"
+                },
+                {
+                    "userId": "ioan.alferaru@gmail.com",
+                    "changedDate": "2026-09-13T16:33:02.667622930Z",
+                    "initStatus": "TESTING",
+                    "endStatus": "BUSINESS"
+                },
+                {
+                    "userId": "ioan.alferaru@gmail.com",
+                    "changedDate": "2026-09-13T16:33:36.984893270Z",
+                    "initStatus": "BUSINESS",
+                    "endStatus": "DEPLOYED"
                 }
             ],
             "assignee": "github|ioan.alferaru@gmail.com|User"
@@ -612,7 +698,7 @@
             },
             "responsible": "alfu32@github",
             "modified": {
-                "date": "2026-09-09T09:24:15.947810253Z",
+                "date": "2026-09-13T16:33:27.761967244Z",
                 "user": "ioan.alferaru@gmail.com"
             },
             "ports": [
@@ -660,6 +746,30 @@
                     "userId": "ioan.alferaru@gmail.com",
                     "changedDate": "2026-09-09T09:24:15.947787817Z",
                     "initStatus": "BUSINESS",
+                    "endStatus": "IMPLEMENTATION"
+                },
+                {
+                    "userId": "ioan.alferaru@gmail.com",
+                    "changedDate": "2026-09-13T16:32:48.719422213Z",
+                    "initStatus": "IMPLEMENTATION",
+                    "endStatus": "TESTING"
+                },
+                {
+                    "userId": "ioan.alferaru@gmail.com",
+                    "changedDate": "2026-09-13T16:33:19.030289598Z",
+                    "initStatus": "TESTING",
+                    "endStatus": "IMPLEMENTATION"
+                },
+                {
+                    "userId": "ioan.alferaru@gmail.com",
+                    "changedDate": "2026-09-13T16:33:21.200499976Z",
+                    "initStatus": "IMPLEMENTATION",
+                    "endStatus": "TESTING"
+                },
+                {
+                    "userId": "ioan.alferaru@gmail.com",
+                    "changedDate": "2026-09-13T16:33:27.761934661Z",
+                    "initStatus": "TESTING",
                     "endStatus": "IMPLEMENTATION"
                 }
             ],
@@ -1072,7 +1182,7 @@
             },
             "responsible": "local|devlin|",
             "modified": {
-                "date": "2026-09-09T10:12:19.828785300Z",
+                "date": "2026-09-13T16:32:54.223288335Z",
                 "user": "ioan.alferaru@gmail.com"
             },
             "ports": [],
@@ -1100,7 +1210,7 @@
             "metadata": {},
             "pluginData": {},
             "nameDetail": "",
-            "status": "IMPLEMENTATION",
+            "status": "TESTING",
             "statusChanges": [
                 {
                     "userId": "devlin",
@@ -1113,6 +1223,12 @@
                     "changedDate": "2026-09-08T14:55:07.994276097Z",
                     "initStatus": "BUSINESS",
                     "endStatus": "IMPLEMENTATION"
+                },
+                {
+                    "userId": "ioan.alferaru@gmail.com",
+                    "changedDate": "2026-09-13T16:32:54.223257660Z",
+                    "initStatus": "IMPLEMENTATION",
+                    "endStatus": "TESTING"
                 }
             ],
             "assignee": "github|ioan.alferaru@gmail.com|User"
@@ -1832,7 +1948,7 @@
             },
             "responsible": "alfu32@github",
             "modified": {
-                "date": "2026-09-12T22:22:58.762005712Z",
+                "date": "2026-09-13T16:33:07.383919747Z",
                 "user": "ioan.alferaru@gmail.com"
             },
             "ports": [
@@ -1857,13 +1973,19 @@
             "metadata": {},
             "pluginData": {},
             "nameDetail": "a",
-            "status": "IMPLEMENTATION",
+            "status": "TESTING",
             "statusChanges": [
                 {
                     "userId": "devlin",
                     "changedDate": "2026-09-08T14:53:30.429984723Z",
                     "initStatus": null,
                     "endStatus": "IMPLEMENTATION"
+                },
+                {
+                    "userId": "ioan.alferaru@gmail.com",
+                    "changedDate": "2026-09-13T16:33:07.383890189Z",
+                    "initStatus": "IMPLEMENTATION",
+                    "endStatus": "TESTING"
                 }
             ],
             "assignee": "microsoft|ioan.alferaru@gmail.com|"
@@ -2427,7 +2549,7 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-12T22:22:58.762005712Z",
+                "date": "2026-09-13T16:32:59.735499832Z",
                 "user": "ioan.alferaru@gmail.com"
             },
             "ports": [
@@ -2445,13 +2567,19 @@
             "metadata": {},
             "pluginData": {},
             "nameDetail": "",
-            "status": "BUSINESS",
+            "status": "FUNCTIONAL",
             "statusChanges": [
                 {
                     "userId": "ioan.alferaru@gmail.com",
                     "changedDate": "2026-09-12T22:22:17.934758384Z",
                     "initStatus": null,
                     "endStatus": "BUSINESS"
+                },
+                {
+                    "userId": "ioan.alferaru@gmail.com",
+                    "changedDate": "2026-09-13T16:32:59.735461267Z",
+                    "initStatus": "BUSINESS",
+                    "endStatus": "FUNCTIONAL"
                 }
             ],
             "assignee": null
@@ -2537,7 +2665,8 @@
             "children": [],
             "incomingLinks": [
                 "link_e2173d13-86b1-440b-88f8-77a1c4628b9c",
-                "link_7997954b-3628-42ef-bdfd-1146684c6a6c"
+                "link_7997954b-3628-42ef-bdfd-1146684c6a6c",
+                "link_8dae3e7b-5a21-40e9-aa13-3d16ffa183fe"
             ],
             "outgoingLinks": [
                 "link_e2173d13-86b1-440b-88f8-77a1c4628b9c"
@@ -2546,11 +2675,11 @@
                 "x": -561.0,
                 "y": 1018.0,
                 "width": 200.0,
-                "height": 108.0,
+                "height": 138.0,
                 "closedWidth": 200.0,
-                "closedHeight": 108.0,
+                "closedHeight": 138.0,
                 "openWidth": 200.0,
-                "openHeight": 108.0,
+                "openHeight": 138.0,
                 "isExpanded": true
             },
             "fileLayoutStrategyId": "none",
@@ -2580,7 +2709,7 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-13T10:10:30.952802522Z",
+                "date": "2026-09-13T10:55:33.645686255Z",
                 "user": "ioan.alferaru@gmail.com"
             },
             "ports": [
@@ -2765,6 +2894,175 @@
             "status": null,
             "statusChanges": [],
             "assignee": null
+        },
+        {
+            "id": "node_d3143aee-4f6c-47a4-81dd-4e3bfe61789c",
+            "name": "file_queue",
+            "kind": "Processor",
+            "parentId": "root",
+            "children": [],
+            "incomingLinks": [],
+            "outgoingLinks": [
+                "link_8dae3e7b-5a21-40e9-aa13-3d16ffa183fe"
+            ],
+            "layout": {
+                "x": 9.0,
+                "y": 1222.0,
+                "width": 200.0,
+                "height": 78.0,
+                "closedWidth": 200.0,
+                "closedHeight": 78.0,
+                "openWidth": 200.0,
+                "openHeight": 78.0,
+                "isExpanded": true
+            },
+            "fileLayoutStrategyId": "none",
+            "text": {
+                "initialization": "",
+                "initializationLanguageId": "",
+                "source": "typedef struct { char id[64]; char filename[256]; char content[4096]; } FilePacket;\ntypedef struct { const char *in; const char *out; const char *err; } FileQueueConfig;\nextern FILE *popen(const char *, const char *);\nextern int pclose(FILE *);\nstatic unsigned long long file_queue_next_id = 1ULL;\nstatic FileQueueConfig queue_config = {0};\nFilePacket packet;\nif (pop(config, &queue_config) == THREADWORK_QUEUE_OK && queue_config.in != NULL && queue_config.out != NULL && queue_config.err != NULL) {\n    const char *allowed = \"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_./-\";\n    if (strspn(queue_config.in, allowed) == strlen(queue_config.in)) {\n        char command[1024];\n        char path[256];\n        snprintf(command, sizeof(command), \"find '%s' -maxdepth 1 -type f -print -quit\", queue_config.in);\n        FILE *listing = popen(command, \"r\");\n        if (listing != NULL && fgets(path, sizeof(path), listing) != NULL) {\n            path[strcspn(path, \"\\r\\n\")] = '\\0';\n            FILE *input = fopen(path, \"rb\");\n            if (input != NULL) {\n                memset(&packet, 0, sizeof(packet));\n                snprintf(packet.id, sizeof(packet.id), \"%llu\", file_queue_next_id++);\n                snprintf(packet.filename, sizeof(packet.filename), \"%s\", strrchr(path, '/') != NULL ? strrchr(path, '/') + 1 : path);\n                packet.content[0] = '\\0';\n                fread(packet.content, 1U, sizeof(packet.content) - 1U, input);\n                fclose(input);\n                push(read, &packet);\n                remove(path);\n            }\n        }\n        if (listing != NULL) pclose(listing);\n    }\n}\nif (pop(response, &packet) == THREADWORK_QUEUE_OK && queue_config.out != NULL) {\n    char output_path[512];\n    snprintf(output_path, sizeof(output_path), \"%s/%s\", queue_config.out, packet.filename);\n    FILE *output = fopen(output_path, \"wb\");\n    if (output != NULL) { fwrite(packet.content, 1U, strlen(packet.content), output); fclose(output); }\n}",
+                "sourceLanguageId": "",
+                "specification": "Implements a folder-backed request/response queue.\n\nConfiguration contract: input port/link `config` supplies `FileQueueConfig` with the communication folders `in`, `out`, and `err`. All three paths are required and must resolve independently.\n\nTransport contract:\n- output port/link `read` emits one consumed input file as a `FilePacket`;\n- input port/link `response` accepts processed content correlated to the original input file;\n- input port/link `config` updates the folder configuration.\n\nPacket contract: `FilePacket` contains exactly `id`, `filename`, and `content`. The emitted packet receives a stable `id`, the original basename in `filename`, and the complete file data in `content`. A response should preserve `id`; the ID is used to recover the original filename when necessary.\n\nBehavior: atomically claim regular files from the `in` folder, emit them once through `read`, remember pending IDs, and write correlated responses to the `out` folder. Move malformed, unreadable, uncorrelated, timed-out, or failed files to `err`. Create no partial final output file: write a temporary file and atomically rename it.\n\nThe implementation may omit ID lookup when the response preserves an unambiguous safe filename, but it must still prevent cross-file response mixups and path traversal.",
+                "specificationLanguageId": "markdown",
+                "tests": "",
+                "testsLanguageId": "json",
+                "aiInstructions": "Keep file claiming and output publication atomic. Preserve `id`, `filename`, and `content`, and reject unsafe filenames.",
+                "aiInstructionsLanguageId": "markdown"
+            },
+            "binaryContent": null,
+            "technology": {
+                "languageId": "c",
+                "technologyId": "c-native",
+                "compilerId": "c-compiler",
+                "fileExtension": "",
+                "contentType": ""
+            },
+            "revision": {
+                "name": "",
+                "date": ""
+            },
+            "responsible": null,
+            "modified": {
+                "date": "2026-09-13T10:55:33.645686255Z",
+                "user": "ioan.alferaru@gmail.com"
+            },
+            "ports": [
+                {
+                    "id": "config",
+                    "name": "config",
+                    "direction": "Input",
+                    "dataType": "FileQueueConfig",
+                    "metadata": {}
+                },
+                {
+                    "id": "read",
+                    "name": "read",
+                    "direction": "Output",
+                    "dataType": "FilePacket",
+                    "metadata": {}
+                },
+                {
+                    "id": "response",
+                    "name": "response",
+                    "direction": "Input",
+                    "dataType": "FilePacket",
+                    "metadata": {}
+                },
+                {
+                    "id": "output_out",
+                    "name": "out",
+                    "direction": "Output",
+                    "dataType": "",
+                    "metadata": {}
+                }
+            ],
+            "link": null,
+            "typeDefinition": null,
+            "diagnostics": [],
+            "metadata": {},
+            "pluginData": {},
+            "nameDetail": "",
+            "status": "BUSINESS",
+            "statusChanges": [
+                {
+                    "userId": "ioan.alferaru@gmail.com",
+                    "changedDate": "2026-09-13T10:53:23.287028424Z",
+                    "initStatus": null,
+                    "endStatus": "BUSINESS"
+                }
+            ],
+            "assignee": null
+        },
+        {
+            "id": "link_8dae3e7b-5a21-40e9-aa13-3d16ffa183fe",
+            "name": "file_queue -> memory_example",
+            "kind": "Link",
+            "parentId": "root",
+            "children": [],
+            "incomingLinks": [],
+            "outgoingLinks": [],
+            "layout": {
+                "x": 0.0,
+                "y": 0.0,
+                "width": 200.0,
+                "height": 70.0,
+                "closedWidth": 200.0,
+                "closedHeight": 70.0,
+                "openWidth": 200.0,
+                "openHeight": 70.0,
+                "isExpanded": true
+            },
+            "fileLayoutStrategyId": "none",
+            "text": {
+                "initialization": "",
+                "initializationLanguageId": "",
+                "source": "",
+                "sourceLanguageId": "",
+                "specification": "",
+                "specificationLanguageId": "markdown",
+                "tests": "",
+                "testsLanguageId": "json",
+                "aiInstructions": "",
+                "aiInstructionsLanguageId": "markdown"
+            },
+            "binaryContent": null,
+            "technology": {
+                "languageId": "",
+                "technologyId": "",
+                "compilerId": "",
+                "fileExtension": "",
+                "contentType": ""
+            },
+            "revision": {
+                "name": "",
+                "date": ""
+            },
+            "responsible": null,
+            "modified": {
+                "date": "2026-09-13T10:55:33.645686255Z",
+                "user": "ioan.alferaru@gmail.com"
+            },
+            "ports": [],
+            "link": {
+                "sourceNodeId": "node_d3143aee-4f6c-47a4-81dd-4e3bfe61789c",
+                "sourcePortName": "out",
+                "targetNodeId": "node_3fcc850e-744b-4b6b-812c-35983aad4a82",
+                "targetPortName": "in",
+                "transportKind": "in-process",
+                "typeName": "",
+                "payloadDefinition": "",
+                "typeDefinitionId": "",
+                "compositeBoundaryIds": [],
+                "interactionKind": "data"
+            },
+            "typeDefinition": null,
+            "diagnostics": [],
+            "metadata": {},
+            "pluginData": {},
+            "nameDetail": "",
+            "status": null,
+            "statusChanges": [],
+            "assignee": null
         }
     ],
     "metadata": {},
@@ -2783,7 +3081,7 @@
             "username": "",
             "fullName": "Ioan Alferaru",
             "role": "",
-            "refreshedAt": "2026-09-13T10:23:45.610277352Z"
+            "refreshedAt": "2026-09-13T10:53:06.460292016Z"
         },
         {
             "identifier": "alferaru.ioan@gmail.com",
@@ -2879,7 +3177,7 @@
             "username": "",
             "fullName": "",
             "role": "",
-            "refreshedAt": "2026-09-13T10:10:30.952802522Z"
+            "refreshedAt": "2026-09-13T16:33:41.647629088Z"
         }
     ]
 }
