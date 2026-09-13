@@ -353,7 +353,7 @@ abstract class TemplateSetCompiler : StructuredCompiler() {
             "kotlin" -> {
                 val arguments = buildList {
                     add("context: RuntimeContext")
-                    (dataInputs + dataOutputs).forEach { linkNode ->
+                    (dataInputs + dataOutputs).distinctBy { it.id }.forEach { linkNode ->
                         add("${compilerArgumentName(linkNode.name)}: ArrayDeque<Any?>")
                     }
                     capabilities.forEach { linkNode -> add("${compilerArgumentName(linkNode.name)}: Any?") }
@@ -364,7 +364,8 @@ abstract class TemplateSetCompiler : StructuredCompiler() {
             "javascript", "typescript" -> {
                 val arguments = buildList {
                     add("context = {}")
-                    (dataInputs + dataOutputs + capabilities).forEach { linkNode -> add(compilerArgumentName(linkNode.name)) }
+                    (dataInputs + dataOutputs + capabilities).distinctBy { it.id }
+                        .forEach { linkNode -> add(compilerArgumentName(linkNode.name)) }
                 }
                 "function ${functionPrefix}_$symbol(${arguments.joinToString(", ")}) {"
             }
@@ -372,7 +373,8 @@ abstract class TemplateSetCompiler : StructuredCompiler() {
             else -> {
                 val arguments = buildList {
                     add("context")
-                    (dataInputs + dataOutputs + capabilities).forEach { linkNode -> add(compilerArgumentName(linkNode.name)) }
+                    (dataInputs + dataOutputs + capabilities).distinctBy { it.id }
+                        .forEach { linkNode -> add(compilerArgumentName(linkNode.name)) }
                 }
                 "${functionPrefix}_$symbol(${arguments.joinToString(", ")}) {"
             }

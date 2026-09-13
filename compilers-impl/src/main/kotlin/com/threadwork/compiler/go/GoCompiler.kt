@@ -128,7 +128,10 @@ class GoCompiler : TemplateSetCompiler() {
             else -> return ""
         }
         val arguments = mutableListOf("context *ThreadworkContext")
-        node.incomingLinks.mapNotNull(document.nodes::get).forEach { linkNode ->
+        val dataArguments = node.incomingLinks.mapNotNull(document.nodes::get) +
+            node.outgoingLinks.mapNotNull(document.nodes::get)
+                .filterNot { LinkClassifier.isCapability(document, it) }
+        dataArguments.distinctBy { it.id }.forEach { linkNode ->
             when (LinkClassifier.classify(document, linkNode)) {
                 LinkStereotype.UsageImport,
                 LinkStereotype.DependencyInjection -> Unit
@@ -141,9 +144,6 @@ class GoCompiler : TemplateSetCompiler() {
                 else -> arguments += "${compilerArgumentName(linkNode.name)} *ThreadworkBuffer"
             }
         }
-        node.outgoingLinks.mapNotNull(document.nodes::get)
-            .filterNot { LinkClassifier.isCapability(document, it) }
-            .forEach { arguments += "${compilerArgumentName(it.name)} *ThreadworkBuffer" }
         return "func ${functionPrefix}_${indexedNodeSymbol(document, node)}(${arguments.joinToString(", ")}) error {"
     }
 

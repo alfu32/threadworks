@@ -26,6 +26,24 @@ import kotlin.test.assertTrue
 
 class CCompilerTest {
     @Test
+    fun `self targeting links appear once in generated function headers`() {
+        val repository = cProject()
+        val root = repository.getDocument().rootNodeId
+        val worker = repository.createNode(root, "worker", NodeKind.Processor)
+        repository.addPort(worker.id, NodePort("out", "loop", PortDirection.Output))
+        repository.addPort(worker.id, NodePort("in", "loop", PortDirection.Input))
+        repository.createLink(root, "loop", worker.id, "out", worker.id, "in")
+
+        val header = CCompiler().generatedFunctionHeader(
+            repository.getDocument(),
+            worker,
+            NodeTextSection.Declaration,
+        )
+
+        assertEquals(1, Regex("threadwork_buffer \\*loop").findAll(header).count())
+    }
+
+    @Test
     fun `C compiler accepts native primitive link types without translation`() {
         val repository = cProject()
         val root = repository.getDocument().rootNodeId

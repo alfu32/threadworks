@@ -117,7 +117,10 @@ class PhpCompiler : TemplateSetCompiler() {
             else -> return ""
         }
         val arguments = mutableListOf("array &\$context")
-        node.incomingLinks.mapNotNull(document.nodes::get).forEach { linkNode ->
+        val dataArguments = node.incomingLinks.mapNotNull(document.nodes::get) +
+            node.outgoingLinks.mapNotNull(document.nodes::get)
+                .filterNot { LinkClassifier.isCapability(document, it) }
+        dataArguments.distinctBy { it.id }.forEach { linkNode ->
             val argument = "\$${compilerArgumentName(linkNode.name)}"
             when (LinkClassifier.classify(document, linkNode)) {
                 LinkStereotype.UsageImport,
@@ -127,11 +130,6 @@ class PhpCompiler : TemplateSetCompiler() {
                 else -> arguments += "array &$argument"
             }
         }
-        node.outgoingLinks.mapNotNull(document.nodes::get)
-            .filterNot { LinkClassifier.isCapability(document, it) }
-            .forEach { linkNode ->
-                arguments += "array &\$${compilerArgumentName(linkNode.name)}"
-            }
         return "function ${functionPrefix}_${indexedNodeSymbol(document, node)}(${arguments.joinToString(", ")}): void {"
     }
 

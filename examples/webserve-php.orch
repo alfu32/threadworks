@@ -72,13 +72,23 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-13T09:44:58.188710411Z",
+                "date": "2026-09-13T10:06:51.825616068Z",
                 "user": "ioan.alferaru@gmail.com"
             },
             "ports": [],
             "link": null,
             "typeDefinition": null,
-            "diagnostics": [],
+            "diagnostics": [
+                {
+                    "severity": "Error",
+                    "message": "Delegated compiler 'php-compiler' failed for 'webserve-php'.",
+                    "nodeId": "root",
+                    "textSection": null,
+                    "line": null,
+                    "column": null,
+                    "sourcePluginId": "multi-tech"
+                }
+            ],
             "metadata": {},
             "pluginData": {},
             "nameDetail": "",
@@ -2136,7 +2146,17 @@
                 "interactionKind": "data"
             },
             "typeDefinition": null,
-            "diagnostics": [],
+            "diagnostics": [
+                {
+                    "severity": "Error",
+                    "message": "Link 'link_a8ce6267-aa95-4362-84e5-c2929e395f3a' references unknown type 'number'",
+                    "nodeId": "link_a8ce6267-aa95-4362-84e5-c2929e395f3a",
+                    "textSection": null,
+                    "line": null,
+                    "column": null,
+                    "sourcePluginId": null
+                }
+            ],
             "metadata": {},
             "pluginData": {},
             "nameDetail": "",
@@ -2560,7 +2580,7 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-13T09:57:29.457762707Z",
+                "date": "2026-09-13T10:10:30.952802522Z",
                 "user": "ioan.alferaru@gmail.com"
             },
             "ports": [
@@ -2600,7 +2620,7 @@
                     "endStatus": "FUNCTIONAL"
                 }
             ],
-            "assignee": "google|ioan.alferaru@gmail.com|"
+            "assignee": "github|ioan.alferaru@gmail.com|User"
         },
         {
             "id": "link_e2173d13-86b1-440b-88f8-77a1c4628b9c",
@@ -2763,7 +2783,7 @@
             "username": "",
             "fullName": "Ioan Alferaru",
             "role": "",
-            "refreshedAt": "2026-09-13T09:48:08.518449922Z"
+            "refreshedAt": "2026-09-13T10:04:13.415142747Z"
         },
         {
             "identifier": "alferaru.ioan@gmail.com",
@@ -2859,7 +2879,7 @@
             "username": "",
             "fullName": "",
             "role": "",
-            "refreshedAt": "2026-09-13T09:57:29.457762707Z"
+            "refreshedAt": "2026-09-13T10:10:30.952802522Z"
         }
     ]
 }

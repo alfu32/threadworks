@@ -13,9 +13,30 @@ import com.threadwork.core.model.TypeFieldDefinition
 import com.threadwork.storage.InMemoryDocumentRepository
 import com.threadwork.storage.newDocument
 import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class PhpCompilerTest {
+    @Test
+    fun `self targeting links appear once in generated function headers`() {
+        val repository = InMemoryDocumentRepository(newDocument("PHP self loop"))
+        val root = repository.getDocument().rootNodeId
+        repository.updateNodeTechnology(root, TechnologyMetadata(languageId = "php", technologyId = "php"))
+        val worker = repository.createNode(root, "worker", NodeKind.Processor)
+        repository.addPort(worker.id, NodePort("out", "loop", PortDirection.Output))
+        repository.addPort(worker.id, NodePort("in", "loop", PortDirection.Input))
+        repository.createLink(root, "loop", worker.id, "out", worker.id, "in")
+
+        val header = PhpCompiler().generatedFunctionHeader(
+            repository.getDocument(),
+            worker,
+            com.threadwork.core.model.NodeTextSection.Declaration,
+        )
+
+        val argument = "array &" + '$' + "loop"
+        assertEquals(1, header.windowed(argument.length).count { it == argument })
+    }
+
     @Test
     fun `declared types are generated for typed links`() {
         val repository = InMemoryDocumentRepository(newDocument("Typed PHP"))

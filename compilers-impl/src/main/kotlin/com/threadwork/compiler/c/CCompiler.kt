@@ -230,7 +230,10 @@ class CCompiler : TemplateSetCompiler() {
             else -> return ""
         }
         val arguments = mutableListOf("threadwork_context *context")
-        node.incomingLinks.mapNotNull(document.nodes::get).forEach { linkNode ->
+        val dataArguments = node.incomingLinks.mapNotNull(document.nodes::get) +
+            node.outgoingLinks.mapNotNull(document.nodes::get)
+                .filterNot { LinkClassifier.isCapability(document, it) }
+        dataArguments.distinctBy { it.id }.forEach { linkNode ->
             when (LinkClassifier.classify(document, linkNode)) {
                 LinkStereotype.UsageImport,
                 LinkStereotype.DependencyInjection -> Unit
@@ -242,9 +245,6 @@ class CCompiler : TemplateSetCompiler() {
                 else -> arguments += "threadwork_buffer *${compilerArgumentName(linkNode.name)}"
             }
         }
-        node.outgoingLinks.mapNotNull(document.nodes::get)
-            .filterNot { LinkClassifier.isCapability(document, it) }
-            .forEach { arguments += "threadwork_buffer *${compilerArgumentName(it.name)}" }
         return "static threadwork_error_t tw_${functionPrefix}_${indexedNodeSymbol(document, node)}(${arguments.joinToString(", ")}) {"
     }
 

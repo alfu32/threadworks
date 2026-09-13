@@ -23,6 +23,25 @@ import kotlin.test.assertTrue
 
 class GoCompilerTest {
     @Test
+    fun `self targeting links appear once in generated function headers`() {
+        val repository = InMemoryDocumentRepository(newDocument("Go self loop"))
+        val root = repository.getDocument().rootNodeId
+        repository.updateNodeTechnology(root, TechnologyMetadata("go", "go", "go-compiler"))
+        val worker = repository.createNode(root, "worker", NodeKind.Processor)
+        repository.addPort(worker.id, NodePort("out", "loop", PortDirection.Output))
+        repository.addPort(worker.id, NodePort("in", "loop", PortDirection.Input))
+        repository.createLink(root, "loop", worker.id, "out", worker.id, "in")
+
+        val header = GoCompiler().generatedFunctionHeader(
+            repository.getDocument(),
+            worker,
+            NodeTextSection.Declaration,
+        )
+
+        assertEquals(1, Regex("loop \\*ThreadworkBuffer").findAll(header).count())
+    }
+
+    @Test
     fun `generates typed double buffered Go network and runner`() {
         val repository = InMemoryDocumentRepository(newDocument("Typed Go"))
         val root = repository.getDocument().rootNodeId
