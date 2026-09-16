@@ -2954,6 +2954,10 @@ class GraphCanvas(
         const val DEPENDENCY_TARGET_MIN_WIDTH = 80
         const val DEPENDENCY_LABEL_HORIZONTAL_PADDING = 16
         const val DEPENDENCY_TARGET_RULE_RATIO = 0.72
+        const val DEPENDENCY_ANNOTATION_TOP_PADDING = 10
+        const val DEPENDENCY_ANNOTATION_LABEL_HEIGHT = 24
+        const val DEPENDENCY_ANNOTATION_ROW_HEIGHT = 32
+        const val DEPENDENCY_ANNOTATION_BOTTOM_PADDING = 8
         const val PORT_STUB_LENGTH = 46
         const val PORT_OUTSIDE_OFFSET = 20
         const val ROUTING_STEP = 40
@@ -3529,12 +3533,25 @@ class GraphCanvas(
         return (topSpacing + portCount * PORT_SPACING + PORT_BOTTOM_SPACING).toDouble()
     }
 
+    private fun requiredDependencyAnnotationHeight(node: Node): Double {
+        val annotationCount = node.outgoingLinks
+            .mapNotNull(repository::getNode)
+            .count { isVisibleLink(it) && isDependencyAnnotation(it) }
+        if (annotationCount == 0) return 0.0
+        return (
+            DEPENDENCY_ANNOTATION_TOP_PADDING +
+                annotationCount * DEPENDENCY_ANNOTATION_ROW_HEIGHT +
+                DEPENDENCY_ANNOTATION_BOTTOM_PADDING
+            ).toDouble()
+    }
+
     private fun requiredTerminalHeight(node: Node): Double {
         val textHeight = TERMINAL_NODE_BASE_HEIGHT + if (node.isComposite) COMPOSITE_HEADER_EXTRA_HEIGHT else 0
         return maxOf(
             textHeight.toDouble(),
             requiredPortHeight(node, PORT_TOP_SPACING),
             requiredTypeHeight(node),
+            requiredDependencyAnnotationHeight(node),
         )
     }
 
@@ -4866,8 +4883,8 @@ class GraphCanvas(
             repository.getNode(link.targetNodeId) ?: return@forEachIndexed
             val label = dependencyInjectionLabel(linkNode, library)
             val labelWidth = dependencyAnnotationWidth(label, DEPENDENCY_SOURCE_MIN_WIDTH)
-            val labelHeight = 24
-            val y = r.y + 10 + index * (labelHeight + 8)
+            val labelHeight = DEPENDENCY_ANNOTATION_LABEL_HEIGHT
+            val y = r.y + DEPENDENCY_ANNOTATION_TOP_PADDING + index * DEPENDENCY_ANNOTATION_ROW_HEIGHT
             val x = r.x + r.width + DEPENDENCY_SOURCE_GAP
             val anchor = Point(r.x + r.width, y + labelHeight / 2)
             val color = hex(annotationColor(linkNode, selected = false))
@@ -5697,8 +5714,8 @@ class GraphCanvas(
                 DEPENDENCY_SOURCE_MIN_WIDTH,
                 g2.fontMetrics.stringWidth(label) + DEPENDENCY_LABEL_HORIZONTAL_PADDING,
             )
-            val labelHeight = 24
-            val y = r.y + 10 + index * (labelHeight + 8)
+            val labelHeight = DEPENDENCY_ANNOTATION_LABEL_HEIGHT
+            val y = r.y + DEPENDENCY_ANNOTATION_TOP_PADDING + index * DEPENDENCY_ANNOTATION_ROW_HEIGHT
             val x = r.x + r.width + DEPENDENCY_SOURCE_GAP
             val anchor = Point(r.x + r.width, y + labelHeight / 2)
             val color = annotationColor(linkNode, selected)
@@ -6809,9 +6826,9 @@ class GraphCanvas(
         val sourceLabelWidth = dependencyAnnotationWidth(label, DEPENDENCY_SOURCE_MIN_WIDTH)
         val sourceBounds = Rectangle(
             sourceRect.x + sourceRect.width,
-            sourceRect.y + 10 + sourceIndex * 32,
+            sourceRect.y + DEPENDENCY_ANNOTATION_TOP_PADDING + sourceIndex * DEPENDENCY_ANNOTATION_ROW_HEIGHT,
             DEPENDENCY_SOURCE_GAP + sourceLabelWidth,
-            24,
+            DEPENDENCY_ANNOTATION_LABEL_HEIGHT,
         )
         val dependencyWidth = dependencyAnnotationWidth(label, DEPENDENCY_TARGET_MIN_WIDTH)
         val dependencyBounds = Rectangle(

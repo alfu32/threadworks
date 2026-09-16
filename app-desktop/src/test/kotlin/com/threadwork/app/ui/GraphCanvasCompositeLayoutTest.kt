@@ -27,6 +27,25 @@ class GraphCanvasCompositeLayoutTest {
     }
 
     @Test
+    fun serviceLibrariesGrowForDependencyAnnotationRows() {
+        val repository = InMemoryDocumentRepository(newDocument("library annotations"))
+        val root = repository.getDocument().rootNodeId
+        val library = repository.createNode(root, "worker_lib", NodeKind.Processor)
+        val targets = (1..3).map { index ->
+            repository.createNode(root, "consumer$index", NodeKind.Processor).also { target ->
+                repository.createLink(root, "capability$index", library.id, "capability$index", target.id, "in")
+            }
+        }
+        val canvas = GraphCanvas(repository, linkedSetOf(), {}, {}, {})
+
+        canvas.refreshBoundsFromChildren()
+
+        assertEquals(114.0, library.layout.height)
+        assertEquals(114.0, library.layout.closedHeight)
+        assertTrue(targets.all { it.layout.height == 70.0 })
+    }
+
+    @Test
     fun `collapsed composites reserve room for every metadata line`() {
         val repository = InMemoryDocumentRepository(newDocument("collapsed composite"))
         val root = repository.getDocument().rootNodeId
