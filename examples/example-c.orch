@@ -36,7 +36,8 @@
                 "node_078ec47e-e735-4cc2-a56a-34da3933ac8b",
                 "node_352d6efc-bce0-4273-8c4b-03c64e7764fc",
                 "node_6a831982-71aa-47ad-ab14-fbfcbc9cd384",
-                "node_34e10e8d-c693-4e56-91d9-f03334aafa9b"
+                "node_34e10e8d-c693-4e56-91d9-f03334aafa9b",
+                "node_968adf46-fe80-45e7-a6c3-90d78a8697e4"
             ],
             "incomingLinks": [],
             "outgoingLinks": [],
@@ -78,8 +79,8 @@
             },
             "responsible": "devlin",
             "modified": {
-                "date": "2026-09-07T22:58:15.391284748Z",
-                "user": "devlin"
+                "date": "2026-09-17T01:44:04.578458599Z",
+                "user": "8todraw@gmail.com"
             },
             "ports": [],
             "link": null,
@@ -140,8 +141,8 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-09T07:10:51.662224747Z",
-                "user": "cristian.alferaru@gmail.com"
+                "date": "2026-09-17T01:35:03.365282309Z",
+                "user": "8todraw@gmail.com"
             },
             "ports": [],
             "link": null,
@@ -150,8 +151,21 @@
             "metadata": {},
             "pluginData": {},
             "nameDetail": "",
-            "status": null,
-            "statusChanges": [],
+            "status": "DEPLOYED",
+            "statusChanges": [
+                {
+                    "userId": "8todraw@gmail.com",
+                    "changedDate": "2026-09-17T01:34:17.660450233Z",
+                    "initStatus": null,
+                    "endStatus": "BUSINESS"
+                },
+                {
+                    "userId": "8todraw@gmail.com",
+                    "changedDate": "2026-09-17T01:35:03.365190995Z",
+                    "initStatus": "BUSINESS",
+                    "endStatus": "DEPLOYED"
+                }
+            ],
             "assignee": null
         },
         {
@@ -200,8 +214,8 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-09T07:07:56.075824522Z",
-                "user": "devlin"
+                "date": "2026-09-17T01:35:19.430086813Z",
+                "user": "8todraw@gmail.com"
             },
             "ports": [],
             "link": null,
@@ -210,27 +224,32 @@
                     {
                         "name": "timestamp",
                         "typeId": "string",
-                        "isReference": false
+                        "isReference": false,
+                        "typeExpression": null
                     },
                     {
                         "name": "uuid",
                         "typeId": "string",
-                        "isReference": false
+                        "isReference": false,
+                        "typeExpression": null
                     },
                     {
                         "name": "random_word",
                         "typeId": "string",
-                        "isReference": false
+                        "isReference": false,
+                        "typeExpression": null
                     },
                     {
                         "name": "random_word_length",
                         "typeId": "number",
-                        "isReference": false
+                        "isReference": false,
+                        "typeExpression": null
                     },
                     {
                         "name": "isok",
                         "typeId": "boolean",
-                        "isReference": false
+                        "isReference": false,
+                        "typeExpression": null
                     }
                 ]
             },
@@ -238,8 +257,27 @@
             "metadata": {},
             "pluginData": {},
             "nameDetail": "",
-            "status": null,
-            "statusChanges": [],
+            "status": "DEPLOYED",
+            "statusChanges": [
+                {
+                    "userId": "8todraw@gmail.com",
+                    "changedDate": "2026-09-17T01:33:58.025180015Z",
+                    "initStatus": null,
+                    "endStatus": "BUSINESS"
+                },
+                {
+                    "userId": "8todraw@gmail.com",
+                    "changedDate": "2026-09-17T01:34:41.440454010Z",
+                    "initStatus": "BUSINESS",
+                    "endStatus": "IMPLEMENTATION"
+                },
+                {
+                    "userId": "8todraw@gmail.com",
+                    "changedDate": "2026-09-17T01:35:19.430041159Z",
+                    "initStatus": "IMPLEMENTATION",
+                    "endStatus": "DEPLOYED"
+                }
+            ],
             "assignee": null
         },
         {
@@ -292,8 +330,8 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-09T07:08:04.860638508Z",
-                "user": "devlin"
+                "date": "2026-09-17T01:35:38.882664409Z",
+                "user": "8todraw@gmail.com"
             },
             "ports": [
                 {
@@ -317,8 +355,33 @@
             "metadata": {},
             "pluginData": {},
             "nameDetail": "",
-            "status": null,
-            "statusChanges": [],
+            "status": "TESTING",
+            "statusChanges": [
+                {
+                    "userId": "8todraw@gmail.com",
+                    "changedDate": "2026-09-17T01:33:43.455957896Z",
+                    "initStatus": null,
+                    "endStatus": "BUSINESS"
+                },
+                {
+                    "userId": "8todraw@gmail.com",
+                    "changedDate": "2026-09-17T01:34:45.533298811Z",
+                    "initStatus": "BUSINESS",
+                    "endStatus": "FUNCTIONAL"
+                },
+                {
+                    "userId": "8todraw@gmail.com",
+                    "changedDate": "2026-09-17T01:35:26.658905972Z",
+                    "initStatus": "FUNCTIONAL",
+                    "endStatus": "IMPLEMENTATION"
+                },
+                {
+                    "userId": "8todraw@gmail.com",
+                    "changedDate": "2026-09-17T01:35:38.882606769Z",
+                    "initStatus": "IMPLEMENTATION",
+                    "endStatus": "TESTING"
+                }
+            ],
             "assignee": null
         },
         {
@@ -381,7 +444,8 @@
                 "payloadDefinition": "",
                 "typeDefinitionId": "",
                 "compositeBoundaryIds": [],
-                "interactionKind": "lib"
+                "interactionKind": "lib",
+                "typeExpression": null
             },
             "typeDefinition": null,
             "diagnostics": [],
@@ -452,7 +516,8 @@
                 "payloadDefinition": "",
                 "typeDefinitionId": "",
                 "compositeBoundaryIds": [],
-                "interactionKind": "lib"
+                "interactionKind": "lib",
+                "typeExpression": null
             },
             "typeDefinition": null,
             "diagnostics": [],
@@ -513,8 +578,8 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-09T07:07:44.315947765Z",
-                "user": "devlin"
+                "date": "2026-09-17T01:35:37.798459440Z",
+                "user": "8todraw@gmail.com"
             },
             "ports": [
                 {
@@ -538,8 +603,27 @@
             "metadata": {},
             "pluginData": {},
             "nameDetail": "random text",
-            "status": null,
-            "statusChanges": [],
+            "status": "BUSINESS",
+            "statusChanges": [
+                {
+                    "userId": "8todraw@gmail.com",
+                    "changedDate": "2026-09-17T01:33:46.405473442Z",
+                    "initStatus": null,
+                    "endStatus": "BUSINESS"
+                },
+                {
+                    "userId": "8todraw@gmail.com",
+                    "changedDate": "2026-09-17T01:35:32.310768553Z",
+                    "initStatus": "BUSINESS",
+                    "endStatus": "FUNCTIONAL"
+                },
+                {
+                    "userId": "8todraw@gmail.com",
+                    "changedDate": "2026-09-17T01:35:37.798405243Z",
+                    "initStatus": "FUNCTIONAL",
+                    "endStatus": "BUSINESS"
+                }
+            ],
             "assignee": null
         },
         {
@@ -602,7 +686,8 @@
                 "payloadDefinition": "",
                 "typeDefinitionId": "node_c4fb01af-8d9d-4a30-838f-8ab8f6328db8",
                 "compositeBoundaryIds": [],
-                "interactionKind": "data"
+                "interactionKind": "data",
+                "typeExpression": null
             },
             "typeDefinition": null,
             "diagnostics": [],
@@ -673,7 +758,8 @@
                 "payloadDefinition": "",
                 "typeDefinitionId": "node_c4fb01af-8d9d-4a30-838f-8ab8f6328db8",
                 "compositeBoundaryIds": [],
-                "interactionKind": "data"
+                "interactionKind": "data",
+                "typeExpression": null
             },
             "typeDefinition": null,
             "diagnostics": [],
@@ -712,7 +798,7 @@
             "text": {
                 "initialization": "",
                 "initializationLanguageId": "",
-                "source": "Packet item;\nif (pop(ip_time, &item) != THREADWORK_OK) {\n    return THREADWORK_OK;\n}\n\n// should raise a compilation error // -gibberish--\n\nuuid_t uuid_value;\nchar *uuid_string = malloc(37);\n\nif (uuid_string == NULL) {\n    item.isok = false;\n    push(ip_uuid, &item);\n    return THREADWORK_ERROR;\n}\n\nuuids__uuid_generate_random(uuid_value);\nuuids__uuid_unparse_lower(uuid_value, uuid_string);\n\nitem.uuid = uuid_string;\nitem.random_word_length = 5 + (uuid_value[0] % 21);\nprintf(\"gen_text.timestamp:%s\\n\",item.timestamp != NULL ? item.timestamp : \"null\");\nprintf(\"gen_text.uuid:%s\\n\",item.uuid != NULL ? item.uuid : \"null\");\n\npush(ip_uuid, &item);",
+                "source": "Packet item;\nif (pop(ip_time, &item) != THREADWORK_OK) {\n    return THREADWORK_OK;\n}\n\n// should raise a compilation error // -gibberish--\n\nuuid_t uuid_value;\nchar *uuid_string = malloc(37);\n\nif (uuid_string == NULL) {\n    item.isok = false;\n    push(ip_uuid, &item);\n    return THREADWORK_ERROR;\n}\n\nuuids__uuid_generate_random(uuid_value);\nuuids__uuid_unparse_lower(uuid_value, uuid_string);\n\nitem.uuid = uuid_string;\nitem.random_word_length = 5 + (uuid_value[0] % 21);\nprintf(\"gen_text.timestamp:%s\\n\",item.timestamp != NULL ? item.timestamp : \"null\");\nprintf(\"gen_text.uuid:%s\\n\",item.uuid != NULL ? item.uuid : \"null\");\n\npush(ip_uuid, &item);\n\npu",
                 "sourceLanguageId": "",
                 "specification": "takes a Packet from ip_time, fills in its uuid field, sets random_word_length to a number between 5 and 25, and pushes the updated packet to ip_uuid",
                 "specificationLanguageId": "markdown",
@@ -735,8 +821,8 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-09T07:08:11.913091707Z",
-                "user": "devlin"
+                "date": "2026-09-17T01:37:27.489014179Z",
+                "user": "8todraw@gmail.com"
             },
             "ports": [
                 {
@@ -760,8 +846,21 @@
             "metadata": {},
             "pluginData": {},
             "nameDetail": "",
-            "status": null,
-            "statusChanges": [],
+            "status": "FUNCTIONAL",
+            "statusChanges": [
+                {
+                    "userId": "8todraw@gmail.com",
+                    "changedDate": "2026-09-17T01:33:49.310602657Z",
+                    "initStatus": null,
+                    "endStatus": "BUSINESS"
+                },
+                {
+                    "userId": "8todraw@gmail.com",
+                    "changedDate": "2026-09-17T01:35:33.395482365Z",
+                    "initStatus": "BUSINESS",
+                    "endStatus": "FUNCTIONAL"
+                }
+            ],
             "assignee": null
         },
         {
@@ -824,7 +923,8 @@
                 "payloadDefinition": "",
                 "typeDefinitionId": "node_c4fb01af-8d9d-4a30-838f-8ab8f6328db8",
                 "compositeBoundaryIds": [],
-                "interactionKind": "data"
+                "interactionKind": "data",
+                "typeExpression": null
             },
             "typeDefinition": null,
             "diagnostics": [],
@@ -895,7 +995,8 @@
                 "payloadDefinition": "",
                 "typeDefinitionId": "",
                 "compositeBoundaryIds": [],
-                "interactionKind": "lib"
+                "interactionKind": "lib",
+                "typeExpression": null
             },
             "typeDefinition": null,
             "diagnostics": [],
@@ -956,8 +1057,8 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-09T07:11:38.668314766Z",
-                "user": "ioan.alferaru@gmail.com"
+                "date": "2026-09-17T01:35:40.159634913Z",
+                "user": "8todraw@gmail.com"
             },
             "ports": [
                 {
@@ -981,8 +1082,33 @@
             "metadata": {},
             "pluginData": {},
             "nameDetail": "",
-            "status": null,
-            "statusChanges": [],
+            "status": "TESTING",
+            "statusChanges": [
+                {
+                    "userId": "8todraw@gmail.com",
+                    "changedDate": "2026-09-17T01:33:52.040266440Z",
+                    "initStatus": null,
+                    "endStatus": "BUSINESS"
+                },
+                {
+                    "userId": "8todraw@gmail.com",
+                    "changedDate": "2026-09-17T01:34:47.067465115Z",
+                    "initStatus": "BUSINESS",
+                    "endStatus": "FUNCTIONAL"
+                },
+                {
+                    "userId": "8todraw@gmail.com",
+                    "changedDate": "2026-09-17T01:35:27.699874159Z",
+                    "initStatus": "FUNCTIONAL",
+                    "endStatus": "IMPLEMENTATION"
+                },
+                {
+                    "userId": "8todraw@gmail.com",
+                    "changedDate": "2026-09-17T01:35:40.159547041Z",
+                    "initStatus": "IMPLEMENTATION",
+                    "endStatus": "TESTING"
+                }
+            ],
             "assignee": null
         },
         {
@@ -1045,7 +1171,8 @@
                 "payloadDefinition": "",
                 "typeDefinitionId": "",
                 "compositeBoundaryIds": [],
-                "interactionKind": "lib"
+                "interactionKind": "lib",
+                "typeExpression": null
             },
             "typeDefinition": null,
             "diagnostics": [],
@@ -1116,7 +1243,8 @@
                 "payloadDefinition": "",
                 "typeDefinitionId": "",
                 "compositeBoundaryIds": [],
-                "interactionKind": "lib"
+                "interactionKind": "lib",
+                "typeExpression": null
             },
             "typeDefinition": null,
             "diagnostics": [],
@@ -1144,11 +1272,11 @@
                 "x": 105.0,
                 "y": 628.0,
                 "width": 220.0,
-                "height": 70.0,
+                "height": 146.0,
                 "closedWidth": 220.0,
-                "closedHeight": 70.0,
+                "closedHeight": 146.0,
                 "openWidth": 220.0,
-                "openHeight": 70.0,
+                "openHeight": 146.0,
                 "isExpanded": true
             },
             "fileLayoutStrategyId": "single-file",
@@ -1178,8 +1306,8 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-09T07:10:01.691453126Z",
-                "user": "alfu32"
+                "date": "2026-09-17T01:35:42.882429852Z",
+                "user": "8todraw@gmail.com"
             },
             "ports": [
                 {
@@ -1196,8 +1324,33 @@
             "metadata": {},
             "pluginData": {},
             "nameDetail": "",
-            "status": null,
-            "statusChanges": [],
+            "status": "TESTING",
+            "statusChanges": [
+                {
+                    "userId": "8todraw@gmail.com",
+                    "changedDate": "2026-09-17T01:33:54.674486061Z",
+                    "initStatus": null,
+                    "endStatus": "BUSINESS"
+                },
+                {
+                    "userId": "8todraw@gmail.com",
+                    "changedDate": "2026-09-17T01:34:48.429504239Z",
+                    "initStatus": "BUSINESS",
+                    "endStatus": "FUNCTIONAL"
+                },
+                {
+                    "userId": "8todraw@gmail.com",
+                    "changedDate": "2026-09-17T01:35:29.012770933Z",
+                    "initStatus": "FUNCTIONAL",
+                    "endStatus": "IMPLEMENTATION"
+                },
+                {
+                    "userId": "8todraw@gmail.com",
+                    "changedDate": "2026-09-17T01:35:42.882377153Z",
+                    "initStatus": "IMPLEMENTATION",
+                    "endStatus": "TESTING"
+                }
+            ],
             "assignee": null
         },
         {
@@ -1260,7 +1413,8 @@
                 "payloadDefinition": "",
                 "typeDefinitionId": "",
                 "compositeBoundaryIds": [],
-                "interactionKind": "lib"
+                "interactionKind": "lib",
+                "typeExpression": null
             },
             "typeDefinition": null,
             "diagnostics": [],
@@ -1331,7 +1485,8 @@
                 "payloadDefinition": "",
                 "typeDefinitionId": "",
                 "compositeBoundaryIds": [],
-                "interactionKind": "lib"
+                "interactionKind": "lib",
+                "typeExpression": null
             },
             "typeDefinition": null,
             "diagnostics": [],
@@ -1369,7 +1524,7 @@
             "text": {
                 "initialization": "",
                 "initializationLanguageId": "",
-                "source": "#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\n#define ARGPARSE_NOTERM  -1\n#define ARGPARSE_NOVALUE -2\n#define ARGPARSE_OOBOUND -3\n\nstatic char  *argparse_buffer = NULL;\nstatic char **argparse_argv   = NULL;\nstatic int    argparse_argc   = 0;\nstatic int    argparse_loaded = 0;\n\n\n/* --------------------------------------------------------- */\n/* internal loading                                           */\n/* --------------------------------------------------------- */\n\nstatic int argparse_load(void)\n{\n    if (argparse_loaded)\n        return 0;\n\n    FILE *f = fopen(\"/proc/self/cmdline\", \"rb\");\n    if (f == NULL)\n        return ARGPARSE_NOTERM;\n\n    size_t capacity = 256;\n    size_t size = 0;\n\n    argparse_buffer = malloc(capacity);\n    if (argparse_buffer == NULL) {\n        fclose(f);\n        return ARGPARSE_OOBOUND;\n    }\n\n    for (;;) {\n        if (size == capacity) {\n            capacity *= 2;\n\n            char *new_buffer = realloc(argparse_buffer, capacity);\n            if (new_buffer == NULL) {\n                free(argparse_buffer);\n                argparse_buffer = NULL;\n                fclose(f);\n                return ARGPARSE_OOBOUND;\n            }\n\n            argparse_buffer = new_buffer;\n        }\n\n        size_t n = fread(\n            argparse_buffer + size,\n            1,\n            capacity - size,\n            f\n        );\n\n        size += n;\n\n        if (n == 0)\n            break;\n    }\n\n    fclose(f);\n\n    if (size == 0)\n        return ARGPARSE_NOTERM;\n\n    /*\n     * /proc/self/cmdline normally ends in \\0,\n     * but guarantee it ourselves.\n     */\n    if (argparse_buffer[size - 1] != '\\0') {\n        if (size == capacity) {\n            capacity++;\n\n            char *new_buffer = realloc(argparse_buffer, capacity);\n            if (new_buffer == NULL)\n                return ARGPARSE_OOBOUND;\n\n            argparse_buffer = new_buffer;\n        }\n\n        argparse_buffer[size++] = '\\0';\n    }\n\n    /* count arguments */\n    for (size_t i = 0; i < size; i++) {\n        if (argparse_buffer[i] == '\\0')\n            argparse_argc++;\n    }\n\n    argparse_argv = malloc(\n        sizeof(char *) * (size_t)argparse_argc\n    );\n\n    if (argparse_argv == NULL)\n        return ARGPARSE_OOBOUND;\n\n    int index = 0;\n    char *p = argparse_buffer;\n    char *end = argparse_buffer + size;\n\n    while (p < end && index < argparse_argc) {\n        argparse_argv[index++] = p;\n        p += strlen(p) + 1;\n    }\n\n    argparse_loaded = 1;\n    return 0;\n}\n\n\n/* --------------------------------------------------------- */\n/* helpers                                                    */\n/* --------------------------------------------------------- */\n\nstatic int option_like(const char *s)\n{\n    return s != NULL &&\n           s[0] == '-' &&\n           s[1] != '\\0';\n}\n\n\n/* --------------------------------------------------------- */\n/* --name value                                               */\n/* --------------------------------------------------------- */\n\nint option(const char *name, char **option_value)\n{\n    if (argparse_load() < 0)\n        return ARGPARSE_NOTERM;\n\n    if (name == NULL || option_value == NULL)\n        return ARGPARSE_NOTERM;\n\n    *option_value = NULL;\n\n    for (int i = 1; i < argparse_argc; i++) {\n\n        const char *arg = argparse_argv[i];\n\n        if (strncmp(arg, \"--\", 2) != 0)\n            continue;\n\n        const char *actual_name = arg + 2;\n\n        if (strcmp(actual_name, name) == 0) {\n\n            if (i + 1 >= argparse_argc)\n                return ARGPARSE_NOVALUE;\n\n            if (option_like(argparse_argv[i + 1]))\n                return ARGPARSE_NOVALUE;\n\n            *option_value = argparse_argv[i + 1];\n            return i;\n        }\n    }\n\n    return ARGPARSE_NOTERM;\n}\n\n\n/* --------------------------------------------------------- */\n/* -flag                                                      */\n/* --------------------------------------------------------- */\n\nint flag(const char *name)\n{\n    if (argparse_load() < 0)\n        return ARGPARSE_NOTERM;\n\n    if (name == NULL)\n        return ARGPARSE_NOTERM;\n\n    for (int i = 1; i < argparse_argc; i++) {\n\n        const char *arg = argparse_argv[i];\n\n        if (arg[0] != '-' || arg[1] == '-')\n            continue;\n\n        if (strcmp(arg + 1, name) == 0)\n            return i;\n    }\n\n    return ARGPARSE_NOTERM;\n}\n\n\n/* --------------------------------------------------------- */\n/* -p value                                                   */\n/* --------------------------------------------------------- */\n\nint short_option(const char *name, char **option_value)\n{\n    if (argparse_load() < 0)\n        return ARGPARSE_NOTERM;\n\n    if (name == NULL || option_value == NULL)\n        return ARGPARSE_NOTERM;\n\n    *option_value = NULL;\n\n    for (int i = 1; i < argparse_argc; i++) {\n\n        const char *arg = argparse_argv[i];\n\n        if (arg[0] != '-' || arg[1] == '-')\n            continue;\n\n        if (strcmp(arg + 1, name) == 0) {\n\n            if (i + 1 >= argparse_argc)\n                return ARGPARSE_NOVALUE;\n\n            if (option_like(argparse_argv[i + 1]))\n                return ARGPARSE_NOVALUE;\n\n            *option_value = argparse_argv[i + 1];\n            return i;\n        }\n    }\n\n    return ARGPARSE_NOTERM;\n}\n\n\n/* --------------------------------------------------------- */\n/* literal word                                               */\n/* --------------------------------------------------------- */\n\nint word(const char *name)\n{\n    if (argparse_load() < 0)\n        return ARGPARSE_NOTERM;\n\n    if (name == NULL)\n        return ARGPARSE_NOTERM;\n\n    for (int i = 1; i < argparse_argc; i++) {\n\n        if (strcmp(argparse_argv[i], name) == 0)\n            return i;\n    }\n\n    return ARGPARSE_NOTERM;\n}\n\n\n/* --------------------------------------------------------- */\n/* everything from argv[startpos] onward                      */\n/* --------------------------------------------------------- */\n\nint varargs(int startpos, char **results, int capacity)\n{\n    if (argparse_load() < 0)\n        return ARGPARSE_NOTERM;\n\n    if (startpos < 0 || startpos >= argparse_argc)\n        return ARGPARSE_OOBOUND;\n\n    int count = argparse_argc - startpos;\n\n    /*\n     * +1 because results is NULL terminated.\n     */\n    if (results == NULL || capacity < count + 1)\n        return ARGPARSE_OOBOUND;\n\n    for (int i = 0; i < count; i++)\n        results[i] = argparse_argv[startpos + i];\n\n    results[count] = NULL;\n\n    return startpos;\n}\n\n\n/* --------------------------------------------------------- */\n/* raw argv access                                            */\n/* --------------------------------------------------------- */\n\nint get_arg(int n, char **name, char **value)\n{\n    if (argparse_load() < 0)\n        return ARGPARSE_NOTERM;\n\n    if (n < 0 || n >= argparse_argc)\n        return ARGPARSE_OOBOUND;\n\n    if (name == NULL || value == NULL)\n        return ARGPARSE_OOBOUND;\n\n    char *arg = argparse_argv[n];\n\n    *value = NULL;\n\n    /*\n     * --option\n     */\n    if (strncmp(arg, \"--\", 2) == 0) {\n\n        *name = arg + 2;\n\n        if (n + 1 >= argparse_argc ||\n            option_like(argparse_argv[n + 1]))\n            return ARGPARSE_NOVALUE;\n\n        *value = argparse_argv[n + 1];\n        return n;\n    }\n\n    /*\n     * -flag / -option\n     */\n    if (arg[0] == '-' && arg[1] != '\\0') {\n\n        *name = arg + 1;\n\n        /*\n         * Could be a flag, therefore absence of a following\n         * value is not considered an error here.\n         */\n        if (n + 1 < argparse_argc &&\n            !option_like(argparse_argv[n + 1])) {\n            *value = argparse_argv[n + 1];\n        }\n\n        return n;\n    }\n\n    /*\n     * ordinary word\n     */\n    *name = arg;\n    return n;\n}",
+                "source": "#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\n#define ARGPARSE_NOTERM  -1\n#define ARGPARSE_NOVALUE -2\n#define ARGPARSE_OOBOUND -3\n\nstatic char  *argparse_buffer = NULL;\nstatic char **argparse_argv   = NULL;\nstatic int    argparse_argc   = 0;\nstatic int    argparse_loaded = 0;\n\n\n/* --------------------------------------------------------- */\n/* internal loading                                           */\n/* --------------------------------------------------------- */\n\nstatic int argparse_load(void)\n{\n    \n    if (argparse_loaded)\n        return 0;\n\n    FILE *f = fopen(\"/proc/self/cmdline\", \"rb\");\n    if (f == NULL)\n        return ARGPARSE_NOTERM;\n\n    size_t capacity = 256;\n    size_t size = 0;\n\n    argparse_buffer = malloc(capacity);\n    if (argparse_buffer == NULL) {\n        fclose(f);\n        return ARGPARSE_OOBOUND;\n    }\n\n    for (;;) {\n        if (size == capacity) {\n            capacity *= 2;\n\n            char *new_buffer = realloc(argparse_buffer, capacity);\n            if (new_buffer == NULL) {\n                free(argparse_buffer);\n                argparse_buffer = NULL;\n                fclose(f);\n                return ARGPARSE_OOBOUND;\n            }\n\n            argparse_buffer = new_buffer;\n        }\n\n        size_t n = fread(\n            argparse_buffer + size,\n            1,\n            capacity - size,\n            f\n        );\n\n        size += n;\n\n        if (n == 0)\n            break;\n    }\n\n    fclose(f);\n\n    if (size == 0)\n        return ARGPARSE_NOTERM;\n\n    /*\n     * /proc/self/cmdline normally ends in \\0,\n     * but guarantee it ourselves.\n     */\n    if (argparse_buffer[size - 1] != '\\0') {\n        if (size == capacity) {\n            capacity++;\n\n            char *new_buffer = realloc(argparse_buffer, capacity);\n            if (new_buffer == NULL)\n                return ARGPARSE_OOBOUND;\n\n            argparse_buffer = new_buffer;\n        }\n\n        argparse_buffer[size++] = '\\0';\n    }\n\n    /* count arguments */\n    for (size_t i = 0; i < size; i++) {\n        if (argparse_buffer[i] == '\\0')\n            argparse_argc++;\n    }\n\n    argparse_argv = malloc(\n        sizeof(char *) * (size_t)argparse_argc\n    );\n\n    if (argparse_argv == NULL)\n        return ARGPARSE_OOBOUND;\n\n    int index = 0;\n    char *p = argparse_buffer;\n    char *end = argparse_buffer + size;\n\n    while (p < end && index < argparse_argc) {\n        argparse_argv[index++] = p;\n        p += strlen(p) + 1;\n    }\n\n    argparse_loaded = 1;\n    return 0;\n}\n\n\n/* --------------------------------------------------------- */\n/* helpers                                                    */\n/* --------------------------------------------------------- */\n\nstatic int option_like(const char *s)\n{\n    return s != NULL &&\n           s[0] == '-' &&\n           s[1] != '\\0';\n}\n\n\n/* --------------------------------------------------------- */\n/* --name value                                               */\n/* --------------------------------------------------------- */\n\nint option(const char *name, char **option_value)\n{\n    if (argparse_load() < 0)\n        return ARGPARSE_NOTERM;\n\n    if (name == NULL || option_value == NULL)\n        return ARGPARSE_NOTERM;\n\n    *option_value = NULL;\n\n    for (int i = 1; i < argparse_argc; i++) {\n\n        const char *arg = argparse_argv[i];\n\n        if (strncmp(arg, \"--\", 2) != 0)\n            continue;\n\n        const char *actual_name = arg + 2;\n\n        if (strcmp(actual_name, name) == 0) {\n\n            if (i + 1 >= argparse_argc)\n                return ARGPARSE_NOVALUE;\n\n            if (option_like(argparse_argv[i + 1]))\n                return ARGPARSE_NOVALUE;\n\n            *option_value = argparse_argv[i + 1];\n            return i;\n        }\n    }\n\n    return ARGPARSE_NOTERM;\n}\n\n\n/* --------------------------------------------------------- */\n/* -flag                                                      */\n/* --------------------------------------------------------- */\n\nint flag(const char *name)\n{\n    if (argparse_load() < 0)\n        return ARGPARSE_NOTERM;\n\n    if (name == NULL)\n        return ARGPARSE_NOTERM;\n\n    for (int i = 1; i < argparse_argc; i++) {\n\n        const char *arg = argparse_argv[i];\n\n        if (arg[0] != '-' || arg[1] == '-')\n            continue;\n\n        if (strcmp(arg + 1, name) == 0)\n            return i;\n    }\n\n    return ARGPARSE_NOTERM;\n}\n\n\n/* --------------------------------------------------------- */\n/* -p value                                                   */\n/* --------------------------------------------------------- */\n\nint short_option(const char *name, char **option_value)\n{\n    if (argparse_load() < 0)\n        return ARGPARSE_NOTERM;\n\n    if (name == NULL || option_value == NULL)\n        return ARGPARSE_NOTERM;\n\n    *option_value = NULL;\n\n    for (int i = 1; i < argparse_argc; i++) {\n\n        const char *arg = argparse_argv[i];\n\n        if (arg[0] != '-' || arg[1] == '-')\n            continue;\n\n        if (strcmp(arg + 1, name) == 0) {\n\n            if (i + 1 >= argparse_argc)\n                return ARGPARSE_NOVALUE;\n\n            if (option_like(argparse_argv[i + 1]))\n                return ARGPARSE_NOVALUE;\n\n            *option_value = argparse_argv[i + 1];\n            return i;\n        }\n    }\n\n    return ARGPARSE_NOTERM;\n}\n\n\n/* --------------------------------------------------------- */\n/* literal word                                               */\n/* --------------------------------------------------------- */\n\nint word(const char *name)\n{\n    if (argparse_load() < 0)\n        return ARGPARSE_NOTERM;\n\n    if (name == NULL)\n        return ARGPARSE_NOTERM;\n\n    for (int i = 1; i < argparse_argc; i++) {\n\n        if (strcmp(argparse_argv[i], name) == 0)\n            return i;\n    }\n\n    return ARGPARSE_NOTERM;\n}\n\n\n/* --------------------------------------------------------- */\n/* everything from argv[startpos] onward                      */\n/* --------------------------------------------------------- */\n\nint varargs(int startpos, char **results, int capacity)\n{\n    if (argparse_load() < 0)\n        return ARGPARSE_NOTERM;\n\n    if (startpos < 0 || startpos >= argparse_argc)\n        return ARGPARSE_OOBOUND;\n\n    int count = argparse_argc - startpos;\n\n    /*\n     * +1 because results is NULL terminated.\n     */\n    if (results == NULL || capacity < count + 1)\n        return ARGPARSE_OOBOUND;\n\n    for (int i = 0; i < count; i++)\n        results[i] = argparse_argv[startpos + i];\n\n    results[count] = NULL;\n\n    return startpos;\n}\n\n\n/* --------------------------------------------------------- */\n/* raw argv access                                            */\n/* --------------------------------------------------------- */\n\nint get_arg(int n, char **name, char **value)\n{\n    if (argparse_load() < 0)\n        return ARGPARSE_NOTERM;\n\n    if (n < 0 || n >= argparse_argc)\n        return ARGPARSE_OOBOUND;\n\n    if (name == NULL || value == NULL)\n        return ARGPARSE_OOBOUND;\n\n    char *arg = argparse_argv[n];\n\n    *value = NULL;\n\n    /*\n     * --option\n     */\n    if (strncmp(arg, \"--\", 2) == 0) {\n\n        *name = arg + 2;\n\n        if (n + 1 >= argparse_argc ||\n            option_like(argparse_argv[n + 1]))\n            return ARGPARSE_NOVALUE;\n\n        *value = argparse_argv[n + 1];\n        return n;\n    }\n\n    /*\n     * -flag / -option\n     */\n    if (arg[0] == '-' && arg[1] != '\\0') {\n\n        *name = arg + 1;\n\n        /*\n         * Could be a flag, therefore absence of a following\n         * value is not considered an error here.\n         */\n        if (n + 1 < argparse_argc &&\n            !option_like(argparse_argv[n + 1])) {\n            *value = argparse_argv[n + 1];\n        }\n\n        return n;\n    }\n\n    /*\n     * ordinary word\n     */\n    *name = arg;\n    return n;\n}",
                 "sourceLanguageId": "",
                 "specification": "reads the commandline from \"/proc/self/cmdline\"",
                 "specificationLanguageId": "markdown",
@@ -1392,8 +1547,8 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-09T07:08:01.117098055Z",
-                "user": "devlin"
+                "date": "2026-09-17T01:35:30.097985811Z",
+                "user": "8todraw@gmail.com"
             },
             "ports": [
                 {
@@ -1417,8 +1572,27 @@
             "metadata": {},
             "pluginData": {},
             "nameDetail": "",
-            "status": null,
-            "statusChanges": [],
+            "status": "IMPLEMENTATION",
+            "statusChanges": [
+                {
+                    "userId": "8todraw@gmail.com",
+                    "changedDate": "2026-09-17T01:34:00.956430238Z",
+                    "initStatus": null,
+                    "endStatus": "BUSINESS"
+                },
+                {
+                    "userId": "8todraw@gmail.com",
+                    "changedDate": "2026-09-17T01:34:49.760003991Z",
+                    "initStatus": "BUSINESS",
+                    "endStatus": "FUNCTIONAL"
+                },
+                {
+                    "userId": "8todraw@gmail.com",
+                    "changedDate": "2026-09-17T01:35:30.097931114Z",
+                    "initStatus": "FUNCTIONAL",
+                    "endStatus": "IMPLEMENTATION"
+                }
+            ],
             "assignee": null
         },
         {
@@ -1481,7 +1655,8 @@
                 "payloadDefinition": "",
                 "typeDefinitionId": "",
                 "compositeBoundaryIds": [],
-                "interactionKind": "lib"
+                "interactionKind": "lib",
+                "typeExpression": null
             },
             "typeDefinition": null,
             "diagnostics": [],
@@ -1542,8 +1717,8 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-09T07:08:07.740071249Z",
-                "user": "devlin"
+                "date": "2026-09-17T01:35:34.489267648Z",
+                "user": "8todraw@gmail.com"
             },
             "ports": [
                 {
@@ -1567,8 +1742,21 @@
             "metadata": {},
             "pluginData": {},
             "nameDetail": "",
-            "status": null,
-            "statusChanges": [],
+            "status": "FUNCTIONAL",
+            "statusChanges": [
+                {
+                    "userId": "8todraw@gmail.com",
+                    "changedDate": "2026-09-17T01:34:13.522138102Z",
+                    "initStatus": null,
+                    "endStatus": "BUSINESS"
+                },
+                {
+                    "userId": "8todraw@gmail.com",
+                    "changedDate": "2026-09-17T01:35:34.489216762Z",
+                    "initStatus": "BUSINESS",
+                    "endStatus": "FUNCTIONAL"
+                }
+            ],
             "assignee": null
         },
         {
@@ -1621,8 +1809,8 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-09T07:09:35.073906463Z",
-                "user": "octo draw"
+                "date": "2026-09-17T01:35:31.244526113Z",
+                "user": "8todraw@gmail.com"
             },
             "ports": [
                 {
@@ -1646,8 +1834,27 @@
             "metadata": {},
             "pluginData": {},
             "nameDetail": "",
-            "status": null,
-            "statusChanges": [],
+            "status": "IMPLEMENTATION",
+            "statusChanges": [
+                {
+                    "userId": "8todraw@gmail.com",
+                    "changedDate": "2026-09-17T01:34:22.140541807Z",
+                    "initStatus": null,
+                    "endStatus": "BUSINESS"
+                },
+                {
+                    "userId": "8todraw@gmail.com",
+                    "changedDate": "2026-09-17T01:35:09.715848361Z",
+                    "initStatus": "BUSINESS",
+                    "endStatus": "FUNCTIONAL"
+                },
+                {
+                    "userId": "8todraw@gmail.com",
+                    "changedDate": "2026-09-17T01:35:31.244473012Z",
+                    "initStatus": "FUNCTIONAL",
+                    "endStatus": "IMPLEMENTATION"
+                }
+            ],
             "assignee": null
         },
         {
@@ -1700,8 +1907,8 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-09T07:07:53.407556220Z",
-                "user": "devlin"
+                "date": "2026-09-17T01:35:35.662104229Z",
+                "user": "8todraw@gmail.com"
             },
             "ports": [
                 {
@@ -1725,8 +1932,21 @@
             "metadata": {},
             "pluginData": {},
             "nameDetail": "",
-            "status": null,
-            "statusChanges": [],
+            "status": "FUNCTIONAL",
+            "statusChanges": [
+                {
+                    "userId": "8todraw@gmail.com",
+                    "changedDate": "2026-09-17T01:34:24.459835646Z",
+                    "initStatus": null,
+                    "endStatus": "BUSINESS"
+                },
+                {
+                    "userId": "8todraw@gmail.com",
+                    "changedDate": "2026-09-17T01:35:35.662051334Z",
+                    "initStatus": "BUSINESS",
+                    "endStatus": "FUNCTIONAL"
+                }
+            ],
             "assignee": null
         },
         {
@@ -1775,8 +1995,8 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-09T07:10:56.352777891Z",
-                "user": "cristian.alferaru@gmail.com"
+                "date": "2026-09-17T01:35:00.932809344Z",
+                "user": "8todraw@gmail.com"
             },
             "ports": [],
             "link": null,
@@ -1785,8 +2005,21 @@
             "metadata": {},
             "pluginData": {},
             "nameDetail": "",
-            "status": null,
-            "statusChanges": [],
+            "status": "DEPLOYED",
+            "statusChanges": [
+                {
+                    "userId": "8todraw@gmail.com",
+                    "changedDate": "2026-09-17T01:34:15.560750745Z",
+                    "initStatus": null,
+                    "endStatus": "BUSINESS"
+                },
+                {
+                    "userId": "8todraw@gmail.com",
+                    "changedDate": "2026-09-17T01:35:00.932755179Z",
+                    "initStatus": "BUSINESS",
+                    "endStatus": "DEPLOYED"
+                }
+            ],
             "assignee": null
         },
         {
@@ -1835,8 +2068,8 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-09T07:10:10.510421157Z",
-                "user": "alfu32"
+                "date": "2026-09-17T01:34:32.418280335Z",
+                "user": "8todraw@gmail.com"
             },
             "ports": [],
             "link": null,
@@ -1845,8 +2078,21 @@
             "metadata": {},
             "pluginData": {},
             "nameDetail": "",
-            "status": null,
-            "statusChanges": [],
+            "status": "DEPLOYED",
+            "statusChanges": [
+                {
+                    "userId": "8todraw@gmail.com",
+                    "changedDate": "2026-09-17T01:33:40.280299878Z",
+                    "initStatus": null,
+                    "endStatus": "BUSINESS"
+                },
+                {
+                    "userId": "8todraw@gmail.com",
+                    "changedDate": "2026-09-17T01:34:32.418260457Z",
+                    "initStatus": "BUSINESS",
+                    "endStatus": "DEPLOYED"
+                }
+            ],
             "assignee": null
         },
         {
@@ -1895,8 +2141,8 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-03T22:19:24.399246170Z",
-                "user": "devlin"
+                "date": "2026-09-17T01:34:52.393906019Z",
+                "user": "8todraw@gmail.com"
             },
             "ports": [],
             "link": null,
@@ -1905,8 +2151,21 @@
             "metadata": {},
             "pluginData": {},
             "nameDetail": "",
-            "status": null,
-            "statusChanges": [],
+            "status": "DEPLOYED",
+            "statusChanges": [
+                {
+                    "userId": "8todraw@gmail.com",
+                    "changedDate": "2026-09-17T01:34:03.949201732Z",
+                    "initStatus": null,
+                    "endStatus": "BUSINESS"
+                },
+                {
+                    "userId": "8todraw@gmail.com",
+                    "changedDate": "2026-09-17T01:34:52.393853596Z",
+                    "initStatus": "BUSINESS",
+                    "endStatus": "DEPLOYED"
+                }
+            ],
             "assignee": null
         },
         {
@@ -1955,8 +2214,8 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-03T22:19:27.400275416Z",
-                "user": "devlin"
+                "date": "2026-09-17T01:34:54.414705509Z",
+                "user": "8todraw@gmail.com"
             },
             "ports": [],
             "link": null,
@@ -1965,8 +2224,21 @@
             "metadata": {},
             "pluginData": {},
             "nameDetail": "",
-            "status": null,
-            "statusChanges": [],
+            "status": "DEPLOYED",
+            "statusChanges": [
+                {
+                    "userId": "8todraw@gmail.com",
+                    "changedDate": "2026-09-17T01:34:09.050350106Z",
+                    "initStatus": null,
+                    "endStatus": "BUSINESS"
+                },
+                {
+                    "userId": "8todraw@gmail.com",
+                    "changedDate": "2026-09-17T01:34:54.414638166Z",
+                    "initStatus": "BUSINESS",
+                    "endStatus": "DEPLOYED"
+                }
+            ],
             "assignee": null
         },
         {
@@ -2015,8 +2287,8 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-03T22:19:29.912469864Z",
-                "user": "devlin"
+                "date": "2026-09-17T01:34:56.234390118Z",
+                "user": "8todraw@gmail.com"
             },
             "ports": [],
             "link": null,
@@ -2025,8 +2297,21 @@
             "metadata": {},
             "pluginData": {},
             "nameDetail": "",
-            "status": null,
-            "statusChanges": [],
+            "status": "DEPLOYED",
+            "statusChanges": [
+                {
+                    "userId": "8todraw@gmail.com",
+                    "changedDate": "2026-09-17T01:34:11.543638133Z",
+                    "initStatus": null,
+                    "endStatus": "BUSINESS"
+                },
+                {
+                    "userId": "8todraw@gmail.com",
+                    "changedDate": "2026-09-17T01:34:56.234326616Z",
+                    "initStatus": "BUSINESS",
+                    "endStatus": "DEPLOYED"
+                }
+            ],
             "assignee": null
         },
         {
@@ -2075,8 +2360,8 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-09T07:07:48.717620553Z",
-                "user": "devlin"
+                "date": "2026-09-17T01:35:23.560607851Z",
+                "user": "8todraw@gmail.com"
             },
             "ports": [],
             "link": null,
@@ -2085,12 +2370,14 @@
                     {
                         "name": "sig_num",
                         "typeId": "number",
-                        "isReference": false
+                        "isReference": false,
+                        "typeExpression": null
                     },
                     {
                         "name": "field_2",
                         "typeId": "string",
-                        "isReference": false
+                        "isReference": false,
+                        "typeExpression": null
                     }
                 ]
             },
@@ -2098,8 +2385,103 @@
             "metadata": {},
             "pluginData": {},
             "nameDetail": "",
-            "status": null,
-            "statusChanges": [],
+            "status": "DEPLOYED",
+            "statusChanges": [
+                {
+                    "userId": "8todraw@gmail.com",
+                    "changedDate": "2026-09-17T01:34:19.900329434Z",
+                    "initStatus": null,
+                    "endStatus": "BUSINESS"
+                },
+                {
+                    "userId": "8todraw@gmail.com",
+                    "changedDate": "2026-09-17T01:35:07.994245711Z",
+                    "initStatus": "BUSINESS",
+                    "endStatus": "IMPLEMENTATION"
+                },
+                {
+                    "userId": "8todraw@gmail.com",
+                    "changedDate": "2026-09-17T01:35:23.560526726Z",
+                    "initStatus": "IMPLEMENTATION",
+                    "endStatus": "DEPLOYED"
+                }
+            ],
+            "assignee": null
+        },
+        {
+            "id": "node_968adf46-fe80-45e7-a6c3-90d78a8697e4",
+            "name": "Packets",
+            "kind": "Type",
+            "parentId": "root",
+            "children": [],
+            "incomingLinks": [],
+            "outgoingLinks": [],
+            "layout": {
+                "x": 1830.0,
+                "y": 1048.0,
+                "width": 220.0,
+                "height": 70.0,
+                "closedWidth": 220.0,
+                "closedHeight": 70.0,
+                "openWidth": 220.0,
+                "openHeight": 70.0,
+                "isExpanded": true
+            },
+            "fileLayoutStrategyId": "single-file",
+            "text": {
+                "initialization": "",
+                "initializationLanguageId": "",
+                "source": "",
+                "sourceLanguageId": "",
+                "specification": "",
+                "specificationLanguageId": "markdown",
+                "tests": "",
+                "testsLanguageId": "json",
+                "aiInstructions": "",
+                "aiInstructionsLanguageId": "markdown"
+            },
+            "binaryContent": null,
+            "technology": {
+                "languageId": "",
+                "technologyId": "",
+                "compilerId": "",
+                "fileExtension": "",
+                "contentType": ""
+            },
+            "revision": {
+                "name": "A",
+                "date": "20260831"
+            },
+            "responsible": null,
+            "modified": {
+                "date": "2026-09-17T01:44:55.501011488Z",
+                "user": "8todraw@gmail.com"
+            },
+            "ports": [],
+            "link": null,
+            "typeDefinition": {
+                "fields": [
+                    {
+                        "name": "packets",
+                        "typeId": "node_c4fb01af-8d9d-4a30-838f-8ab8f6328db8",
+                        "isReference": true,
+                        "typeExpression": null
+                    }
+                ]
+            },
+            "diagnostics": [],
+            "metadata": {},
+            "pluginData": {},
+            "nameDetail": "",
+            "status": "BUSINESS",
+            "statusChanges": [
+                {
+                    "userId": "8todraw@gmail.com",
+                    "changedDate": "2026-09-17T01:44:04.576549715Z",
+                    "initStatus": null,
+                    "endStatus": "BUSINESS"
+                }
+            ],
             "assignee": null
         }
     ],
@@ -2216,6 +2598,30 @@
             "fullName": "Ioan Alferaru",
             "role": "",
             "refreshedAt": "2026-09-10T06:55:34.928079151Z"
+        },
+        {
+            "identifier": "8todraw@gmail.com",
+            "avatar": "https://lh3.googleusercontent.com/a/ACg8ocKzE4hgMY2Vtwm-hqpgJTAU97DxSLXKslmbxACbcoBI10say1I=s96-c",
+            "avatarData": "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",
+            "source": "google",
+            "userId": "104019366419327384449",
+            "emailAddress": "8todraw@gmail.com",
+            "username": "",
+            "fullName": "octo draw",
+            "role": "",
+            "refreshedAt": "2026-09-17T01:30:22.124477532Z"
+        },
+        {
+            "identifier": "8todraw@gmail.com",
+            "avatar": "",
+            "avatarData": "",
+            "source": "local",
+            "userId": "",
+            "emailAddress": "",
+            "username": "",
+            "fullName": "",
+            "role": "",
+            "refreshedAt": "2026-09-17T01:44:55.501011488Z"
         }
     ]
 }
