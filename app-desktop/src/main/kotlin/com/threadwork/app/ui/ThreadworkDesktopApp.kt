@@ -7016,6 +7016,7 @@ internal class InspectorPanel(
     private var boundNodeIsRoot = false
     private var boundHasNode = false
     private var binding = false
+    private var applying = false
     private var unsupportedLayoutSelectionId: String? = null
     private var compilerTechnologyProposal = "generated"
     private val parentPath = JLabel()
@@ -7633,7 +7634,9 @@ internal class InspectorPanel(
     }
 
     private fun apply() {
-        if (binding) return
+        if (binding || applying) return
+        applying = true
+        try {
         val id = nodeId ?: return
         if (typeFields.isEditing) typeFields.cellEditor?.stopCellEditing()
         val node = repository.requireNode(id)
@@ -7692,6 +7695,9 @@ internal class InspectorPanel(
         bindEffectiveValues(updatedNode)
         bindTracking(updatedNode)
         binding = previousBinding
+        } finally {
+            applying = false
+        }
     }
 
     private fun selectedLanguage(): String =
