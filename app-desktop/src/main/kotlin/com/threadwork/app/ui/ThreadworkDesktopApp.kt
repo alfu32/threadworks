@@ -5001,7 +5001,7 @@ class GraphCanvas(
     }
 
     private fun svgNodeName(svg: StringBuilder, node: Node, x: Int, baseline: Int, size: Int) {
-        val name = node.name
+        val name = renderedNodeName(node)
         val detail = node.nameDetail.trim()
         val override = isOverrideNode(node)
         svgText(svg, name, x, baseline, size, "#222222")
@@ -5279,7 +5279,7 @@ class GraphCanvas(
     }
 
     private fun nodeDisplayName(node: Node): String {
-        val name = node.name.trim()
+        val name = renderedNodeName(node)
         val detail = node.nameDetail.trim()
         if (detail.isBlank()) return name
         val renderedDetail = if (isOverrideNode(node)) {
@@ -5291,7 +5291,7 @@ class GraphCanvas(
     }
 
     private fun drawNodeName(g2: Graphics2D, node: Node, x: Int, baseline: Int) {
-        val name = node.name
+        val name = renderedNodeName(node)
         val detail = node.nameDetail.trim()
         g2.color = activePalette[DesignerColorKey.TextPrimary]
         g2.drawString(name, x, baseline)
@@ -5309,6 +5309,8 @@ class GraphCanvas(
         }
         g2.drawString(renderedDetail, detailX, baseline)
     }
+
+    private fun renderedNodeName(node: Node): String = node.name.trim()
 
     private fun isOverrideNode(node: Node): Boolean =
         nodeStereotype(node) in setOf(NodeStereotype.CompilerTemplate, NodeStereotype.StaticFile)
@@ -7166,15 +7168,17 @@ internal class InspectorPanel(
         isEnabled = false
     }
     private val linkTypeDefinition = JComboBox(arrayOf(NoneTypeChoice)).apply { isEditable = false }
+    private val linkCollectionType = JComboBox(collectionTypeChoices()).apply { isEditable = false }
+    private val linkCollectionKeyType = JComboBox(arrayOf(NoneTypeChoice)).apply { isEditable = false }
     private var typeIdByDisplay = emptyMap<String, String>()
     private var typeExpressionByDisplay = emptyMap<String, TypeExpression?>()
     private var genericTypeDisplayById = emptyMap<String, String>()
     private val typeQualifier = JComboBox(TypeQualifiers.all.toTypedArray()).apply { isEditable = false }
     private val genericTypeOne = JComboBox(arrayOf(NoneTypeChoice)).apply { isEditable = false }
     private val genericTypeTwo = JComboBox(arrayOf(NoneTypeChoice)).apply { isEditable = false }
-    private val typeFieldsModel = object : DefaultTableModel(arrayOf("Name", "Type", "Reference"), 0) {
+    private val typeFieldsModel = object : DefaultTableModel(arrayOf("Name", "Type", "Collection type", "Key type", "Reference"), 0) {
         override fun getColumnClass(columnIndex: Int): Class<*> =
-            if (columnIndex == 2) java.lang.Boolean::class.java else String::class.java
+            if (columnIndex == 4) java.lang.Boolean::class.java else String::class.java
     }
     private val typeFields = JTable(typeFieldsModel).apply {
         rowHeight = 24
@@ -7222,6 +7226,8 @@ internal class InspectorPanel(
     private val linkTransportKindRow = fieldRow("Link transport kind", linkTransportKind)
     private val linkInteractionKindRow = fieldRow("Link interaction", linkInteractionKind)
     private val linkTypeDefinitionRow = fieldRow("Link Type Definition", linkTypeDefinition)
+    private val linkCollectionTypeRow = fieldRow("Collection type", linkCollectionType)
+    private val linkCollectionKeyTypeRow = fieldRow("Key type", linkCollectionKeyType)
     private val typeQualifierRow = fieldRow("Type qualifier", typeQualifier)
     private val genericTypeOneRow = fieldRow("Generic type", genericTypeOne)
     private val genericTypeTwoRow = fieldRow("Generic type", genericTypeTwo)
@@ -7236,6 +7242,8 @@ internal class InspectorPanel(
                             typeFieldsModel.addRow(arrayOf<Any>(
                                 "field_${typeFieldsModel.rowCount + 1}",
                                 defaultPrimitiveTypeId(),
+                                NoneCollectionTypeChoice,
+                                NoneTypeChoice,
                                 false,
                             ))
                             apply()
@@ -7320,9 +7328,12 @@ internal class InspectorPanel(
         applyOnCommit(linkTransportKind)
         applyOnCommit(linkInteractionKind)
         applyOnCommit(linkTypeDefinition)
+        applyOnCommit(linkCollectionType)
+        applyOnCommit(linkCollectionKeyType)
         applyOnCommit(typeQualifier)
         applyOnCommit(genericTypeOne)
         applyOnCommit(genericTypeTwo)
+        typeFieldsModel.addTableModelListener { if (!binding) apply() }
         metadataModel.addTableModelListener { if (!binding) apply() }
         val form = JPanel().apply {
             layout = BoxLayout(this, BoxLayout.Y_AXIS)
@@ -7357,9 +7368,8 @@ internal class InspectorPanel(
                 linkTransportKindRow,
                 linkInteractionKindRow,
                 linkTypeDefinitionRow,
-                typeQualifierRow,
-                genericTypeOneRow,
-                genericTypeTwoRow,
+                linkCollectionTypeRow,
+                linkCollectionKeyTypeRow,
                 customTransportKindPanel,
                 typeFieldsRow,
             )))
@@ -7411,7 +7421,9 @@ internal class InspectorPanel(
         masterRevisionDate.text = if (boundNodeIsRoot) repository.getDocument().masterRevision.date else ""
         bindTransportKind(node?.link?.transportKind.orEmpty())
         bindInteractionKind(node?.link?.interactionKind.orEmpty())
-        refreshTypeChoices(node?.link?.effectiveTypeExpression(repository.getDocument()))
+        val linkTypeExpression = node?.link?.effectiveTypeExpression(repository.getDocument())
+        refreshTypeChoices(linkTypeExpression)
+        bindLinkTypeExpression(linkTypeExpression)
         bindTypeDefinition(node)
         bindTypeFields(node)
         bindMetadata(node)
@@ -7600,6 +7612,8 @@ internal class InspectorPanel(
             linkTransportKind.hasFocus() ||
             linkInteractionKind.hasFocus() ||
             linkTypeDefinition.hasFocus() ||
+            linkCollectionType.hasFocus() ||
+            linkCollectionKeyType.hasFocus() ||
             typeQualifier.hasFocus() ||
             genericTypeOne.hasFocus() ||
             genericTypeTwo.hasFocus() ||
@@ -7623,6 +7637,9 @@ internal class InspectorPanel(
         val id = nodeId ?: return
         if (typeFields.isEditing) typeFields.cellEditor?.stopCellEditing()
         val node = repository.requireNode(id)
+        val typeDefinition = node.typeDefinition
+            ?.takeIf { node.isType }
+            ?.let { typeDefinitionFromTable() }
         if (boundNodeIsRoot) {
             repository.updateMasterRevision(Revision(masterRevisionName.text.trim(), masterRevisionDate.text.trim()))
         }
@@ -7658,7 +7675,7 @@ internal class InspectorPanel(
             }
             repository.updateNodeStatus(id, selectedProjectStatus())
         }
-        if (node.isType) repository.updateNodeTypeDefinition(id, typeDefinitionFromTable())
+        typeDefinition?.let { repository.updateNodeTypeDefinition(id, it) }
         if (isLink) node.link?.copy()?.let {
             it.transportKind = selectedTransportKind().ifBlank { LinkTransportKinds.Default }
             it.interactionKind = selectedInteractionKind()
@@ -7789,26 +7806,88 @@ internal class InspectorPanel(
             ?: LinkInteractionKinds.Data
 
     private fun selectedTypeExpression(): TypeExpression? =
-        typeExpressionByDisplay[linkTypeDefinition.selectedItem?.toString().orEmpty()]
+        collectionExpression(
+            typeExpressionByDisplay[linkTypeDefinition.selectedItem?.toString().orEmpty()],
+            linkCollectionType.selectedItem?.toString().orEmpty(),
+            linkCollectionKeyType.selectedItem?.toString().orEmpty(),
+        )
 
-    private fun typeDefinitionFromTable(): TypeDefinition = TypeDefinition(
+    private fun collectionTypeChoices(): Array<String> = arrayOf(
+        NoneCollectionTypeChoice,
+        ArrayCollectionTypeChoice,
+        MapCollectionTypeChoice,
+    )
+
+    private fun collectionExpression(
+        valueType: TypeExpression?,
+        collectionType: String,
+        keyTypeDisplay: String,
+    ): TypeExpression? {
+        valueType ?: return null
+        return when (collectionType) {
+            ArrayCollectionTypeChoice -> TypeExpression.constructed("array", valueType)
+            MapCollectionTypeChoice -> {
+                val keyType = typeExpressionByDisplay[keyTypeDisplay] ?: return null
+                TypeExpression.constructed("map", keyType, valueType)
+            }
+            else -> valueType
+        }
+    }
+
+    private fun bindLinkTypeExpression(expression: TypeExpression?) {
+        val valueType = when {
+            expression?.isNamed == true -> expression
+            expression?.constructorId == "array" -> expression.arguments.firstOrNull()
+            expression?.constructorId == "map" -> expression.arguments.getOrNull(1)
+            else -> null
+        }
+        val valueDisplay = typeExpressionByDisplay.entries.firstOrNull { it.value == valueType }?.key
+        linkTypeDefinition.selectedItem = valueDisplay ?: NoneTypeChoice
+        linkCollectionType.selectedItem = when (expression?.constructorId) {
+            "array" -> ArrayCollectionTypeChoice
+            "map" -> MapCollectionTypeChoice
+            else -> NoneCollectionTypeChoice
+        }
+        val keyType = expression?.arguments?.firstOrNull()
+        linkCollectionKeyType.selectedItem = typeExpressionByDisplay.entries
+            .firstOrNull { it.value == keyType }
+            ?.key
+            ?: NoneTypeChoice
+    }
+
+    private fun typeDefinitionFromTable(): TypeDefinition {
+        val existing = nodeId?.let(repository::getNode)?.typeDefinition
+        val preserveLegacyCollection = typeFieldsModel.rowCount == 0 &&
+            existing != null &&
+            TypeQualifiers.normalize(existing.qualifier) != TypeQualifiers.Object
+        return TypeDefinition(
         fields = (0 until typeFieldsModel.rowCount).map { row ->
             val displayType = typeFieldsModel.getValueAt(row, 1)?.toString().orEmpty()
-            val expression = typeExpressionByDisplay[displayType]
-                ?: TypeExpression.named(typeIdByDisplay[displayType] ?: displayType.ifBlank { defaultPrimitiveTypeId() })
+            val expression = collectionExpression(
+                typeExpressionByDisplay[displayType]
+                    ?: TypeExpression.named(typeIdByDisplay[displayType] ?: displayType.ifBlank { defaultPrimitiveTypeId() }),
+                typeFieldsModel.getValueAt(row, 2)?.toString().orEmpty(),
+                typeFieldsModel.getValueAt(row, 3)?.toString().orEmpty(),
+            ) ?: TypeExpression.named(defaultPrimitiveTypeId())
             TypeFieldDefinition(
                 name = typeFieldsModel.getValueAt(row, 0)?.toString().orEmpty().trim(),
                 typeId = expression.typeId,
-                isReference = typeFieldsModel.getValueAt(row, 2) as? Boolean ?: false,
+                isReference = typeFieldsModel.getValueAt(row, 4) as? Boolean ?: false,
                 typeExpression = expression.takeUnless(TypeExpression::isNamed),
             )
         }.toMutableList(),
-        qualifier = selectedTypeQualifier(),
-        genericTypeIds = listOfNotNull(
-            genericTypeId(genericTypeOne),
-            genericTypeId(genericTypeTwo).takeIf { TypeQualifiers.arity(selectedTypeQualifier()) > 1 },
-        ).toMutableList(),
-    )
+            qualifier = if (preserveLegacyCollection) {
+                TypeQualifiers.normalize(existing!!.qualifier)
+            } else {
+                TypeQualifiers.Object
+            },
+            genericTypeIds = if (preserveLegacyCollection) {
+                existing!!.genericTypeIds.toMutableList()
+            } else {
+                mutableListOf()
+            },
+        )
+    }
 
     private fun refreshTypeChoices(selectedExpression: TypeExpression?) {
         val document = repository.getDocument()
@@ -7859,6 +7938,8 @@ internal class InspectorPanel(
         val genericChoices = arrayOf(NoneTypeChoice) + genericTypeDisplayById.values.toTypedArray()
         genericTypeOne.model = DefaultComboBoxModel(genericChoices)
         genericTypeTwo.model = DefaultComboBoxModel(genericChoices)
+        typeFields.columnModel.getColumn(2).cellEditor = DefaultCellEditor(JComboBox(collectionTypeChoices()))
+        typeFields.columnModel.getColumn(3).cellEditor = DefaultCellEditor(JComboBox(genericChoices))
 
         val supportedQualifiers = buildList {
             add(TypeQualifiers.Object)
@@ -7912,13 +7993,26 @@ internal class InspectorPanel(
         typeFieldsModel.rowCount = 0
         node?.typeDefinition?.fields.orEmpty().forEach { field ->
             val expression = field.effectiveTypeExpression(repository.getDocument())
+            val valueExpression = when {
+                expression.constructorId == "array" -> expression.arguments.firstOrNull()
+                expression.constructorId == "map" -> expression.arguments.getOrNull(1)
+                else -> expression
+            }
             val display = typeExpressionByDisplay.entries.firstOrNull { entry ->
                 val candidate = entry.value
-                entry.value == expression ||
-                    (candidate?.isNamed == true && candidate.typeId == field.typeId)
+                candidate == valueExpression ||
+                    (candidate?.isNamed == true && candidate.typeId == valueExpression?.typeId)
             }?.key
                 ?: repository.getDocument().typeDisplayName(expression)
-            typeFieldsModel.addRow(arrayOf<Any>(field.name, display, field.isReference))
+            val keyExpression = expression.arguments.firstOrNull().takeIf { expression.constructorId == "map" }
+            val keyDisplay = typeExpressionByDisplay.entries.firstOrNull { it.value == keyExpression }?.key
+                ?: NoneTypeChoice
+            val collectionType = when (expression.constructorId) {
+                "array" -> ArrayCollectionTypeChoice
+                "map" -> MapCollectionTypeChoice
+                else -> NoneCollectionTypeChoice
+            }
+            typeFieldsModel.addRow(arrayOf<Any>(field.name, display, collectionType, keyDisplay, field.isReference))
         }
     }
 
@@ -8041,6 +8135,8 @@ internal class InspectorPanel(
         customTechnology.isEnabled = customTechnologyPanel.isVisible
         customTransportKindPanel.isVisible = linkTransportKindRow.isVisible && linkTransportKind.selectedItem == OtherTransportChoice
         customTransportKind.isEnabled = customTransportKindPanel.isVisible
+        linkCollectionKeyTypeRow.isVisible = linkTypeDefinitionRow.isVisible &&
+            linkCollectionType.selectedItem == MapCollectionTypeChoice
         refreshLayoutStrategyComputedLabel()
         revalidate()
         repaint()
@@ -8049,6 +8145,7 @@ internal class InspectorPanel(
     private fun updateEntityFieldVisibility() {
         val showNodeFields = boundHasNode && !boundNodeIsLink
         val showLinkFields = boundHasNode && boundNodeIsLink
+        nameField.isEditable = true
         layoutStrategyRow.isVisible = boundHasNode
         parentRow.isVisible = boundHasNode
         languageRow.isVisible = showNodeFields
@@ -8071,10 +8168,12 @@ internal class InspectorPanel(
         linkTransportKindRow.isVisible = showLinkFields
         linkInteractionKindRow.isVisible = showLinkFields
         linkTypeDefinitionRow.isVisible = showLinkFields
-        typeQualifierRow.isVisible = boundNodeIsType
-        genericTypeOneRow.isVisible = boundNodeIsType && TypeQualifiers.arity(selectedTypeQualifier()) >= 1
-        genericTypeTwoRow.isVisible = boundNodeIsType && TypeQualifiers.arity(selectedTypeQualifier()) >= 2
-        typeFieldsRow.isVisible = boundNodeIsType && selectedTypeQualifier() == TypeQualifiers.Object
+        linkCollectionTypeRow.isVisible = showLinkFields
+        linkCollectionKeyTypeRow.isVisible = showLinkFields && linkCollectionType.selectedItem == MapCollectionTypeChoice
+        typeQualifierRow.isVisible = false
+        genericTypeOneRow.isVisible = false
+        genericTypeTwoRow.isVisible = false
+        typeFieldsRow.isVisible = boundNodeIsType
         updateConditionalChoiceVisibility()
     }
 
@@ -8212,6 +8311,9 @@ internal class InspectorPanel(
         private const val OtherTransportChoice = "Other"
         private const val NoneLayoutChoice = "None"
         private const val NoneTypeChoice = "None"
+        private const val NoneCollectionTypeChoice = "none"
+        private const val ArrayCollectionTypeChoice = "array"
+        private const val MapCollectionTypeChoice = "map"
         private const val NoneProjectStatusChoice = "(none)"
     }
 }

@@ -32,7 +32,8 @@
                 "link_e2173d13-86b1-440b-88f8-77a1c4628b9c",
                 "link_7997954b-3628-42ef-bdfd-1146684c6a6c",
                 "node_d3143aee-4f6c-47a4-81dd-4e3bfe61789c",
-                "link_8dae3e7b-5a21-40e9-aa13-3d16ffa183fe"
+                "link_8dae3e7b-5a21-40e9-aa13-3d16ffa183fe",
+                "node_5d3a1605-b95e-48d2-8570-db9e4a4fdcbd"
             ],
             "incomingLinks": [],
             "outgoingLinks": [],
@@ -74,8 +75,8 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-13T10:55:33.645686255Z",
-                "user": "ioan.alferaru@gmail.com"
+                "date": "2026-09-17T01:53:13.774634989Z",
+                "user": "8todraw@gmail.com"
             },
             "ports": [],
             "link": null,
@@ -113,11 +114,11 @@
                 "x": -202.0,
                 "y": 500.0,
                 "width": 200.0,
-                "height": 70.0,
+                "height": 82.0,
                 "closedWidth": 200.0,
-                "closedHeight": 70.0,
+                "closedHeight": 82.0,
                 "openWidth": 200.0,
-                "openHeight": 70.0,
+                "openHeight": 82.0,
                 "isExpanded": true
             },
             "fileLayoutStrategyId": "none",
@@ -227,11 +228,11 @@
                 "x": 990.0,
                 "y": 500.0,
                 "width": 200.0,
-                "height": 70.0,
+                "height": 82.0,
                 "closedWidth": 200.0,
-                "closedHeight": 70.0,
+                "closedHeight": 82.0,
                 "openWidth": 200.0,
-                "openHeight": 70.0,
+                "openHeight": 82.0,
                 "isExpanded": true
             },
             "fileLayoutStrategyId": "none",
@@ -495,8 +496,8 @@
             },
             "responsible": "alfu32@github",
             "modified": {
-                "date": "2026-09-13T16:33:10.427901877Z",
-                "user": "ioan.alferaru@gmail.com"
+                "date": "2026-09-17T01:53:13.774634989Z",
+                "user": "8todraw@gmail.com"
             },
             "ports": [
                 {
@@ -893,8 +894,8 @@
             },
             "responsible": "github|ioan.alferaru@gmail.com|",
             "modified": {
-                "date": "2026-09-09T09:23:33.197340728Z",
-                "user": "ioan.alferaru@gmail.com"
+                "date": "2026-09-17T01:53:13.774634989Z",
+                "user": "8todraw@gmail.com"
             },
             "ports": [],
             "link": {
@@ -905,7 +906,7 @@
                 "transportKind": "in-process",
                 "typeName": "",
                 "payloadDefinition": "",
-                "typeDefinitionId": "node_c9ef5e41-5a4b-4271-b98a-c6d69d434a6d",
+                "typeDefinitionId": "node_5d3a1605-b95e-48d2-8570-db9e4a4fdcbd",
                 "compositeBoundaryIds": [
                     "node_6fe0a353-135a-4433-b77b-4521da00d728"
                 ],
@@ -1212,7 +1213,9 @@
                         "isReference": false,
                         "typeExpression": null
                     }
-                ]
+                ],
+                "qualifier": "object",
+                "genericTypeIds": []
             },
             "diagnostics": [],
             "metadata": {},
@@ -1959,8 +1962,8 @@
             },
             "responsible": "alfu32@github",
             "modified": {
-                "date": "2026-09-13T16:33:07.383919747Z",
-                "user": "ioan.alferaru@gmail.com"
+                "date": "2026-09-17T01:53:13.774634989Z",
+                "user": "8todraw@gmail.com"
             },
             "ports": [
                 {
@@ -3085,6 +3088,79 @@
             "status": null,
             "statusChanges": [],
             "assignee": null
+        },
+        {
+            "id": "node_5d3a1605-b95e-48d2-8570-db9e4a4fdcbd",
+            "name": "Requests",
+            "kind": "Type",
+            "parentId": "root",
+            "children": [],
+            "incomingLinks": [],
+            "outgoingLinks": [],
+            "layout": {
+                "x": 1969.0,
+                "y": 856.0,
+                "width": 220.0,
+                "height": 70.0,
+                "closedWidth": 220.0,
+                "closedHeight": 70.0,
+                "openWidth": 220.0,
+                "openHeight": 70.0,
+                "isExpanded": true
+            },
+            "fileLayoutStrategyId": "none",
+            "text": {
+                "initialization": "",
+                "initializationLanguageId": "",
+                "source": "",
+                "sourceLanguageId": "",
+                "specification": "",
+                "specificationLanguageId": "markdown",
+                "tests": "",
+                "testsLanguageId": "json",
+                "aiInstructions": "",
+                "aiInstructionsLanguageId": "markdown"
+            },
+            "binaryContent": null,
+            "technology": {
+                "languageId": "",
+                "technologyId": "",
+                "compilerId": "",
+                "fileExtension": "",
+                "contentType": ""
+            },
+            "revision": {
+                "name": "",
+                "date": ""
+            },
+            "responsible": null,
+            "modified": {
+                "date": "2026-09-17T01:50:31.214894591Z",
+                "user": "8todraw@gmail.com"
+            },
+            "ports": [],
+            "link": null,
+            "typeDefinition": {
+                "fields": [],
+                "qualifier": "array",
+                "genericTypeIds": [
+                    "node_c9ef5e41-5a4b-4271-b98a-c6d69d434a6d"
+                ]
+            },
+            "diagnostics": [],
+            "metadata": {},
+            "pluginData": {},
+            "nameDetail": "",
+            "status": "BUSINESS",
+            "statusChanges": [
+                {
+                    "userId": "8todraw@gmail.com",
+                    "changedDate": "2026-09-17T01:49:08.614537642Z",
+                    "initStatus": null,
+                    "endStatus": "BUSINESS"
+                }
+            ],
+            "assignee": null
         }
     ],
     "metadata": {},
@@ -3139,7 +3215,7 @@
             "username": "",
             "fullName": "octo draw",
             "role": "",
-            "refreshedAt": "2026-09-09T08:45:09.281992651Z"
+            "refreshedAt": "2026-09-17T06:02:03.818297Z"
         },
         {
             "identifier": "ioan.alferaru@gmail.com",
@@ -3200,6 +3276,18 @@
             "fullName": "",
             "role": "",
             "refreshedAt": "2026-09-13T16:33:41.647629088Z"
+        },
+        {
+            "identifier": "8todraw@gmail.com",
+            "avatar": "",
+            "avatarData": "",
+            "source": "local",
+            "userId": "",
+            "emailAddress": "",
+            "username": "",
+            "fullName": "",
+            "role": "",
+            "refreshedAt": "2026-09-17T01:53:13.774634989Z"
         }
     ]
 }
