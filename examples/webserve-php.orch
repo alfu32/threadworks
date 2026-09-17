@@ -75,7 +75,7 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-17T01:53:13.774634989Z",
+                "date": "2026-09-17T06:04:59.573959133Z",
                 "user": "8todraw@gmail.com"
             },
             "ports": [],
@@ -496,7 +496,7 @@
             },
             "responsible": "alfu32@github",
             "modified": {
-                "date": "2026-09-17T01:53:13.774634989Z",
+                "date": "2026-09-17T06:04:59.573959133Z",
                 "user": "8todraw@gmail.com"
             },
             "ports": [
@@ -894,7 +894,7 @@
             },
             "responsible": "github|ioan.alferaru@gmail.com|",
             "modified": {
-                "date": "2026-09-17T01:53:13.774634989Z",
+                "date": "2026-09-17T06:04:59.573959133Z",
                 "user": "8todraw@gmail.com"
             },
             "ports": [],
@@ -906,7 +906,7 @@
                 "transportKind": "in-process",
                 "typeName": "",
                 "payloadDefinition": "",
-                "typeDefinitionId": "node_5d3a1605-b95e-48d2-8570-db9e4a4fdcbd",
+                "typeDefinitionId": "",
                 "compositeBoundaryIds": [
                     "node_6fe0a353-135a-4433-b77b-4521da00d728"
                 ],
@@ -1154,11 +1154,11 @@
                 "x": 1487.0,
                 "y": 975.0,
                 "width": 220.0,
-                "height": 268.0,
+                "height": 236.0,
                 "closedWidth": 220.0,
-                "closedHeight": 268.0,
+                "closedHeight": 236.0,
                 "openWidth": 220.0,
-                "openHeight": 268.0,
+                "openHeight": 236.0,
                 "isExpanded": true
             },
             "fileLayoutStrategyId": "none",
@@ -1915,8 +1915,8 @@
             "parentId": "node_6fe0a353-135a-4433-b77b-4521da00d728",
             "children": [],
             "incomingLinks": [
-                "link_bad231a8-7d70-4818-a821-3b5669b0b083",
-                "link_82d8b8bf-5902-49ef-ae53-9b94238a131c"
+                "link_82d8b8bf-5902-49ef-ae53-9b94238a131c",
+                "link_bad231a8-7d70-4818-a821-3b5669b0b083"
             ],
             "outgoingLinks": [
                 "link_15158725-e92f-4fd6-b765-462646956e26",
@@ -1962,7 +1962,7 @@
             },
             "responsible": "alfu32@github",
             "modified": {
-                "date": "2026-09-17T01:53:13.774634989Z",
+                "date": "2026-09-17T06:04:59.573959133Z",
                 "user": "8todraw@gmail.com"
             },
             "ports": [
@@ -3135,17 +3135,22 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-17T01:50:31.214894591Z",
+                "date": "2026-09-17T06:06:18.088965619Z",
                 "user": "8todraw@gmail.com"
             },
             "ports": [],
             "link": null,
             "typeDefinition": {
-                "fields": [],
-                "qualifier": "array",
-                "genericTypeIds": [
-                    "node_c9ef5e41-5a4b-4271-b98a-c6d69d434a6d"
-                ]
+                "fields": [
+                    {
+                        "name": "field_1",
+                        "typeId": "string",
+                        "isReference": false,
+                        "typeExpression": null
+                    }
+                ],
+                "qualifier": "object",
+                "genericTypeIds": []
             },
             "diagnostics": [],
             "metadata": {},
@@ -3215,7 +3220,7 @@
             "username": "",
             "fullName": "octo draw",
             "role": "",
-            "refreshedAt": "2026-09-17T06:02:03.818297Z"
+            "refreshedAt": "2026-09-17T06:04:12.997411971Z"
         },
         {
             "identifier": "ioan.alferaru@gmail.com",
@@ -3287,7 +3292,7 @@
             "username": "",
             "fullName": "",
             "role": "",
-            "refreshedAt": "2026-09-17T01:53:13.774634989Z"
+            "refreshedAt": "2026-09-17T06:06:18.088965619Z"
         }
     ]
 }

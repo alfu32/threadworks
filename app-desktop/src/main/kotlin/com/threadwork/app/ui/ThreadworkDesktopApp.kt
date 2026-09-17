@@ -7938,8 +7938,18 @@ internal class InspectorPanel(
         val genericChoices = arrayOf(NoneTypeChoice) + genericTypeDisplayById.values.toTypedArray()
         genericTypeOne.model = DefaultComboBoxModel(genericChoices)
         genericTypeTwo.model = DefaultComboBoxModel(genericChoices)
+        val primitiveChoices = arrayOf(NoneTypeChoice) + primitiveTypeIds()
+            .mapNotNull { primitiveId ->
+                typeExpressionByDisplay.entries.firstOrNull { entry ->
+                    val expression = entry.value
+                    expression?.isNamed == true && expression.typeId == primitiveId
+                }?.key
+            }
+            .distinct()
+            .toTypedArray()
+        linkCollectionKeyType.model = DefaultComboBoxModel(primitiveChoices)
         typeFields.columnModel.getColumn(2).cellEditor = DefaultCellEditor(JComboBox(collectionTypeChoices()))
-        typeFields.columnModel.getColumn(3).cellEditor = DefaultCellEditor(JComboBox(genericChoices))
+        typeFields.columnModel.getColumn(3).cellEditor = DefaultCellEditor(JComboBox(primitiveChoices))
 
         val supportedQualifiers = buildList {
             add(TypeQualifiers.Object)
