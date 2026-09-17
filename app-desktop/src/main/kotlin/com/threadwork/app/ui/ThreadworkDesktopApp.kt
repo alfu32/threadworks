@@ -71,6 +71,8 @@ import com.threadwork.core.model.Revision
 import com.threadwork.core.model.TechnologyMetadata
 import com.threadwork.core.model.TypeDefinition
 import com.threadwork.core.model.TypeFieldDefinition
+import com.threadwork.core.model.TypeExpression
+import com.threadwork.core.model.effectiveTypeExpression
 import com.threadwork.core.model.VOID_LAYOUT_STRATEGY_ID
 import com.threadwork.core.model.VOID_LANGUAGE_ID
 import com.threadwork.core.model.VOID_TECHNOLOGY_ID
@@ -7159,7 +7161,7 @@ internal class InspectorPanel(
     }
     private val linkTypeDefinition = JComboBox(arrayOf(NoneTypeChoice)).apply { isEditable = false }
     private var typeIdByDisplay = emptyMap<String, String>()
-    private var typeDisplayById = emptyMap<String, String>()
+    private var typeExpressionByDisplay = emptyMap<String, TypeExpression?>()
     private val typeFieldsModel = object : DefaultTableModel(arrayOf("Name", "Type", "Reference"), 0) {
         override fun getColumnClass(columnIndex: Int): Class<*> =
             if (columnIndex == 2) java.lang.Boolean::class.java else String::class.java
@@ -7390,7 +7392,7 @@ internal class InspectorPanel(
         masterRevisionDate.text = if (boundNodeIsRoot) repository.getDocument().masterRevision.date else ""
         bindTransportKind(node?.link?.transportKind.orEmpty())
         bindInteractionKind(node?.link?.interactionKind.orEmpty())
-        refreshTypeChoices(node?.link?.typeDefinitionId.orEmpty())
+        refreshTypeChoices(node?.link?.effectiveTypeExpression())
         bindTypeFields(node)
         bindMetadata(node)
         updateEntityFieldVisibility()
@@ -7637,7 +7639,9 @@ internal class InspectorPanel(
         if (isLink) node.link?.copy()?.let {
             it.transportKind = selectedTransportKind().ifBlank { LinkTransportKinds.Default }
             it.interactionKind = selectedInteractionKind()
-            it.typeDefinitionId = selectedTypeDefinitionId()
+            val expression = selectedTypeExpression()
+            it.typeExpression = expression?.takeUnless(TypeExpression::isNamed)
+            it.typeDefinitionId = expression?.takeIf(TypeExpression::isNamed)?.typeId.orEmpty()
             repository.updateLinkData(id, it)
         }
         inspectorRefreshTimer.restart()
@@ -7761,40 +7765,74 @@ internal class InspectorPanel(
         interactionIdByDisplay[linkInteractionKind.selectedItem?.toString().orEmpty()]
             ?: LinkInteractionKinds.Data
 
-    private fun selectedTypeDefinitionId(): String =
-        typeIdByDisplay[linkTypeDefinition.selectedItem?.toString().orEmpty()].orEmpty()
+    private fun selectedTypeExpression(): TypeExpression? =
+        typeExpressionByDisplay[linkTypeDefinition.selectedItem?.toString().orEmpty()]
 
     private fun typeDefinitionFromTable(): TypeDefinition = TypeDefinition(
         fields = (0 until typeFieldsModel.rowCount).map { row ->
             val displayType = typeFieldsModel.getValueAt(row, 1)?.toString().orEmpty()
+            val expression = typeExpressionByDisplay[displayType]
+                ?: TypeExpression.named(typeIdByDisplay[displayType] ?: displayType.ifBlank { defaultPrimitiveTypeId() })
             TypeFieldDefinition(
                 name = typeFieldsModel.getValueAt(row, 0)?.toString().orEmpty().trim(),
-                typeId = typeIdByDisplay[displayType] ?: displayType.ifBlank { defaultPrimitiveTypeId() },
+                typeId = expression.typeId,
                 isReference = typeFieldsModel.getValueAt(row, 2) as? Boolean ?: false,
+                typeExpression = expression.takeUnless(TypeExpression::isNamed),
             )
         }.toMutableList(),
     )
 
-    private fun refreshTypeChoices(selectedTypeId: String) {
+    private fun refreshTypeChoices(selectedExpression: TypeExpression?) {
         val document = repository.getDocument()
-        val choices = linkedMapOf(NoneTypeChoice to "")
-        primitiveTypeIds().forEach { choices[it] = it }
+        val baseChoices = linkedMapOf<String, TypeExpression>()
+        primitiveTypeIds().forEach { id -> baseChoices[id] = TypeExpression.named(id) }
         document.typeNodes()
             .sortedBy { it.name.lowercase() }
-            .forEach { type -> choices["${type.name} (${type.id.value})"] = type.id.value }
-        typeIdByDisplay = choices
-        typeDisplayById = choices.entries.associate { (display, id) -> id to display }
+            .forEach { type -> baseChoices[type.name + " (" + type.id.value + ")"] = TypeExpression.named(type.id.value) }
+
+        val choices = linkedMapOf<String, TypeExpression?>()
+        choices[NoneTypeChoice] = null
+        baseChoices.forEach { (display, expression) -> choices[display] = expression }
+        val compiler = typeEditingCompiler(document)
+        compiler?.typeConstructors.orEmpty().forEach { constructor ->
+            when (constructor.arity) {
+                1 -> baseChoices.values.forEach { argument ->
+                    val expression = TypeExpression.constructed(constructor.id, argument)
+                    choices[constructor.displayName + "<" + document.typeDisplayName(argument) + ">"]= expression
+                }
+                2 -> baseChoices.values.forEach { key ->
+                    baseChoices.values.forEach { value ->
+                        val expression = TypeExpression.constructed(constructor.id, key, value)
+                        choices[constructor.displayName + "<" + document.typeDisplayName(key) + ", " + document.typeDisplayName(value) + ">"]= expression
+                    }
+                }
+            }
+        }
+        selectedExpression?.let { expression ->
+            val display = document.typeDisplayName(expression)
+            if (display !in choices) choices[display] = expression
+        }
+        typeExpressionByDisplay = choices
+        typeIdByDisplay = choices.mapNotNull { (display, expression) ->
+            expression?.takeIf(TypeExpression::isNamed)?.let { display to it.typeId }
+        }.toMap()
         linkTypeDefinition.model = DefaultComboBoxModel(choices.keys.toTypedArray())
-        linkTypeDefinition.selectedItem = typeDisplayById[selectedTypeId].orEmpty().ifBlank { NoneTypeChoice }
-        val fieldChoices = choices.filterValues(String::isNotBlank).keys.toTypedArray()
+        linkTypeDefinition.selectedItem = choices.entries.firstOrNull { it.value == selectedExpression }?.key ?: NoneTypeChoice
+        val fieldChoices = choices.filterKeys { it != NoneTypeChoice }.keys.toTypedArray()
         typeFields.columnModel.getColumn(1).cellEditor = DefaultCellEditor(JComboBox(fieldChoices))
     }
 
+    private fun typeEditingCompiler(document: ThreadworkDocument): CompilerPlugin? {
+        val id = nodeId ?: return null
+        val node = document.getElementById(id) ?: return null
+        val direct = compilerCapabilityResolver.compilerFor(document, id)
+        if (!node.isLink) return direct
+        val sourceCompiler = compilerCapabilityResolver.compilerFor(document, node.link?.sourceNodeId ?: return direct)
+        return sourceCompiler ?: direct
+    }
+
     private fun primitiveTypeIds(): List<String> =
-        nodeId
-            ?.let { compilerCapabilityResolver.compilerFor(repository.getDocument(), it)?.primitiveTypeIds }
-            .orEmpty()
-            .distinct()
+        typeEditingCompiler(repository.getDocument())?.primitiveTypeIds.orEmpty().distinct()
 
     private fun defaultPrimitiveTypeId(): String =
         primitiveTypeIds().firstOrNull { it == BuiltInTypeIds.String }
@@ -7805,7 +7843,9 @@ internal class InspectorPanel(
     private fun bindTypeFields(node: Node?) {
         typeFieldsModel.rowCount = 0
         node?.typeDefinition?.fields.orEmpty().forEach { field ->
-            val display = typeDisplayById[field.typeId] ?: repository.getDocument().typeDisplayName(field.typeId)
+            val expression = field.effectiveTypeExpression()
+            val display = typeExpressionByDisplay.entries.firstOrNull { it.value == expression }?.key
+                ?: repository.getDocument().typeDisplayName(expression)
             typeFieldsModel.addRow(arrayOf<Any>(field.name, display, field.isReference))
         }
     }

@@ -1,0 +1,170 @@
+name: threadwork
+title: Threadwork
+base: core24
+adopt-info: threadwork
+summary: Topology-first IDE and compiler framework
+description: |
+  Threadwork is a topology-first IDE and compiler framework for designing
+  software systems as connected, inspectable node graphs.
+  The snap packages the prebuilt Threadwork fat JAR and a bundled JRE 21.
+icon: snap/gui/threadwork.svg
+
+grade: stable
+confinement: strict
+
+platforms:
+  amd64:
+  arm64:
+
+apps:
+  threadwork:
+    command: bin/threadwork
+    desktop: snap/gui/threadwork.desktop
+    environment:
+      THREADWORK_HOME: $SNAP_USER_COMMON
+      THREADWORK_PLUGINS_DIR: $SNAP_USER_COMMON/plugins
+    plugs:
+      - desktop
+      - desktop-legacy
+      - home
+      - removable-media
+      - network
+      - network-bind
+      - opengl
+      - wayland
+      - x11
+      - audio-playback
+
+parts:
+  threadwork:
+    plugin: nil
+    source: .
+    build-packages:
+      - openjdk-21-jdk-headless
+    stage-packages:
+      - libasound2-data
+      - libasound2t64
+      - alsa-topology-conf
+      - alsa-ucm-conf
+      - libdrm2
+      - libegl1
+      - libgbm1
+      - libgif7
+      - libgl1
+      - libgl1-mesa-dri
+      - libgles2
+      - libglx-mesa0
+      - libgtk-3-0t64
+      - libharfbuzz0b
+      - libjpeg-turbo8
+      - liblcms2-2
+      - libopengl0
+      - libwayland-client0
+      - libwayland-cursor0
+      - libwayland-egl1
+      - libx11-6
+      - libxcursor1
+      - libxext6
+      - libxfixes3
+      - libxi6
+      - libxinerama1
+      - libxkbcommon0
+      - libxrandr2
+      - libxrender1
+      - libxtst6
+      - libxxf86vm1
+    override-build: |
+      set -eux
+
+      SRC_ROOT="${CRAFT_PART_SRC:-${SNAPCRAFT_PART_SRC:-$PWD}}"
+      cd "$SRC_ROOT"
+
+      export JAVA_HOME="$(dirname "$(dirname "$(readlink -f "$(command -v javac)")")")"
+      export PATH="$JAVA_HOME/bin:$PATH"
+
+      APP_JAR="${THREADWORK_SNAP_JAR:-}"
+      if [ -n "$APP_JAR" ]; then
+        if [ ! -f "$APP_JAR" ]; then
+          echo "THREADWORK_SNAP_JAR does not point to a file: $APP_JAR" >&2
+          exit 1
+        fi
+      else
+        APP_JAR="$(find dist -maxdepth 1 -type f -name 'threadwork-*.jar' -printf '%T@ %p\n' 2>/dev/null | sort -nr | sed -n '1s/^[^ ]* //p')"
+      fi
+
+      if [ -z "$APP_JAR" ]; then
+        echo "No prebuilt Threadwork fat JAR found in dist/." >&2
+        echo "Build it before running snapcraft:" >&2
+        echo "  GRADLE_USER_HOME=.gradle-user ./gradlew fatJar -Prelease_number=2.4.2" >&2
+        exit 1
+      fi
+
+      JAR_VERSION="$(basename "$APP_JAR" .jar | sed 's/^threadwork-//')"
+      SNAP_VERSION="${THREADWORK_SNAP_VERSION:-${V:-$JAR_VERSION}}"
+      SNAP_VERSION="${SNAP_VERSION#v}"
+      INSTALL_ROOT="$CRAFT_PART_INSTALL/opt/threadwork"
+
+      install -d "$INSTALL_ROOT" "$CRAFT_PART_INSTALL/bin" "$CRAFT_PART_INSTALL/snap/gui"
+      install -m 0644 "$APP_JAR" "$INSTALL_ROOT/threadwork.jar"
+
+      # jdeps cannot analyze this merged fat JAR because some bundled
+      # libraries contain overlapping module packages. Include the JDK
+      # modules so the packaged runtime remains reliable across releases.
+      "$JAVA_HOME/bin/jlink" \
+        --add-modules ALL-MODULE-PATH \
+        --strip-debug \
+        --no-header-files \
+        --no-man-pages \
+        --compress=2 \
+        --output "$INSTALL_ROOT/runtime"
+
+      install -m 0644 snap/gui/threadwork.desktop "$CRAFT_PART_INSTALL/snap/gui/threadwork.desktop"
+      install -m 0644 snap/gui/threadwork.svg "$CRAFT_PART_INSTALL/snap/gui/threadwork.svg"
+
+      cat > "$CRAFT_PART_INSTALL/bin/threadwork" <<'EOF'
+      #!/bin/sh
+      set -eu
+
+      INSTALL_PATH="$SNAP/opt/threadwork"
+      JAVA_BIN="$INSTALL_PATH/runtime/bin/java"
+      RUNTIME_HOME="${THREADWORK_HOME:-$SNAP_USER_COMMON}"
+      PLUGINS_DIR="${THREADWORK_PLUGINS_DIR:-$SNAP_USER_COMMON/plugins}"
+      JAVA_TMPDIR="$SNAP_USER_COMMON/tmp"
+
+      mkdir -p "$RUNTIME_HOME" "$RUNTIME_HOME/.config" "$RUNTIME_HOME/.prefs" "$PLUGINS_DIR" "$JAVA_TMPDIR"
+      export HOME="$RUNTIME_HOME"
+      export XDG_CONFIG_HOME="$RUNTIME_HOME/.config"
+      export XDG_DATA_HOME="$RUNTIME_HOME"
+
+      # Keep stdout/stderr attached: the desktop entry deliberately opens a
+      # terminal so it acts as Threadwork's development console.
+      FIRST_ARG=""
+      if [ "$#" -gt 0 ]; then
+        FIRST_ARG="$1"
+      fi
+      case "$FIRST_ARG" in
+       desktop|validate|compile|help|--help|-h)
+         if [ "$FIRST_ARG" != "help" ] && [ "$FIRST_ARG" != "--help" ] && [ "$FIRST_ARG" != "-h" ]; then
+            case " $* " in
+              *" --plugins "*|*" --plugins-dir "*) ;;
+              *) set -- "$@" --plugins-dir "$PLUGINS_DIR" ;;
+            esac
+          fi
+         exec "$JAVA_BIN" \
+           -Duser.home="$RUNTIME_HOME" \
+           -Djava.io.tmpdir="$JAVA_TMPDIR" \
+           -jar "$INSTALL_PATH/threadwork.jar" \
+           "$@"
+         ;;
+       *)
+         exec "$JAVA_BIN" \
+           -Duser.home="$RUNTIME_HOME" \
+           -Djava.io.tmpdir="$JAVA_TMPDIR" \
+           -jar "$INSTALL_PATH/threadwork.jar" \
+           desktop --plugins-dir "$PLUGINS_DIR" "$@"
+         ;;
+      esac
+      EOF
+      chmod 755 "$CRAFT_PART_INSTALL/bin/threadwork"
+
+      craftctl set version="$SNAP_VERSION"

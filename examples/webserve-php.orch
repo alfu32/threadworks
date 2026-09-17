@@ -3158,14 +3158,14 @@
         {
             "identifier": "devlin",
             "avatar": "",
-            "avatarData": "",
+            "avatarData": "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",
             "source": "local",
             "userId": "",
             "emailAddress": "",
             "username": "",
             "fullName": "",
             "role": "",
-            "refreshedAt": "2026-09-09T08:10:26.491351206Z"
+            "refreshedAt": "2026-09-16T18:19:48.432789090Z"
         },
         {
             "identifier": "ioan.alferaru@gmail.com",

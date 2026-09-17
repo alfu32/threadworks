@@ -6,6 +6,7 @@ import com.threadwork.compiler.api.CompilerCodeMember
 import com.threadwork.compiler.api.CompilerCodeSymbol
 import com.threadwork.compiler.api.CompilerCodeSymbolKind
 import com.threadwork.compiler.api.CompilerTechnology
+import com.threadwork.compiler.api.CompilerTypeConstructor
 import com.threadwork.compiler.api.NodeCompilerContext
 import com.threadwork.compiler.api.compilerArgumentName
 import com.threadwork.compiler.api.defaultCodeIntelligence
@@ -42,13 +43,17 @@ class PhpCompiler : TemplateSetCompiler() {
         "mixed",
         "null",
     )
+    override val typeConstructors: List<CompilerTypeConstructor> = listOf(
+        CompilerTypeConstructor("array", "Array", listOf("item"), "array<{0}>"),
+        CompilerTypeConstructor("map", "Map", listOf("key", "value"), "array<{0}, {1}>"),
+    )
     override val providedTechnologies: List<CompilerTechnology> = listOf(CompilerTechnology("php", "php"))
     override val magicFileNames: Set<String> = TEMPLATES.staticFileNames
 
     override fun supports(document: ThreadworkDocument): Boolean = true
 
     override fun validate(document: ThreadworkDocument): List<Diagnostic> =
-        DocumentValidator.validate(document, primitiveTypeIds) + document.nodes.values
+        DocumentValidator.validate(document, primitiveTypeIds, typeConstructors.map { it.id }) + document.nodes.values
             .filter { it.isLink && document.effectiveTechnologyId(it.id) == "php" }
             .filter { LinkClassifier.classify(document, it) == LinkStereotype.RunnableCapability }
             .map {

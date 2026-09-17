@@ -139,6 +139,16 @@ GRADLE_USER_HOME=.gradle-user ./gradlew clean fatJar -Prelease_number=1.7.0
 java -jar dist/threadwork-1.7.0.jar desktop
 ```
 
+Build the Snap from that fat JAR. Snapcraft intentionally does not invoke
+Gradle again, so the JAR build is the only compilation step:
+
+    GRADLE_USER_HOME=.gradle-user ./gradlew fatJar -Prelease_number=2.4.2
+    snapcraft pack
+
+The Snap desktop launcher opens a terminal with the graphical editor so the
+attached stdout/stderr stream remains available as Threadwork's development
+console.
+
 Without `-Prelease_number`, the build uses the latest Git tag, falling back to `0.1.0`. The generated, ignored `com.threadwork.Version` records the semantic version, Git commit, tag, and UTC build date. The fat JAR and manifest carry the same build identity.
 
 ## Project Files and Compatibility

@@ -2,6 +2,7 @@ package com.threadwork.compiler.quickjs
 
 import com.threadwork.compiler.api.CompilerOptions
 import com.threadwork.compiler.api.CompilerTechnology
+import com.threadwork.compiler.api.CompilerTypeConstructor
 import com.threadwork.compiler.api.CompilerCodeIntelligence
 import com.threadwork.compiler.api.CompilerCodeMember
 import com.threadwork.compiler.api.CompilerCodeSymbol
@@ -35,6 +36,10 @@ class QuickJsCompiler : TemplateSetCompiler() {
         "Array",
         "Uint8Array",
     )
+    override val typeConstructors: List<CompilerTypeConstructor> = listOf(
+        CompilerTypeConstructor("array", "Array", listOf("item"), "Array<{0}>"),
+        CompilerTypeConstructor("map", "Map", listOf("key", "value"), "Map<{0}, {1}>"),
+    )
     override val providedTechnologies: List<CompilerTechnology> = listOf(
         CompilerTechnology("javascript", "quickjs"),
     )
@@ -44,7 +49,7 @@ class QuickJsCompiler : TemplateSetCompiler() {
     override fun supports(document: ThreadworkDocument): Boolean = true
 
     override fun validate(document: ThreadworkDocument): List<Diagnostic> =
-        DocumentValidator.validate(document, primitiveTypeIds)
+        DocumentValidator.validate(document, primitiveTypeIds, typeConstructors.map { it.id })
 
     override fun codeIntelligence(document: ThreadworkDocument, node: Node): CompilerCodeIntelligence {
         val defaults = defaultCodeIntelligence(document, node)

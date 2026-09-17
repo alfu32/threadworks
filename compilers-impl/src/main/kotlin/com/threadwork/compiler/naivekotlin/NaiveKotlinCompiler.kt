@@ -2,6 +2,7 @@ package com.threadwork.compiler.naivekotlin
 
 import com.threadwork.compiler.api.CompilerOptions
 import com.threadwork.compiler.api.CompilerTechnology
+import com.threadwork.compiler.api.CompilerTypeConstructor
 import com.threadwork.compiler.api.CompilerCodeIntelligence
 import com.threadwork.compiler.api.CompilerCodeMember
 import com.threadwork.compiler.api.CompilerCodeSymbol
@@ -48,13 +49,19 @@ class NaiveKotlinCompiler : TemplateSetCompiler() {
         "Any",
         "Unit",
     )
+    override val typeConstructors: List<CompilerTypeConstructor> = listOf(
+        CompilerTypeConstructor("array", "Array", listOf("item"), "Array<{0}>"),
+        CompilerTypeConstructor("list", "List", listOf("item"), "List<{0}>"),
+        CompilerTypeConstructor("set", "Set", listOf("item"), "Set<{0}>"),
+        CompilerTypeConstructor("map", "Map", listOf("key", "value"), "Map<{0}, {1}>"),
+    )
     override val providedTechnologies: List<CompilerTechnology> = listOf(CompilerTechnology("kotlin", "kotlin-jvm"))
     override val magicFileNames: Set<String> = TEMPLATES.staticFileNames
 
     override fun supports(document: ThreadworkDocument): Boolean = true
 
     override fun validate(document: ThreadworkDocument): List<Diagnostic> =
-        DocumentValidator.validate(document, primitiveTypeIds) + document.nodes.values
+        DocumentValidator.validate(document, primitiveTypeIds, typeConstructors.map { it.id }) + document.nodes.values
             .filter { it.isLink && document.effectiveTechnologyId(it.id) == "kotlin-jvm" }
             .filter { LinkClassifier.classify(document, it) == LinkStereotype.RunnableCapability }
             .map {

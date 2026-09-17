@@ -17,6 +17,8 @@ import com.threadwork.core.model.effectiveLayoutStrategyId
 import com.threadwork.core.model.effectiveTechnologyId
 import com.threadwork.core.model.getElementById
 import com.threadwork.core.model.projectName
+import com.threadwork.core.model.TypeExpression
+import com.threadwork.core.model.typeDisplayName
 import java.nio.file.Path
 
 enum class GeneratedElementKind {
@@ -39,11 +41,22 @@ data class CompilerTechnology(
     val technologyId: String,
 )
 
+data class CompilerTypeConstructor(
+    val id: String,
+    val displayName: String,
+    val parameterNames: List<String>,
+    val renderPattern: String,
+) {
+    val arity: Int get() = parameterNames.size
+}
+
 interface CompilerPlugin : FsStorage {
     val id: String
     val displayName: String
     val supportedLanguageIds: Set<String> get() = emptySet()
     val supportedTechnologyIds: Set<String> get() = emptySet()
+    /** Parameterized type constructors supported by this compiler. */
+    val typeConstructors: List<CompilerTypeConstructor> get() = emptyList()
     /** Primitive Threadwork field types supported by this compiler. */
     val primitiveTypeIds: List<String> get() = emptyList()
     val providedTechnologies: List<CompilerTechnology>
@@ -97,6 +110,9 @@ interface CompilerPlugin : FsStorage {
     fun layoutStrategy(options: CompilerOptions): LayoutStrategy =
         ClassifiedFilesystemLayoutStrategy
 
+    fun renderTypeExpression(document: ThreadworkDocument, expression: TypeExpression): String =
+        renderCompilerTypeExpression(document, expression, typeConstructors)
+
     fun layoutStrategy(document: ThreadworkDocument, nodeId: NodeId, options: CompilerOptions): LayoutStrategy {
         val resolvedStrategyId = document.effectiveLayoutStrategyId(nodeId)
         return if (resolvedStrategyId == VOID_LAYOUT_STRATEGY_ID) {
@@ -128,6 +144,20 @@ interface CompilerPlugin : FsStorage {
 
     override fun restore(document: ThreadworkDocument, chunk: List<VirtualFile>): ThreadworkDocument =
         document
+}
+
+fun renderCompilerTypeExpression(
+    document: ThreadworkDocument,
+    expression: TypeExpression,
+    constructors: Collection<CompilerTypeConstructor>,
+): String {
+    if (expression.isNamed) return document.typeDisplayName(expression.typeId)
+    val constructor = constructors.firstOrNull { it.id == expression.constructorId }
+        ?: return document.typeDisplayName(expression)
+    val renderedArguments = expression.arguments.map { renderCompilerTypeExpression(document, it, constructors) }
+    return constructor.renderPattern.replace(Regex("\\{(\\d+)\\}")) { match ->
+        renderedArguments.getOrNull(match.groupValues[1].toInt()).orEmpty()
+    }
 }
 
 data class CompilerOptions(

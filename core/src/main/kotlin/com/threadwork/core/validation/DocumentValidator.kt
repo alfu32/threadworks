@@ -11,6 +11,8 @@ import com.threadwork.core.model.BuiltInTypeIds
 import com.threadwork.core.model.LinkInteractionKinds
 import com.threadwork.core.model.closestCommonAncestorId
 import com.threadwork.core.model.compositeBoundaryIdsBetween
+import com.threadwork.core.model.TypeExpression
+import com.threadwork.core.model.effectiveTypeExpression
 
 object DocumentValidator {
     /**
@@ -23,6 +25,7 @@ object DocumentValidator {
     fun validate(
         document: ThreadworkDocument,
         knownPrimitiveTypeIds: Collection<String>? = null,
+        knownTypeConstructorIds: Collection<String>? = null,
     ): List<Diagnostic> {
         val diagnostics = mutableListOf<Diagnostic>()
 
@@ -33,9 +36,9 @@ object DocumentValidator {
         document.nodes.values.forEach { node ->
             validateParent(document, node, diagnostics)
             validateChildren(document, node, diagnostics)
-            validateLinks(document, node, diagnostics, knownPrimitiveTypeIds)
+            validateLinks(document, node, diagnostics, knownPrimitiveTypeIds, knownTypeConstructorIds)
             validatePorts(node, diagnostics)
-            validateType(document, node, diagnostics)
+            validateType(document, node, diagnostics, knownPrimitiveTypeIds, knownTypeConstructorIds)
         }
 
         return diagnostics
@@ -72,6 +75,7 @@ object DocumentValidator {
         node: Node,
         diagnostics: MutableList<Diagnostic>,
         knownPrimitiveTypeIds: Collection<String>?,
+        knownTypeConstructorIds: Collection<String>?,
     ) {
         node.incomingLinks.forEach { if (it !in document.nodes) diagnostics += error("Incoming link '$it' does not exist", node.id) }
         node.outgoingLinks.forEach { if (it !in document.nodes) diagnostics += error("Outgoing link '$it' does not exist", node.id) }
@@ -103,8 +107,11 @@ object DocumentValidator {
             }
         }
 
+        link.effectiveTypeExpression()?.let { expression ->
+            validateTypeExpression(document, expression, "Link " + node.id, diagnostics, knownPrimitiveTypeIds, knownTypeConstructorIds)
+        }
         val typeId = link.typeDefinitionId.trim()
-        if (typeId.isNotBlank() && !isKnownType(document, typeId, knownPrimitiveTypeIds)) {
+        if (link.effectiveTypeExpression() == null && typeId.isNotBlank() && !isKnownType(document, typeId, knownPrimitiveTypeIds)) {
             diagnostics += error("Link '${node.id}' references unknown type '$typeId'", node.id)
         }
 
@@ -127,7 +134,13 @@ object DocumentValidator {
         }
     }
 
-    private fun validateType(document: ThreadworkDocument, node: Node, diagnostics: MutableList<Diagnostic>) {
+    private fun validateType(
+        document: ThreadworkDocument,
+        node: Node,
+        diagnostics: MutableList<Diagnostic>,
+        knownPrimitiveTypeIds: Collection<String>?,
+        knownTypeConstructorIds: Collection<String>?,
+    ) {
         if (node.kind != NodeKind.Type) return
         val definition = node.typeDefinition
         if (definition == null) {
@@ -140,12 +153,39 @@ object DocumentValidator {
             .forEach { diagnostics += error("Duplicate type field '$it'", node.id) }
         definition.fields.forEach { field ->
             if (field.name.isBlank()) diagnostics += error("Type field name cannot be blank", node.id)
-            val typeId = field.typeId.trim()
-            if (typeId.isBlank()) {
-                diagnostics += error("Type field '${field.name}' type cannot be blank", node.id)
-            } else if (document.nodes[NodeId(typeId)]?.kind?.let { it != NodeKind.Type } == true) {
-                diagnostics += error("Type field '${field.name}' references non-type node '$typeId'", node.id)
+            if (field.typeExpression != null) {
+                validateTypeExpression(document, field.typeExpression!!, "Type field", diagnostics, knownPrimitiveTypeIds, knownTypeConstructorIds)
+            } else {
+                val typeId = field.typeId.trim()
+                if (typeId.isBlank()) {
+                    diagnostics += error("Type field '${field.name}' type cannot be blank", node.id)
+                } else if (document.nodes[NodeId(typeId)]?.kind?.let { it != NodeKind.Type } == true) {
+                    diagnostics += error("Type field '${field.name}' references non-type node '$typeId'", node.id)
+                }
             }
+        }
+    }
+
+    private fun validateTypeExpression(
+        document: ThreadworkDocument,
+        expression: TypeExpression,
+        owner: String,
+        diagnostics: MutableList<Diagnostic>,
+        knownPrimitiveTypeIds: Collection<String>?,
+        knownTypeConstructorIds: Collection<String>?,
+    ) {
+        if (expression.isNamed) {
+            val typeId = expression.typeId.trim()
+            if (typeId.isBlank() || !isKnownType(document, typeId, knownPrimitiveTypeIds)) {
+                diagnostics += error(owner + " references unknown type " + typeId)
+            }
+            return
+        }
+        if (knownTypeConstructorIds != null && expression.constructorId !in knownTypeConstructorIds) {
+            diagnostics += error(owner + " uses unsupported type constructor " + expression.constructorId)
+        }
+        expression.arguments.forEach { argument ->
+            validateTypeExpression(document, argument, owner, diagnostics, knownPrimitiveTypeIds, knownTypeConstructorIds)
         }
     }
 

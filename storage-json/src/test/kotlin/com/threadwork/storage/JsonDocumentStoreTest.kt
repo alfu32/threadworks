@@ -12,6 +12,7 @@ import com.threadwork.core.model.ProjectStatus
 import com.threadwork.core.model.Revision
 import com.threadwork.core.model.TypeDefinition
 import com.threadwork.core.model.TypeFieldDefinition
+import com.threadwork.core.model.TypeExpression
 import com.threadwork.core.validation.DocumentValidator
 import java.nio.file.Files
 import kotlin.io.path.createTempFile
@@ -110,6 +111,33 @@ class JsonDocumentStoreTest {
 
         assertEquals("payload", loaded.nodes.getValue(type.id).typeDefinition?.fields?.single()?.name)
         assertEquals(type.id.value, loaded.nodes.getValue(link.id).link?.typeDefinitionId)
+    }
+
+    @Test
+    fun `composed link type round trips`() {
+        val repository = InMemoryDocumentRepository(newDocument("composed link json"))
+        val root = repository.getDocument().rootNodeId
+        val envelope = repository.createNode(root, "Envelope", NodeKind.Type)
+        val source = repository.createNode(root, "source", NodeKind.Processor)
+        val target = repository.createNode(root, "target", NodeKind.Processor)
+        repository.addPort(source.id, com.threadwork.core.model.NodePort("out", "packet", PortDirection.Output))
+        repository.addPort(target.id, com.threadwork.core.model.NodePort("in", "packet", PortDirection.Input))
+        val link = repository.createLink(root, "packet", source.id, "packet", target.id, "packet")
+        val expression = TypeExpression.constructed(
+            "map",
+            TypeExpression.named("string"),
+            TypeExpression.constructed("array", TypeExpression.named(envelope.id.value)),
+        )
+        repository.updateLinkData(link.id, requireNotNull(link.link).copy(typeExpression = expression))
+        val file = createTempFile(suffix = ".threadwork.orch")
+        val store = KotlinxJsonDocumentStore()
+
+        store.save(repository.getDocument(), file)
+        val json = Files.readString(file)
+        val loaded = store.load(file)
+
+        assertTrue(json.contains("\"typeExpression\""))
+        assertEquals(expression, loaded.nodes.getValue(link.id).link?.typeExpression)
     }
 
     @Test

@@ -6,6 +6,7 @@ import com.threadwork.compiler.api.CompilerCodeSymbol
 import com.threadwork.compiler.api.CompilerCodeSymbolKind
 import com.threadwork.compiler.api.CompilerOptions
 import com.threadwork.compiler.api.CompilerTechnology
+import com.threadwork.compiler.api.CompilerTypeConstructor
 import com.threadwork.compiler.api.SingleFileLayoutStrategy
 import com.threadwork.compiler.api.compilerArgumentName
 import com.threadwork.compiler.api.defaultCodeIntelligence
@@ -54,6 +55,10 @@ class GoCompiler : TemplateSetCompiler() {
         "[]byte",
         "any",
     )
+    override val typeConstructors: List<CompilerTypeConstructor> = listOf(
+        CompilerTypeConstructor("array", "Array", listOf("item"), "[]{0}"),
+        CompilerTypeConstructor("map", "Map", listOf("key", "value"), "map[{0}]{1}"),
+    )
     override val providedTechnologies: List<CompilerTechnology> = listOf(CompilerTechnology("go", "go"))
     override val supportedLayoutStrategyIds: Set<String> = setOf(SingleFileLayoutStrategy.id)
     override val magicFileNames: Set<String> = TEMPLATES.staticFileNames
@@ -61,7 +66,7 @@ class GoCompiler : TemplateSetCompiler() {
     override fun supports(document: ThreadworkDocument): Boolean = true
 
     override fun validate(document: ThreadworkDocument): List<Diagnostic> =
-        DocumentValidator.validate(document, primitiveTypeIds) + document.nodes.values
+        DocumentValidator.validate(document, primitiveTypeIds, typeConstructors.map { it.id }) + document.nodes.values
             .filter { it.isLink && document.effectiveTechnologyId(it.id) == "go" }
             .filter { LinkClassifier.classify(document, it) == LinkStereotype.RunnableCapability }
             .map {

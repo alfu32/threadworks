@@ -12,6 +12,7 @@ import com.threadwork.core.model.NodeKind
 import com.threadwork.core.model.TechnologyMetadata
 import com.threadwork.core.model.TypeDefinition
 import com.threadwork.core.model.TypeFieldDefinition
+import com.threadwork.core.model.TypeExpression
 import com.threadwork.storage.InMemoryDocumentRepository
 import com.threadwork.storage.newDocument
 import kotlin.test.Test
@@ -50,17 +51,34 @@ class CompilerPrimitiveTypeTest {
             type.id,
             TypeDefinition(mutableListOf(TypeFieldDefinition("value", "unsigned long long"))),
         )
-
         val source = assertNotNull(CCompiler().compile(repository.getDocument()).generatedProject)
             .files
             .single()
             .content
-
         assertTrue(source.contains("unsigned long long value;"))
         assertTrue(!source.contains("struct unsigned long long value;"))
         assertEquals(
             "unsigned long long",
             assertNotNull(CCompiler().typeInformation(repository.getDocument(), type, "unsigned long long")).name,
         )
+    }
+
+    @Test
+    fun `composed types render with active compiler spelling`() {
+        val repository = InMemoryDocumentRepository(newDocument("composed types"))
+        val root = repository.getDocument().rootNodeId
+        val type = repository.createNode(root, "Envelope", NodeKind.Type)
+        val kotlinExpression = TypeExpression.constructed(
+            "map",
+            TypeExpression.named("String"),
+            TypeExpression.constructed("array", TypeExpression.named(type.id.value)),
+        )
+        val goExpression = TypeExpression.constructed(
+            "map",
+            TypeExpression.named("string"),
+            TypeExpression.constructed("array", TypeExpression.named(type.id.value)),
+        )
+        assertEquals("Map<String, Array<Envelope>>", NaiveKotlinCompiler().renderTypeExpression(repository.getDocument(), kotlinExpression))
+        assertEquals("map[string][]Envelope", GoCompiler().renderTypeExpression(repository.getDocument(), goExpression))
     }
 }

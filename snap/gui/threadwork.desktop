@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Threadwork
+Comment=Topology-first IDE and compiler framework
+Exec=threadwork %U
+Icon=${SNAP}/meta/gui/threadwork.svg
+Terminal=true
+Type=Application
+Categories=Development;IDE;
+MimeType=application/octet-stream;
+StartupWMClass=Threadwork

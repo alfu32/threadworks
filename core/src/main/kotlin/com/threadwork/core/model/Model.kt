@@ -182,6 +182,7 @@ data class LinkData(
     var typeDefinitionId: String = "",
     var compositeBoundaryIds: MutableList<NodeId> = mutableListOf(),
     var interactionKind: String = LinkInteractionKinds.Auto,
+    var typeExpression: TypeExpression? = null,
 )
 
 object BuiltInTypeIds {
@@ -199,7 +200,25 @@ data class TypeFieldDefinition(
     var name: String = "",
     var typeId: String = BuiltInTypeIds.String,
     var isReference: Boolean = false,
+    var typeExpression: TypeExpression? = null,
 )
+
+/** Compiler-neutral reference to either a named type or a parameterized type constructor. */
+@Serializable
+data class TypeExpression(
+    var typeId: String = "",
+    var constructorId: String = "",
+    val arguments: MutableList<TypeExpression> = mutableListOf(),
+) {
+    val isNamed: Boolean get() = constructorId.isBlank()
+
+    companion object {
+        fun named(typeId: String): TypeExpression = TypeExpression(typeId = typeId)
+
+        fun constructed(constructorId: String, vararg arguments: TypeExpression): TypeExpression =
+            TypeExpression(constructorId = constructorId, arguments = arguments.toMutableList())
+    }
+}
 
 @Serializable
 data class TypeDefinition(
@@ -318,14 +337,33 @@ fun ThreadworkDocument.typeDisplayName(typeId: String): String {
     return nodes[NodeId(normalized)]?.takeIf { it.kind == NodeKind.Type }?.name?.trim().orEmpty()
         .ifBlank { normalized }
 }
+fun ThreadworkDocument.typeDisplayName(expression: TypeExpression): String =
+    if (expression.isNamed) {
+        typeDisplayName(expression.typeId)
+    } else {
+        expression.arguments.joinToString(", ", prefix = "${expression.constructorId}<", postfix = ">") {
+            typeDisplayName(it)
+        }
+    }
+fun TypeFieldDefinition.effectiveTypeExpression(): TypeExpression =
+    typeExpression ?: TypeExpression.named(typeId)
+
+fun LinkData.effectiveTypeExpression(): TypeExpression? =
+    typeExpression ?: typeDefinitionId.trim().takeIf(String::isNotBlank)?.let(TypeExpression::named)
+
 
 fun ThreadworkDocument.linkTypeDisplayName(linkNode: Node): String {
     val link = linkNode.link ?: return ""
-    return typeDisplayName(link.typeDefinitionId).ifBlank { link.typeName.trim() }
+    return link.effectiveTypeExpression()?.let(::typeDisplayName).orEmpty().ifBlank { link.typeName.trim() }
 }
 
 fun ThreadworkDocument.linksUsingType(typeNodeId: NodeId): List<Node> =
-    linkNodes().filter { it.link?.typeDefinitionId == typeNodeId.value }
+    linkNodes().filter { node ->
+        node.link?.effectiveTypeExpression()?.containsType(typeNodeId.value) == true
+    }
+
+fun TypeExpression.containsType(typeId: String): Boolean =
+    (isNamed && this.typeId == typeId) || arguments.any { it.containsType(typeId) }
 
 /** Returns the nearest node that contains both endpoints in the persisted hierarchy. */
 fun ThreadworkDocument.closestCommonAncestorId(firstId: NodeId, secondId: NodeId): NodeId? {
