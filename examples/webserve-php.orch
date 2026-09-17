@@ -22,7 +22,6 @@
                 "link_82d8b8bf-5902-49ef-ae53-9b94238a131c",
                 "node_c9ef5e41-5a4b-4271-b98a-c6d69d434a6d",
                 "node_6fe0a353-135a-4433-b77b-4521da00d728",
-                "link_a8ce6267-aa95-4362-84e5-c2929e395f3a",
                 "link_bcb6f8bc-5916-4184-ab74-0a8dfdbff8c5",
                 "link_189bb051-11a0-4914-8cdc-aba75c081412",
                 "link_56f247eb-1397-489b-8130-4ddf2d446a15",
@@ -33,7 +32,8 @@
                 "link_7997954b-3628-42ef-bdfd-1146684c6a6c",
                 "node_d3143aee-4f6c-47a4-81dd-4e3bfe61789c",
                 "link_8dae3e7b-5a21-40e9-aa13-3d16ffa183fe",
-                "node_5d3a1605-b95e-48d2-8570-db9e4a4fdcbd"
+                "node_5d3a1605-b95e-48d2-8570-db9e4a4fdcbd",
+                "link_79e1cd9c-4820-4e1e-a282-d7126be0c896"
             ],
             "incomingLinks": [],
             "outgoingLinks": [],
@@ -75,7 +75,7 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-17T06:16:15.521514623Z",
+                "date": "2026-09-17T06:28:30.120642229Z",
                 "user": "8todraw@gmail.com"
             },
             "ports": [],
@@ -360,11 +360,12 @@
             "incomingLinks": [
                 "link_8b69fa03-f5ad-474f-91d7-0201eee0fcba",
                 "link_bcb6f8bc-5916-4184-ab74-0a8dfdbff8c5",
-                "link_56f247eb-1397-489b-8130-4ddf2d446a15"
+                "link_56f247eb-1397-489b-8130-4ddf2d446a15",
+                "link_79e1cd9c-4820-4e1e-a282-d7126be0c896"
             ],
             "outgoingLinks": [
                 "link_b3a9576f-e2b9-4548-9b02-2438fda8b78e",
-                "link_a8ce6267-aa95-4362-84e5-c2929e395f3a"
+                "link_79e1cd9c-4820-4e1e-a282-d7126be0c896"
             ],
             "layout": {
                 "x": -739.0,
@@ -404,8 +405,8 @@
             },
             "responsible": "cristian.alferaru@gmail.com@microsoft",
             "modified": {
-                "date": "2026-09-09T10:04:33.623107045Z",
-                "user": "ioan.alferaru@gmail.com"
+                "date": "2026-09-17T06:27:28.416921286Z",
+                "user": "8todraw@gmail.com"
             },
             "ports": [
                 {
@@ -1280,7 +1281,7 @@
                 "width": 1423.0,
                 "height": 481.0,
                 "closedWidth": 200.0,
-                "closedHeight": 138.0,
+                "closedHeight": 108.0,
                 "openWidth": 1423.0,
                 "openHeight": 481.0,
                 "isExpanded": true
@@ -1622,7 +1623,6 @@
                 "link_823f422e-35dd-4223-be9b-1907694c76cc",
                 "link_6d0f78b9-7a10-4621-955d-331d8934c60d",
                 "link_9ad4fc83-a96b-4986-9d39-4364f783cd14",
-                "link_a8ce6267-aa95-4362-84e5-c2929e395f3a",
                 "link_189bb051-11a0-4914-8cdc-aba75c081412"
             ],
             "outgoingLinks": [
@@ -1666,8 +1666,8 @@
             },
             "responsible": "alfu32",
             "modified": {
-                "date": "2026-09-13T09:44:58.188710411Z",
-                "user": "ioan.alferaru@gmail.com"
+                "date": "2026-09-17T06:26:57.143347785Z",
+                "user": "8todraw@gmail.com"
             },
             "ports": [
                 {
@@ -1925,8 +1925,8 @@
             "parentId": "node_6fe0a353-135a-4433-b77b-4521da00d728",
             "children": [],
             "incomingLinks": [
-                "link_82d8b8bf-5902-49ef-ae53-9b94238a131c",
-                "link_bad231a8-7d70-4818-a821-3b5669b0b083"
+                "link_bad231a8-7d70-4818-a821-3b5669b0b083",
+                "link_82d8b8bf-5902-49ef-ae53-9b94238a131c"
             ],
             "outgoingLinks": [
                 "link_15158725-e92f-4fd6-b765-462646956e26",
@@ -1972,7 +1972,7 @@
             },
             "responsible": "alfu32@github",
             "modified": {
-                "date": "2026-09-17T06:16:15.521514623Z",
+                "date": "2026-09-17T06:28:30.120642229Z",
                 "user": "8todraw@gmail.com"
             },
             "ports": [
@@ -2223,90 +2223,6 @@
             },
             "typeDefinition": null,
             "diagnostics": [],
-            "metadata": {},
-            "pluginData": {},
-            "nameDetail": "",
-            "status": null,
-            "statusChanges": [],
-            "assignee": null
-        },
-        {
-            "id": "link_a8ce6267-aa95-4362-84e5-c2929e395f3a",
-            "name": "keep_alive",
-            "kind": "Link",
-            "parentId": "root",
-            "children": [],
-            "incomingLinks": [],
-            "outgoingLinks": [],
-            "layout": {
-                "x": 0.0,
-                "y": 0.0,
-                "width": 200.0,
-                "height": 70.0,
-                "closedWidth": 200.0,
-                "closedHeight": 70.0,
-                "openWidth": 200.0,
-                "openHeight": 70.0,
-                "isExpanded": true
-            },
-            "fileLayoutStrategyId": "none",
-            "text": {
-                "initialization": "",
-                "initializationLanguageId": "",
-                "source": "",
-                "sourceLanguageId": "",
-                "specification": "",
-                "specificationLanguageId": "markdown",
-                "tests": "",
-                "testsLanguageId": "json",
-                "aiInstructions": "",
-                "aiInstructionsLanguageId": "markdown"
-            },
-            "binaryContent": null,
-            "technology": {
-                "languageId": "",
-                "technologyId": "",
-                "compilerId": "",
-                "fileExtension": "",
-                "contentType": ""
-            },
-            "revision": {
-                "name": "",
-                "date": ""
-            },
-            "responsible": null,
-            "modified": {
-                "date": "2026-09-09T10:04:33.623107045Z",
-                "user": "ioan.alferaru@gmail.com"
-            },
-            "ports": [],
-            "link": {
-                "sourceNodeId": "node_c4771abb-1184-417a-9157-23f77a5a0aa5",
-                "sourcePortName": "out",
-                "targetNodeId": "node_37b69371-59f6-4a2c-b4eb-29f7edcdbf8d",
-                "targetPortName": "in",
-                "transportKind": "in-process",
-                "typeName": "",
-                "payloadDefinition": "",
-                "typeDefinitionId": "number",
-                "compositeBoundaryIds": [
-                    "node_6fe0a353-135a-4433-b77b-4521da00d728"
-                ],
-                "interactionKind": "data",
-                "typeExpression": null
-            },
-            "typeDefinition": null,
-            "diagnostics": [
-                {
-                    "severity": "Error",
-                    "message": "Link 'link_a8ce6267-aa95-4362-84e5-c2929e395f3a' references unknown type 'number'",
-                    "nodeId": "link_a8ce6267-aa95-4362-84e5-c2929e395f3a",
-                    "textSection": null,
-                    "line": null,
-                    "column": null,
-                    "sourcePluginId": null
-                }
-            ],
             "metadata": {},
             "pluginData": {},
             "nameDetail": "",
@@ -2580,8 +2496,8 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-13T16:32:59.735499832Z",
-                "user": "ioan.alferaru@gmail.com"
+                "date": "2026-09-17T06:28:30.120642229Z",
+                "user": "8todraw@gmail.com"
             },
             "ports": [
                 {
@@ -2661,8 +2577,8 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-12T22:22:58.762005712Z",
-                "user": "ioan.alferaru@gmail.com"
+                "date": "2026-09-17T06:28:30.120642229Z",
+                "user": "8todraw@gmail.com"
             },
             "ports": [],
             "link": {
@@ -2673,12 +2589,22 @@
                 "transportKind": "in-process",
                 "typeName": "",
                 "payloadDefinition": "",
-                "typeDefinitionId": "string",
+                "typeDefinitionId": "",
                 "compositeBoundaryIds": [
                     "node_6fe0a353-135a-4433-b77b-4521da00d728"
                 ],
                 "interactionKind": "data",
-                "typeExpression": null
+                "typeExpression": {
+                    "typeId": "",
+                    "constructorId": "array",
+                    "arguments": [
+                        {
+                            "typeId": "string",
+                            "constructorId": "",
+                            "arguments": []
+                        }
+                    ]
+                }
             },
             "typeDefinition": null,
             "diagnostics": [],
@@ -3111,10 +3037,104 @@
                 "x": 1969.0,
                 "y": 856.0,
                 "width": 220.0,
-                "height": 70.0,
+                "height": 86.0,
                 "closedWidth": 220.0,
-                "closedHeight": 70.0,
+                "closedHeight": 86.0,
                 "openWidth": 220.0,
+                "openHeight": 86.0,
+                "isExpanded": true
+            },
+            "fileLayoutStrategyId": "none",
+            "text": {
+                "initialization": "",
+                "initializationLanguageId": "",
+                "source": "",
+                "sourceLanguageId": "",
+                "specification": "",
+                "specificationLanguageId": "markdown",
+                "tests": "",
+                "testsLanguageId": "json",
+                "aiInstructions": "",
+                "aiInstructionsLanguageId": "markdown"
+            },
+            "binaryContent": null,
+            "technology": {
+                "languageId": "",
+                "technologyId": "",
+                "compilerId": "",
+                "fileExtension": "",
+                "contentType": ""
+            },
+            "revision": {
+                "name": "",
+                "date": ""
+            },
+            "responsible": null,
+            "modified": {
+                "date": "2026-09-17T06:30:50.890127062Z",
+                "user": "8todraw@gmail.com"
+            },
+            "ports": [],
+            "link": null,
+            "typeDefinition": {
+                "fields": [
+                    {
+                        "name": "field_1",
+                        "typeId": "",
+                        "isReference": false,
+                        "typeExpression": {
+                            "typeId": "",
+                            "constructorId": "array",
+                            "arguments": [
+                                {
+                                    "typeId": "node_c9ef5e41-5a4b-4271-b98a-c6d69d434a6d",
+                                    "constructorId": "",
+                                    "arguments": []
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "name": "field_2",
+                        "typeId": "string",
+                        "isReference": false,
+                        "typeExpression": null
+                    }
+                ],
+                "qualifier": "object",
+                "genericTypeIds": []
+            },
+            "diagnostics": [],
+            "metadata": {},
+            "pluginData": {},
+            "nameDetail": "",
+            "status": "BUSINESS",
+            "statusChanges": [
+                {
+                    "userId": "8todraw@gmail.com",
+                    "changedDate": "2026-09-17T01:49:08.614537642Z",
+                    "initStatus": null,
+                    "endStatus": "BUSINESS"
+                }
+            ],
+            "assignee": null
+        },
+        {
+            "id": "link_79e1cd9c-4820-4e1e-a282-d7126be0c896",
+            "name": "keepalive",
+            "kind": "Link",
+            "parentId": "root",
+            "children": [],
+            "incomingLinks": [],
+            "outgoingLinks": [],
+            "layout": {
+                "x": 0.0,
+                "y": 0.0,
+                "width": 200.0,
+                "height": 70.0,
+                "closedWidth": 200.0,
+                "closedHeight": 70.0,
+                "openWidth": 200.0,
                 "openHeight": 70.0,
                 "isExpanded": true
             },
@@ -3145,46 +3165,30 @@
             },
             "responsible": null,
             "modified": {
-                "date": "2026-09-17T06:15:50.156505572Z",
+                "date": "2026-09-17T06:27:28.416921286Z",
                 "user": "8todraw@gmail.com"
             },
             "ports": [],
-            "link": null,
-            "typeDefinition": {
-                "fields": [
-                    {
-                        "name": "field_1",
-                        "typeId": "",
-                        "isReference": false,
-                        "typeExpression": {
-                            "typeId": "",
-                            "constructorId": "array",
-                            "arguments": [
-                                {
-                                    "typeId": "node_c9ef5e41-5a4b-4271-b98a-c6d69d434a6d",
-                                    "constructorId": "",
-                                    "arguments": []
-                                }
-                            ]
-                        }
-                    }
-                ],
-                "qualifier": "object",
-                "genericTypeIds": []
+            "link": {
+                "sourceNodeId": "node_c4771abb-1184-417a-9157-23f77a5a0aa5",
+                "sourcePortName": "out",
+                "targetNodeId": "node_c4771abb-1184-417a-9157-23f77a5a0aa5",
+                "targetPortName": "in",
+                "transportKind": "in-process",
+                "typeName": "",
+                "payloadDefinition": "",
+                "typeDefinitionId": "int",
+                "compositeBoundaryIds": [],
+                "interactionKind": "data",
+                "typeExpression": null
             },
+            "typeDefinition": null,
             "diagnostics": [],
             "metadata": {},
             "pluginData": {},
             "nameDetail": "",
-            "status": "BUSINESS",
-            "statusChanges": [
-                {
-                    "userId": "8todraw@gmail.com",
-                    "changedDate": "2026-09-17T01:49:08.614537642Z",
-                    "initStatus": null,
-                    "endStatus": "BUSINESS"
-                }
-            ],
+            "status": null,
+            "statusChanges": [],
             "assignee": null
         }
     ],
@@ -3240,7 +3244,7 @@
             "username": "",
             "fullName": "octo draw",
             "role": "",
-            "refreshedAt": "2026-09-17T06:14:08.729702576Z"
+            "refreshedAt": "2026-09-17T06:25:53.682624290Z"
         },
         {
             "identifier": "ioan.alferaru@gmail.com",
@@ -3312,7 +3316,7 @@
             "username": "",
             "fullName": "",
             "role": "",
-            "refreshedAt": "2026-09-17T06:16:15.521514623Z"
+            "refreshedAt": "2026-09-17T06:30:50.890127062Z"
         }
     ]
 }

@@ -3090,7 +3090,8 @@ class GraphCanvas(
         val linkId = hitLink(modelPoint(event.point)) ?: return null
         val link = repository.getNode(linkId) ?: return null
         val linkData = link.link ?: return null
-        val declaredType = repository.getDocument().getElementById(linkData.typeDefinitionId)?.takeIf(Node::isType)
+        val document = repository.getDocument()
+        val declaredType = document.getElementById(linkData.typeDefinitionId)?.takeIf(Node::isType)
         val definition = declaredType?.let { type ->
             buildString {
                 append(type.name)
@@ -3099,7 +3100,7 @@ class GraphCanvas(
                     append(field.name)
                     append(": ")
                     if (field.isReference) append("ref ")
-                    append(repository.getDocument().typeReferenceDisplayName(field.typeId))
+                    append(document.typeDisplayName(field.effectiveTypeExpression(document)))
                 }
             }
         } ?: linkData.payloadDefinition.trim()
@@ -3601,7 +3602,8 @@ class GraphCanvas(
     private fun typeFieldLabels(node: Node): List<String> =
         node.typeDefinition?.fields.orEmpty().map { field ->
             val reference = if (field.isReference) "ref " else ""
-            "${field.name}: $reference${repository.getDocument().typeReferenceDisplayName(field.typeId)}"
+            val document = repository.getDocument()
+            "${field.name}: $reference${document.typeDisplayName(field.effectiveTypeExpression(document))}"
         }
 
     private fun requiredOpenCompositeLabelWidth(
