@@ -12,3 +12,5 @@ examples/**
 !examples/**/
 !examples/**/*.orch
 /.secrets/
+
+*.snap

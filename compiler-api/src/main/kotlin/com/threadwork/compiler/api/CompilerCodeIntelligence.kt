@@ -11,6 +11,7 @@ import com.threadwork.core.model.effectiveLanguageId
 import com.threadwork.core.model.getElementById
 import com.threadwork.core.model.linkTypeDisplayName
 import com.threadwork.core.model.typeDisplayName
+import com.threadwork.core.model.typeReferenceDisplayName
 
 /**
  * Compiler-owned names and members made available to an entity editor.  A compiler
@@ -106,7 +107,7 @@ fun defaultCodeIntelligence(
         val fields = typeNode?.typeDefinition?.fields.orEmpty().map { field ->
             CompilerTypeFieldInfo(
                 name = field.name,
-                typeName = document.typeDisplayName(field.typeId),
+                typeName = document.typeReferenceDisplayName(field.typeId),
                 isReference = field.isReference,
             )
         }
@@ -239,12 +240,12 @@ fun defaultTypeInformation(
                 languageId = document.effectiveLanguageId(node.id),
                 declaration = typeNode.text.declaration.ifBlank {
                     typeNode.typeDefinition?.fields.orEmpty().joinToString("\n") { field ->
-                        "${field.name}: ${document.typeDisplayName(field.typeId)}"
+                        "${field.name}: ${document.typeReferenceDisplayName(field.typeId)}"
                     }
                 },
                 documentation = "Shared Threadwork type '${typeNode.name}'.",
                 fields = typeNode.typeDefinition?.fields.orEmpty().map { field ->
-                    CompilerTypeFieldInfo(field.name, document.typeDisplayName(field.typeId), field.isReference)
+                    CompilerTypeFieldInfo(field.name, document.typeReferenceDisplayName(field.typeId), field.isReference)
                 },
             )
         }

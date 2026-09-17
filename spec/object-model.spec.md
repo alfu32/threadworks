@@ -91,20 +91,26 @@ Persisted boundary data is normalized when a document is loaded.
 
 ## 6. Shared Type Declarations
 
-A Type node defines an ordered list of fields:
+A Type node has a qualifier and a detail appropriate to that qualifier:
 
 ```text
 TypeDefinition
+- qualifier: object | array | list | map
+- genericTypeIds[]       // one for array/list, two for map
 - fields[]
   - name
   - typeId
   - isReference
 ```
 
-Built-in type IDs are `string`, `number`, `date`, and `array`. `typeId` may also
-refer to another Type node, allowing a project-owned object model. `isReference`
-states that a custom field refers to another value rather than embedding it;
-the exact representation is compiler-specific.
+`object` uses `fields`; `array` and `list` use one generic type ID; `map` uses
+two generic type IDs for its key and value. Generic IDs are selected from the
+compiler's primitive types or existing Type nodes. A Type node can therefore
+represent a collection without enumerating every possible type combination.
+`typeId` may refer to another Type node, including a collection Type node,
+allowing fields and links to reuse the same project-owned type. `isReference`
+states that a custom field refers to another value rather than embedding it; the
+exact representation is compiler-specific.
 
 Type names and fields are edited in the Entities Edit view. Type boxes list the
 links that use them. In Link mode, selecting a Type and then an existing Link

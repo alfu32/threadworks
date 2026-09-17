@@ -21,6 +21,7 @@ import com.threadwork.core.model.effectiveTechnologyId
 import com.threadwork.core.model.effectiveTextLanguageId
 import com.threadwork.core.model.linkTypeDisplayName
 import com.threadwork.core.model.typeDisplayName
+import com.threadwork.core.model.typeReferenceDisplayName
 
 /** Produces the human-readable functional and technical project narrative. */
 class SpecificationDocumentationCompiler : CompilerPlugin {
@@ -203,7 +204,7 @@ class SpecificationDocumentationCompiler : CompilerPlugin {
             type != null && fields.isNotEmpty() -> {
                 appendLine(
                     "`${type.displayName()}` has the following fields: " + fields.joinToString(", ") { field ->
-                        "`${field.name}`: `${document.typeDisplayName(field.typeId)}`${if (field.isReference) " (reference)" else ""}"
+                        "`${field.name}`: `${document.typeReferenceDisplayName(field.typeId)}`${if (field.isReference) " (reference)" else ""}"
                     } + ".",
                 )
                 appendLine()

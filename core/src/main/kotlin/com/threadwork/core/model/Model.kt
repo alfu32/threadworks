@@ -223,7 +223,26 @@ data class TypeExpression(
 @Serializable
 data class TypeDefinition(
     val fields: MutableList<TypeFieldDefinition> = mutableListOf(),
+    var qualifier: String = TypeQualifiers.Object,
+    val genericTypeIds: MutableList<String> = mutableListOf(),
 )
+
+object TypeQualifiers {
+    const val Object = "object"
+    const val Array = "array"
+    const val List = "list"
+    const val Map = "map"
+
+    val all: List<String> = listOf(Object, Array, List, Map)
+
+    fun normalize(value: String): String = value.trim().lowercase().ifBlank { Object }
+
+    fun arity(value: String): Int = when (normalize(value)) {
+        Array, List -> 1
+        Map -> 2
+        else -> 0
+    }
+}
 
 @Serializable
 data class Node(
@@ -345,21 +364,45 @@ fun ThreadworkDocument.typeDisplayName(expression: TypeExpression): String =
             typeDisplayName(it)
         }
     }
+
+fun ThreadworkDocument.typeExpressionFor(typeId: String, visiting: Set<String> = emptySet()): TypeExpression {
+    val normalized = typeId.trim()
+    val typeNode = nodes[NodeId(normalized)]?.takeIf { it.kind == NodeKind.Type }
+    val definition = typeNode?.typeDefinition
+    val qualifier = TypeQualifiers.normalize(definition?.qualifier.orEmpty())
+    if (typeNode == null || definition == null || qualifier == TypeQualifiers.Object || normalized in visiting) {
+        return TypeExpression.named(normalized)
+    }
+    val arguments = definition.genericTypeIds.map { genericTypeId ->
+        typeExpressionFor(genericTypeId, visiting + normalized)
+    }
+    return TypeExpression(constructorId = qualifier, arguments = arguments.toMutableList())
+}
+
+fun ThreadworkDocument.typeReferenceDisplayName(typeId: String): String =
+    typeDisplayName(typeExpressionFor(typeId))
+
 fun TypeFieldDefinition.effectiveTypeExpression(): TypeExpression =
     typeExpression ?: TypeExpression.named(typeId)
+
+fun TypeFieldDefinition.effectiveTypeExpression(document: ThreadworkDocument): TypeExpression =
+    typeExpression ?: document.typeExpressionFor(typeId)
 
 fun LinkData.effectiveTypeExpression(): TypeExpression? =
     typeExpression ?: typeDefinitionId.trim().takeIf(String::isNotBlank)?.let(TypeExpression::named)
 
+fun LinkData.effectiveTypeExpression(document: ThreadworkDocument): TypeExpression? =
+    typeExpression ?: typeDefinitionId.trim().takeIf(String::isNotBlank)?.let(document::typeExpressionFor)
+
 
 fun ThreadworkDocument.linkTypeDisplayName(linkNode: Node): String {
     val link = linkNode.link ?: return ""
-    return link.effectiveTypeExpression()?.let(::typeDisplayName).orEmpty().ifBlank { link.typeName.trim() }
+    return link.effectiveTypeExpression(this)?.let(::typeDisplayName).orEmpty().ifBlank { link.typeName.trim() }
 }
 
 fun ThreadworkDocument.linksUsingType(typeNodeId: NodeId): List<Node> =
     linkNodes().filter { node ->
-        node.link?.effectiveTypeExpression()?.containsType(typeNodeId.value) == true
+        node.link?.effectiveTypeExpression(this)?.containsType(typeNodeId.value) == true
     }
 
 fun TypeExpression.containsType(typeId: String): Boolean =

@@ -20,6 +20,7 @@ import com.threadwork.core.model.effectiveTechnologyId
 import com.threadwork.core.model.linkTypeDisplayName
 import com.threadwork.core.model.projectName
 import com.threadwork.core.model.typeDisplayName
+import com.threadwork.core.model.typeReferenceDisplayName
 
 /** Preserves the two-file documentation API while delegating each document to its own compiler. */
 class DocumentationCompiler : CompilerPlugin {
@@ -289,7 +290,7 @@ class ComponentDocumentationCompiler : CompilerPlugin {
                     appendLine("| Field | Type | Reference |")
                     appendLine("| --- | --- | --- |")
                     fields.forEach { field ->
-                        appendLine("| ${tableCell(field.name)} | ${tableCell(document.typeDisplayName(field.typeId))} | ${if (field.isReference) "Yes" else "No"} |")
+                        appendLine("| ${tableCell(field.name)} | ${tableCell(document.typeReferenceDisplayName(field.typeId))} | ${if (field.isReference) "Yes" else "No"} |")
                     }
                     appendLine()
                 }
@@ -330,7 +331,7 @@ class ComponentDocumentationCompiler : CompilerPlugin {
                         appendLine("| Field | Type | Reference |")
                         appendLine("| --- | --- | --- |")
                         fields.forEach { field ->
-                            appendLine("| ${tableCell(field.name)} | ${tableCell(document.typeDisplayName(field.typeId))} | ${if (field.isReference) "Yes" else "No"} |")
+                            appendLine("| ${tableCell(field.name)} | ${tableCell(document.typeReferenceDisplayName(field.typeId))} | ${if (field.isReference) "Yes" else "No"} |")
                         }
                         appendLine()
                     }

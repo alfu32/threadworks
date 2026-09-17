@@ -13,6 +13,7 @@ import com.threadwork.core.model.TechnologyMetadata
 import com.threadwork.core.model.TypeDefinition
 import com.threadwork.core.model.TypeFieldDefinition
 import com.threadwork.core.model.TypeExpression
+import com.threadwork.core.model.TypeQualifiers
 import com.threadwork.storage.InMemoryDocumentRepository
 import com.threadwork.storage.newDocument
 import kotlin.test.Test
@@ -80,5 +81,27 @@ class CompilerPrimitiveTypeTest {
         )
         assertEquals("Map<String, Array<Envelope>>", NaiveKotlinCompiler().renderTypeExpression(repository.getDocument(), kotlinExpression))
         assertEquals("map[string][]Envelope", GoCompiler().renderTypeExpression(repository.getDocument(), goExpression))
+    }
+
+    @Test
+    fun `collection type nodes render through their selected generic references`() {
+        val repository = InMemoryDocumentRepository(newDocument("collection types"))
+        val root = repository.getDocument().rootNodeId
+        val values = repository.createNode(root, "Values", NodeKind.Type)
+        repository.updateNodeTypeDefinition(
+            values.id,
+            TypeDefinition(
+                qualifier = TypeQualifiers.Array,
+                genericTypeIds = mutableListOf("string"),
+            ),
+        )
+
+        assertEquals(
+            "[]string",
+            GoCompiler().renderTypeExpression(
+                repository.getDocument(),
+                TypeExpression.named(values.id.value),
+            ),
+        )
     }
 }

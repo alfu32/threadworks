@@ -37,6 +37,7 @@ import com.threadwork.core.model.projectName
 import com.threadwork.core.model.linkTypeDisplayName
 import com.threadwork.core.model.effectiveTypeExpression
 import com.threadwork.core.model.typeDisplayName
+import com.threadwork.core.model.typeReferenceDisplayName
 import com.threadwork.core.model.effectiveResponsible
 import com.threadwork.core.diagnostics.Diagnostic
 import com.threadwork.core.validation.DocumentValidator
@@ -836,7 +837,7 @@ private fun typeFieldViews(
     typeRenderer: (TypeExpression) -> String = { document.typeDisplayName(it) },
 ): List<Map<String, Any?>> =
     node.typeDefinition?.fields.orEmpty().map { field ->
-        val expression = field.effectiveTypeExpression()
+        val expression = field.effectiveTypeExpression(document)
         val typeName = typeRenderer(expression)
         val isCompilerPrimitive = expression.isNamed && document.getElementById(expression.typeId)?.kind != NodeKind.Type &&
             typeName in primitiveTypeIds
@@ -859,7 +860,7 @@ private fun nodeView(
     node: Node,
     typeRenderer: (TypeExpression) -> String = { document.typeDisplayName(it) },
 ): Map<String, Any?> {
-    val renderedLinkType = node.link?.effectiveTypeExpression()?.let(typeRenderer).orEmpty().ifBlank { node.link?.typeName.orEmpty() }
+    val renderedLinkType = node.link?.effectiveTypeExpression(document)?.let(typeRenderer).orEmpty().ifBlank { node.link?.typeName.orEmpty() }
     return linkedMapOf(
     "id" to node.id.value,
     "name" to node.name,
@@ -981,7 +982,7 @@ private fun linkDescriptors(
     ids.mapNotNull { id ->
         val node = document.getElementById(id) ?: return@mapNotNull null
         val link = node.link ?: return@mapNotNull null
-        val typeName = link.effectiveTypeExpression()?.let(typeRenderer).orEmpty().ifBlank { link.typeName.trim() }
+        val typeName = link.effectiveTypeExpression(document)?.let(typeRenderer).orEmpty().ifBlank { link.typeName.trim() }
         val declaredType = document.getElementById(link.typeDefinitionId)
         val symbol = safeIdentifier(node.name, preserveCase = true)
         val sourceNode = document.getElementById(link.sourceNodeId)
@@ -1059,7 +1060,7 @@ private fun linkContext(
     val targetNode = document.getElementById(link.targetNodeId)
     val sourceCompilationProduct = compiledArtifacts[link.sourceNodeId]?.compiledProductText.orEmpty()
         .ifBlank { sourceNode?.text?.declaration.orEmpty() }
-    val renderedLinkType = link.effectiveTypeExpression()?.let(typeRenderer).orEmpty().ifBlank { link.typeName.trim() }
+    val renderedLinkType = link.effectiveTypeExpression(document)?.let(typeRenderer).orEmpty().ifBlank { link.typeName.trim() }
     val sourceName = sourceNode?.name ?: link.sourceNodeId.value
     val targetName = targetNode?.name ?: link.targetNodeId.value
     val sourceReference = "${sanitizeReference(sourceName)}.${sanitizeReference(link.sourcePortName)}"
@@ -1224,7 +1225,7 @@ private fun linkTransportProvenanceComment(document: ThreadworkDocument, node: N
     val packetType = document.linkTypeDisplayName(node).ifBlank { "untyped" }
     val packetFields = typeNode?.typeDefinition?.fields.orEmpty()
         .joinToString(", ") { field ->
-            "${commentValue(field.name)}: ${commentValue(document.typeDisplayName(field.typeId))}"
+            "${commentValue(field.name)}: ${commentValue(document.typeReferenceDisplayName(field.typeId))}"
         }
         .ifBlank {
             if (link.payloadDefinition.isBlank()) "none" else "custom payload definition"

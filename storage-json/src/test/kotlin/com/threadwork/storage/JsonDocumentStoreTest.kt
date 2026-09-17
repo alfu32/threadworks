@@ -13,6 +13,7 @@ import com.threadwork.core.model.Revision
 import com.threadwork.core.model.TypeDefinition
 import com.threadwork.core.model.TypeFieldDefinition
 import com.threadwork.core.model.TypeExpression
+import com.threadwork.core.model.TypeQualifiers
 import com.threadwork.core.validation.DocumentValidator
 import java.nio.file.Files
 import kotlin.io.path.createTempFile
@@ -138,6 +139,28 @@ class JsonDocumentStoreTest {
 
         assertTrue(json.contains("\"typeExpression\""))
         assertEquals(expression, loaded.nodes.getValue(link.id).link?.typeExpression)
+    }
+
+    @Test
+    fun `qualified collection type round trips without generated combinations`() {
+        val repository = InMemoryDocumentRepository(newDocument("qualified type json"))
+        val type = repository.createNode(repository.getDocument().rootNodeId, "Values", NodeKind.Type)
+        repository.updateNodeTypeDefinition(
+            type.id,
+            TypeDefinition(
+                qualifier = TypeQualifiers.Array,
+                genericTypeIds = mutableListOf("string"),
+            ),
+        )
+        val file = createTempFile(suffix = ".threadwork.orch")
+        val store = KotlinxJsonDocumentStore()
+
+        store.save(repository.getDocument(), file)
+        val loaded = store.load(file)
+        val definition = loaded.nodes.getValue(type.id).typeDefinition
+
+        assertEquals(TypeQualifiers.Array, definition?.qualifier)
+        assertEquals(listOf("string"), definition?.genericTypeIds?.toList().orEmpty())
     }
 
     @Test

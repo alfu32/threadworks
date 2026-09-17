@@ -306,6 +306,7 @@ private fun copyArchetypeNode(node: Node): Node = node.copy(
     link = node.link?.copy(compositeBoundaryIds = node.link!!.compositeBoundaryIds.toMutableList()),
     typeDefinition = node.typeDefinition?.copy(
         fields = node.typeDefinition!!.fields.map { it.copy() }.toMutableList(),
+        genericTypeIds = node.typeDefinition!!.genericTypeIds.toMutableList(),
     ),
     metadata = node.metadata.toMutableMap(),
     pluginData = node.pluginData.toMutableMap(),

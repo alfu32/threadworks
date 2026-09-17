@@ -12,6 +12,7 @@ import com.threadwork.core.model.LinkInteractionKinds
 import com.threadwork.core.model.closestCommonAncestorId
 import com.threadwork.core.model.compositeBoundaryIdsBetween
 import com.threadwork.core.model.TypeExpression
+import com.threadwork.core.model.TypeQualifiers
 import com.threadwork.core.model.effectiveTypeExpression
 
 object DocumentValidator {
@@ -107,11 +108,11 @@ object DocumentValidator {
             }
         }
 
-        link.effectiveTypeExpression()?.let { expression ->
+        link.effectiveTypeExpression(document)?.let { expression ->
             validateTypeExpression(document, expression, "Link " + node.id, diagnostics, knownPrimitiveTypeIds, knownTypeConstructorIds)
         }
         val typeId = link.typeDefinitionId.trim()
-        if (link.effectiveTypeExpression() == null && typeId.isNotBlank() && !isKnownType(document, typeId, knownPrimitiveTypeIds)) {
+        if (link.effectiveTypeExpression(document) == null && typeId.isNotBlank() && !isKnownType(document, typeId, knownPrimitiveTypeIds)) {
             diagnostics += error("Link '${node.id}' references unknown type '$typeId'", node.id)
         }
 
@@ -146,6 +147,30 @@ object DocumentValidator {
         if (definition == null) {
             diagnostics += error("Type node '${node.id}' has no type definition", node.id)
             return
+        }
+        val qualifier = TypeQualifiers.normalize(definition.qualifier)
+        if (qualifier !in TypeQualifiers.all) {
+            diagnostics += error("Type node '${node.id}' has unknown qualifier '$qualifier'", node.id)
+        } else {
+            if (qualifier != TypeQualifiers.Object &&
+                knownTypeConstructorIds != null &&
+                qualifier !in knownTypeConstructorIds
+            ) {
+                diagnostics += error("Type node '${node.id}' uses unsupported type constructor '$qualifier'", node.id)
+            }
+            val expectedGenericArity = TypeQualifiers.arity(qualifier)
+            if (definition.genericTypeIds.size != expectedGenericArity) {
+                diagnostics += error(
+                    "Type node '${node.id}' qualifier '$qualifier' requires $expectedGenericArity generic type(s)",
+                    node.id,
+                )
+            }
+        }
+        definition.genericTypeIds.forEach { genericTypeId ->
+            val normalized = genericTypeId.trim()
+            if (normalized.isBlank() || !isKnownType(document, normalized, knownPrimitiveTypeIds)) {
+                diagnostics += error("Type node '${node.id}' references unknown generic type '$normalized'", node.id)
+            }
         }
         definition.fields.groupingBy { it.name.trim() }.eachCount()
             .filter { (name, count) -> name.isNotBlank() && count > 1 }

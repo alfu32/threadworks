@@ -325,7 +325,10 @@ class InMemoryDocumentRepository(
         val node = requireNode(id)
         require(node.kind == NodeKind.Type) { "Node '$id' is not a type" }
         if (node.typeDefinition == definition) return
-        node.typeDefinition = definition.copy(fields = definition.fields.map { it.copy() }.toMutableList())
+        node.typeDefinition = definition.copy(
+            fields = definition.fields.map { it.copy() }.toMutableList(),
+            genericTypeIds = definition.genericTypeIds.toMutableList(),
+        )
         touchNodes(listOf(id))
         markDirty()
     }

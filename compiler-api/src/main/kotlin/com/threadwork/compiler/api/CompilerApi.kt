@@ -19,6 +19,7 @@ import com.threadwork.core.model.getElementById
 import com.threadwork.core.model.projectName
 import com.threadwork.core.model.TypeExpression
 import com.threadwork.core.model.typeDisplayName
+import com.threadwork.core.model.typeExpressionFor
 import java.nio.file.Path
 
 enum class GeneratedElementKind {
@@ -150,11 +151,23 @@ fun renderCompilerTypeExpression(
     document: ThreadworkDocument,
     expression: TypeExpression,
     constructors: Collection<CompilerTypeConstructor>,
+    resolvingTypeIds: Set<String> = emptySet(),
 ): String {
-    if (expression.isNamed) return document.typeDisplayName(expression.typeId)
+    if (expression.isNamed) {
+        val typeId = expression.typeId.trim()
+        if (typeId !in resolvingTypeIds) {
+            val resolved = document.typeExpressionFor(typeId)
+            if (!resolved.isNamed || resolved.typeId != typeId) {
+                return renderCompilerTypeExpression(document, resolved, constructors, resolvingTypeIds + typeId)
+            }
+        }
+        return document.typeDisplayName(typeId)
+    }
     val constructor = constructors.firstOrNull { it.id == expression.constructorId }
         ?: return document.typeDisplayName(expression)
-    val renderedArguments = expression.arguments.map { renderCompilerTypeExpression(document, it, constructors) }
+    val renderedArguments = expression.arguments.map {
+        renderCompilerTypeExpression(document, it, constructors, resolvingTypeIds)
+    }
     return constructor.renderPattern.replace(Regex("\\{(\\d+)\\}")) { match ->
         renderedArguments.getOrNull(match.groupValues[1].toInt()).orEmpty()
     }

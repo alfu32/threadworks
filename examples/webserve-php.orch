@@ -835,7 +835,8 @@
                 "payloadDefinition": "",
                 "typeDefinitionId": "node_c9ef5e41-5a4b-4271-b98a-c6d69d434a6d",
                 "compositeBoundaryIds": [],
-                "interactionKind": "data"
+                "interactionKind": "data",
+                "typeExpression": null
             },
             "typeDefinition": null,
             "diagnostics": [],
@@ -908,7 +909,8 @@
                 "compositeBoundaryIds": [
                     "node_6fe0a353-135a-4433-b77b-4521da00d728"
                 ],
-                "interactionKind": "data"
+                "interactionKind": "data",
+                "typeExpression": null
             },
             "typeDefinition": null,
             "diagnostics": [],
@@ -979,7 +981,8 @@
                 "payloadDefinition": "",
                 "typeDefinitionId": "",
                 "compositeBoundaryIds": [],
-                "interactionKind": "lib"
+                "interactionKind": "lib",
+                "typeExpression": null
             },
             "typeDefinition": null,
             "diagnostics": [],
@@ -1052,7 +1055,8 @@
                 "compositeBoundaryIds": [
                     "node_6fe0a353-135a-4433-b77b-4521da00d728"
                 ],
-                "interactionKind": "lib"
+                "interactionKind": "lib",
+                "typeExpression": null
             },
             "typeDefinition": null,
             "diagnostics": [],
@@ -1125,7 +1129,8 @@
                 "compositeBoundaryIds": [
                     "node_6fe0a353-135a-4433-b77b-4521da00d728"
                 ],
-                "interactionKind": "lib"
+                "interactionKind": "lib",
+                "typeExpression": null
             },
             "typeDefinition": null,
             "diagnostics": [],
@@ -1192,17 +1197,20 @@
                     {
                         "name": "corelation_id",
                         "typeId": "string",
-                        "isReference": false
+                        "isReference": false,
+                        "typeExpression": null
                     },
                     {
                         "name": "request",
                         "typeId": "string",
-                        "isReference": false
+                        "isReference": false,
+                        "typeExpression": null
                     },
                     {
                         "name": "response",
                         "typeId": "string",
-                        "isReference": false
+                        "isReference": false,
+                        "typeExpression": null
                     }
                 ]
             },
@@ -1741,7 +1749,8 @@
                 "payloadDefinition": "",
                 "typeDefinitionId": "node_c9ef5e41-5a4b-4271-b98a-c6d69d434a6d",
                 "compositeBoundaryIds": [],
-                "interactionKind": "data"
+                "interactionKind": "data",
+                "typeExpression": null
             },
             "typeDefinition": null,
             "diagnostics": [],
@@ -1812,7 +1821,8 @@
                 "payloadDefinition": "",
                 "typeDefinitionId": "node_c9ef5e41-5a4b-4271-b98a-c6d69d434a6d",
                 "compositeBoundaryIds": [],
-                "interactionKind": "data"
+                "interactionKind": "data",
+                "typeExpression": null
             },
             "typeDefinition": null,
             "diagnostics": [],
@@ -1883,7 +1893,8 @@
                 "payloadDefinition": "",
                 "typeDefinitionId": "node_c9ef5e41-5a4b-4271-b98a-c6d69d434a6d",
                 "compositeBoundaryIds": [],
-                "interactionKind": "data"
+                "interactionKind": "data",
+                "typeExpression": null
             },
             "typeDefinition": null,
             "diagnostics": [],
@@ -2050,7 +2061,8 @@
                 "payloadDefinition": "",
                 "typeDefinitionId": "node_c9ef5e41-5a4b-4271-b98a-c6d69d434a6d",
                 "compositeBoundaryIds": [],
-                "interactionKind": "data"
+                "interactionKind": "data",
+                "typeExpression": null
             },
             "typeDefinition": null,
             "diagnostics": [],
@@ -2121,7 +2133,8 @@
                 "payloadDefinition": "",
                 "typeDefinitionId": "node_c9ef5e41-5a4b-4271-b98a-c6d69d434a6d",
                 "compositeBoundaryIds": [],
-                "interactionKind": "data"
+                "interactionKind": "data",
+                "typeExpression": null
             },
             "typeDefinition": null,
             "diagnostics": [],
@@ -2192,7 +2205,8 @@
                 "payloadDefinition": "",
                 "typeDefinitionId": "node_c9ef5e41-5a4b-4271-b98a-c6d69d434a6d",
                 "compositeBoundaryIds": [],
-                "interactionKind": "data"
+                "interactionKind": "data",
+                "typeExpression": null
             },
             "typeDefinition": null,
             "diagnostics": [],
@@ -2265,7 +2279,8 @@
                 "compositeBoundaryIds": [
                     "node_6fe0a353-135a-4433-b77b-4521da00d728"
                 ],
-                "interactionKind": "data"
+                "interactionKind": "data",
+                "typeExpression": null
             },
             "typeDefinition": null,
             "diagnostics": [
@@ -2346,7 +2361,8 @@
                 "payloadDefinition": "",
                 "typeDefinitionId": "",
                 "compositeBoundaryIds": [],
-                "interactionKind": "lib"
+                "interactionKind": "lib",
+                "typeExpression": null
             },
             "typeDefinition": null,
             "diagnostics": [],
@@ -2419,7 +2435,8 @@
                 "compositeBoundaryIds": [
                     "node_6fe0a353-135a-4433-b77b-4521da00d728"
                 ],
-                "interactionKind": "lib"
+                "interactionKind": "lib",
+                "typeExpression": null
             },
             "typeDefinition": null,
             "diagnostics": [],
@@ -2490,7 +2507,8 @@
                 "payloadDefinition": "",
                 "typeDefinitionId": "",
                 "compositeBoundaryIds": [],
-                "interactionKind": "lib"
+                "interactionKind": "lib",
+                "typeExpression": null
             },
             "typeDefinition": null,
             "diagnostics": [],
@@ -2646,7 +2664,8 @@
                 "compositeBoundaryIds": [
                     "node_6fe0a353-135a-4433-b77b-4521da00d728"
                 ],
-                "interactionKind": "data"
+                "interactionKind": "data",
+                "typeExpression": null
             },
             "typeDefinition": null,
             "diagnostics": [],
@@ -2811,7 +2830,8 @@
                 "payloadDefinition": "",
                 "typeDefinitionId": "string",
                 "compositeBoundaryIds": [],
-                "interactionKind": "data"
+                "interactionKind": "data",
+                "typeExpression": null
             },
             "typeDefinition": null,
             "diagnostics": [],
@@ -2884,7 +2904,8 @@
                 "compositeBoundaryIds": [
                     "node_6fe0a353-135a-4433-b77b-4521da00d728"
                 ],
-                "interactionKind": "data"
+                "interactionKind": "data",
+                "typeExpression": null
             },
             "typeDefinition": null,
             "diagnostics": [],
@@ -3053,7 +3074,8 @@
                 "payloadDefinition": "",
                 "typeDefinitionId": "",
                 "compositeBoundaryIds": [],
-                "interactionKind": "data"
+                "interactionKind": "data",
+                "typeExpression": null
             },
             "typeDefinition": null,
             "diagnostics": [],
@@ -3165,7 +3187,7 @@
             "username": "",
             "fullName": "",
             "role": "",
-            "refreshedAt": "2026-09-16T18:19:48.432789090Z"
+            "refreshedAt": "2026-09-17T00:54:46.163256775Z"
         },
         {
             "identifier": "ioan.alferaru@gmail.com",
