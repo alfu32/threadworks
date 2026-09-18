@@ -137,6 +137,7 @@ data class SparseBooleanGraph(
 data class GraphSnapshot(
     val nodeIds: List<NodeId>,
     val nodesById: Map<NodeId, Node>,
+    val nodeLabels: Map<NodeId, String>,
     val principal: SparseBooleanGraph,
     val error: SparseBooleanGraph,
     val dependency: SparseBooleanGraph,
@@ -183,6 +184,9 @@ data class GraphSnapshot(
             return GraphSnapshot(
                 nodeIds = nodeIds,
                 nodesById = nodes.associateBy(Node::id),
+                nodeLabels = nodes.associate { node ->
+                    node.id to document.fullyQualifiedName(node.id).ifBlank { node.name }
+                },
                 principal = principal,
                 error = error,
                 dependency = dependency,

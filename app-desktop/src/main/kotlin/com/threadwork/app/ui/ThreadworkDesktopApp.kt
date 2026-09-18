@@ -44,6 +44,7 @@ import com.threadwork.compiler.php.PhpCompiler
 import com.threadwork.compiler.quickjs.QuickJsCompiler
 import com.threadwork.core.diagnostics.DiagnosticSeverity
 import com.threadwork.core.diagnostics.Diagnostic
+import com.threadwork.core.analysis.NetworkAnalysisEngine
 import com.threadwork.completion.ModelAwareCompletionService
 import com.threadwork.completion.AnalysisResult
 import com.threadwork.completion.CompletionRequest
@@ -431,6 +432,7 @@ class ThreadworkDesktopApp(
     private val undoStack = ArrayDeque<String>()
     private val redoStack = ArrayDeque<String>()
     private var currentSnapshot = documentSnapshot()
+    private var analysisReportDirty = true
     private var applyingHistory = false
     private var currentFile: Path? = null
     private val applicationIdentityLabel = JLabel(
@@ -626,14 +628,14 @@ class ThreadworkDesktopApp(
                 "Archetypes",
                 archetypesPanel,
             )
-            analysisPanel = NetworkAnalysisPanel(repository, ::selectAnalysisNodes)
+            analysisPanel = NetworkAnalysisPanel(::refreshNetworkAnalysis, ::selectAnalysisNodes)
             addTab("Analysis", analysisPanel)
             pluginContentTabs.forEach { tab ->
                 addTab(tab.title, tab.createPanel())
             }
             addChangeListener {
                 if (selectedComponent === projectManagementPanel) projectManagementPanel.refresh()
-                if (selectedComponent === analysisPanel) analysisPanel.refresh()
+                if (selectedComponent === analysisPanel) refreshNetworkAnalysisIfNeeded()
             }
         }
         val content = JPanel(BorderLayout()).apply {
@@ -2422,7 +2424,7 @@ class ThreadworkDesktopApp(
         canvas.repaint()
         onSelectionChanged()
         if (::projectManagementPanel.isInitialized) projectManagementPanel.refresh()
-        if (::analysisPanel.isInitialized) analysisPanel.refresh()
+        invalidateNetworkAnalysis()
         checkpointHistory()
     }
 
@@ -2431,7 +2433,7 @@ class ThreadworkDesktopApp(
         canvas.refreshBoundsFromChildren()
         canvas.invalidateRenderCache()
         canvas.repaint()
-        if (::analysisPanel.isInitialized) analysisPanel.refresh()
+        invalidateNetworkAnalysis()
         checkpointHistory()
     }
 
@@ -2451,6 +2453,21 @@ class ThreadworkDesktopApp(
         selection += nodeIds.filter { repository.getNode(it) != null }
         onSelectionChanged()
         if (::projectPanels.isInitialized) projectPanels.selectedIndex = 0
+    }
+
+    private fun invalidateNetworkAnalysis() {
+        analysisReportDirty = true
+        if (::analysisPanel.isInitialized) analysisPanel.markStale()
+    }
+
+    private fun refreshNetworkAnalysisIfNeeded() {
+        if (analysisReportDirty) refreshNetworkAnalysis()
+    }
+
+    private fun refreshNetworkAnalysis() {
+        if (!::analysisPanel.isInitialized) return
+        analysisPanel.showReport(NetworkAnalysisEngine.analyze(repository.getDocument()))
+        analysisReportDirty = false
     }
 
     private fun refreshTree() {

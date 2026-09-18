@@ -6,10 +6,7 @@ import com.threadwork.core.analysis.AnalysisIndicator
 import com.threadwork.core.analysis.AnalysisReport
 import com.threadwork.core.analysis.AnalysisSection
 import com.threadwork.core.analysis.AnalysisSeverity
-import com.threadwork.core.analysis.NetworkAnalysisEngine
 import com.threadwork.core.model.NodeId
-import com.threadwork.core.model.fullyQualifiedName
-import com.threadwork.storage.DocumentRepository
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.FlowLayout
@@ -32,12 +29,13 @@ import javax.swing.SwingConstants
  * navigation back to affected model entities.
  */
 internal class NetworkAnalysisPanel(
-    private val repository: DocumentRepository,
+    private val requestRefresh: () -> Unit,
     private val selectEntities: (Collection<NodeId>) -> Unit,
 ) : JPanel(BorderLayout()) {
     private val reportContent = JPanel()
     private val reportScroll = JScrollPane(reportContent)
     private val revisionLabel = JLabel()
+    private val stateLabel = JLabel("Analysis not calculated")
 
     init {
         border = BorderFactory.createEmptyBorder(8, 8, 8, 8)
@@ -46,12 +44,11 @@ internal class NetworkAnalysisPanel(
         reportScroll.border = BorderFactory.createEmptyBorder()
         add(toolbar(), BorderLayout.NORTH)
         add(reportScroll, BorderLayout.CENTER)
-        refresh()
     }
 
-    fun refresh() {
-        val newReport = NetworkAnalysisEngine.analyze(repository.getDocument())
+    fun showReport(newReport: AnalysisReport) {
         revisionLabel.text = "${newReport.snapshot.nodeIds.size} nodes | ${newReport.snapshot.structural.edgeCount} structural links"
+        stateLabel.text = "Analysis current"
         reportContent.removeAll()
         newReport.sections.forEach { section ->
             reportContent.add(sectionPanel(section, newReport))
@@ -61,6 +58,10 @@ internal class NetworkAnalysisPanel(
         reportContent.repaint()
     }
 
+    fun markStale() {
+        stateLabel.text = "Model changed - refresh required"
+    }
+
     private fun toolbar(): JPanel = JPanel(BorderLayout()).apply {
         border = BorderFactory.createEmptyBorder(0, 0, 8, 0)
         add(JLabel("Network Analysis").apply {
@@ -68,13 +69,16 @@ internal class NetworkAnalysisPanel(
             toolTipText = "Read-only analysis of principal, error, dependency, and structural layers"
         }, BorderLayout.WEST)
         add(JPanel(FlowLayout(FlowLayout.RIGHT, 6, 0)).apply {
+            add(stateLabel.apply {
+                foreground = Color.GRAY
+            })
             add(revisionLabel.apply {
                 foreground = Color.GRAY
                 horizontalAlignment = SwingConstants.RIGHT
             })
             add(JButton("Refresh").apply {
                 toolTipText = "Recalculate the report from the current model"
-                addActionListener { refresh() }
+                addActionListener { requestRefresh() }
             })
         }, BorderLayout.EAST)
     }
@@ -230,9 +234,9 @@ internal class NetworkAnalysisPanel(
     }
 
     private fun entityName(id: NodeId, report: AnalysisReport): String =
-        report.snapshot.nodesById[id]?.let { node ->
-            repository.getDocument().fullyQualifiedName(node.id).ifBlank { node.name }
-        } ?: repository.getNode(id)?.name ?: id.value
+        report.snapshot.nodeLabels[id]
+            ?: report.snapshot.nodesById[id]?.name
+            ?: id.value
 
     private fun severityColor(severity: AnalysisSeverity): Color = when (severity) {
         AnalysisSeverity.INFO -> Color(70, 150, 190)
