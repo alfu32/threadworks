@@ -12,6 +12,7 @@ examples/**
 !examples/**/
 !examples/**/*.orch
 /.secrets/
+app-desktop/src/main/resources/threadwork-oauth.properties
 
 *.snap
 

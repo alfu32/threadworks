@@ -1,0 +1,72 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag (for example, 2.4.7)"
+        required: true
+      draft:
+        description: "Create the release as a draft"
+        required: false
+        default: "true"
+      prerelease:
+        description: "Mark the release as a prerelease"
+        required: false
+        default: "false"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Build Threadwork fat JAR
+        env:
+          THREADWORK_GOOGLE_CLIENT_ID: ${{ secrets.THREADWORK_GOOGLE_CLIENT_ID }}
+          THREADWORK_GOOGLE_CLIENT_SECRET: ${{ secrets.THREADWORK_GOOGLE_CLIENT_SECRET }}
+          THREADWORK_GITHUB_CLIENT_ID: ${{ secrets.THREADWORK_GITHUB_CLIENT_ID }}
+          THREADWORK_GITHUB_CLIENT_SECRET: ${{ secrets.THREADWORK_GITHUB_CLIENT_SECRET }}
+          THREADWORK_MICROSOFT_CLIENT_ID: ${{ secrets.THREADWORK_MICROSOFT_CLIENT_ID }}
+          THREADWORK_MICROSOFT_TENANT: ${{ secrets.THREADWORK_MICROSOFT_TENANT }}
+        run: |
+          set -euo pipefail
+          ./gradlew --no-daemon fatJar -Prelease_number="${{ inputs.tag }}"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: threadwork-linux
+          path: dist/threadwork-${{ inputs.tag }}.jar
+          if-no-files-found: error
+
+  release:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: threadwork-linux
+          path: artifacts
+
+      - name: Create or update GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ inputs.tag }}
+          DRAFT: ${{ inputs.draft }}
+          PRERELEASE: ${{ inputs.prerelease }}
+        run: |
+          set -euo pipefail
+          if ! gh release view "$TAG" >/dev/null 2>&1; then
+            gh release create "$TAG" --draft="$DRAFT" --prerelease="$PRERELEASE"
+          else
+            gh release edit "$TAG" --draft="$DRAFT" --prerelease="$PRERELEASE"
+          fi
+          gh release upload "$TAG" artifacts/threadwork-${TAG}.jar --clobber

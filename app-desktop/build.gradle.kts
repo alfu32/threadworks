@@ -1,7 +1,55 @@
+import org.gradle.language.jvm.tasks.ProcessResources
+
 plugins {
     id("org.jetbrains.kotlin.jvm")
     application
 }
+
+val oauthResourceDirectory = layout.buildDirectory.dir("generated/resources/oauth")
+val oauthEnvironmentProperties = linkedMapOf(
+    "threadwork.oauth.google.clientId" to "THREADWORK_GOOGLE_CLIENT_ID",
+    "threadwork.oauth.google.clientSecret" to "THREADWORK_GOOGLE_CLIENT_SECRET",
+    "threadwork.oauth.github.clientId" to "THREADWORK_GITHUB_CLIENT_ID",
+    "threadwork.oauth.github.clientSecret" to "THREADWORK_GITHUB_CLIENT_SECRET",
+    "threadwork.oauth.microsoft.clientId" to "THREADWORK_MICROSOFT_CLIENT_ID",
+    "threadwork.oauth.microsoft.tenant" to "THREADWORK_MICROSOFT_TENANT",
+)
+
+val generateOAuthProperties by tasks.registering {
+    group = "build setup"
+    description = "Generates packaged OAuth configuration from environment variables."
+    val outputFile = oauthResourceDirectory.map { it.file("threadwork-oauth.properties") }
+    outputs.file(outputFile)
+    oauthEnvironmentProperties.values.forEach { environment ->
+        inputs.property(environment, providers.environmentVariable(environment)).optional(true)
+    }
+    doLast {
+        val target = outputFile.get().asFile
+        target.parentFile.mkdirs()
+        val properties = oauthEnvironmentProperties.mapNotNull { (property, environment) ->
+            providers.environmentVariable(environment).orNull
+                ?.trim()
+                ?.takeIf(String::isNotBlank)
+                ?.let { property to it }
+        }
+        target.writeText(
+            properties.joinToString(separator = "\n", postfix = if (properties.isEmpty()) "" else "\n") { (property, value) ->
+                "${property.escapePropertiesValue()}=${value.escapePropertiesValue()}"
+            },
+        )
+    }
+}
+
+tasks.named<ProcessResources>("processResources") {
+    dependsOn(generateOAuthProperties)
+    from(oauthResourceDirectory)
+}
+
+fun String.escapePropertiesValue(): String = replace("\\", "\\\\")
+    .replace("\n", "\\n")
+    .replace("\r", "\\r")
+    .replace("=", "\\=")
+    .replace(":", "\\:")
 
 dependencies {
     implementation(project(":core"))
