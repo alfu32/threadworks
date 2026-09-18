@@ -21,6 +21,8 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-22.04
+    outputs:
+      version: ${{ steps.release_version.outputs.version }}
     steps:
       - uses: actions/checkout@v5
 
@@ -28,6 +30,19 @@ jobs:
         with:
           distribution: temurin
           java-version: "21"
+
+      - name: Normalize release version
+        id: release_version
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="${{ inputs.tag }}"
+          version="${version#v}"
+          if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+([-.+][0-9A-Za-z.-]+)?$ ]]; then
+            echo "Invalid release version: $version" >&2
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
 
       - name: Build Threadwork fat JAR
         env:
@@ -39,22 +54,167 @@ jobs:
           THREADWORK_MICROSOFT_TENANT: ${{ secrets.THREADWORK_MICROSOFT_TENANT }}
         run: |
           set -euo pipefail
-          ./gradlew --no-daemon fatJar -Prelease_number="${{ inputs.tag }}"
+          ./gradlew --no-daemon fatJar -Prelease_number="${{ steps.release_version.outputs.version }}"
 
       - uses: actions/upload-artifact@v4
         with:
-          name: threadwork-linux
-          path: dist/threadwork-${{ inputs.tag }}.jar
+          name: threadwork-fatjar
+          path: dist/threadwork-${{ steps.release_version.outputs.version }}.jar
+          if-no-files-found: error
+
+  build-msix:
+    runs-on: windows-latest
+    needs: build
+    env:
+      THREADWORK_MSSTORE_PACKAGE_NAME: ${{ secrets.THREADWORK_MSSTORE_PACKAGE_NAME }}
+      THREADWORK_MSSTORE_PUBLISHER: ${{ secrets.THREADWORK_MSSTORE_PUBLISHER }}
+      THREADWORK_MSSTORE_PUBLISHER_DISPLAY_NAME: ${{ secrets.THREADWORK_MSSTORE_PUBLISHER_DISPLAY_NAME }}
+      THREADWORK_MSSTORE_PFX_B64: ${{ secrets.THREADWORK_MSSTORE_PFX_B64 }}
+      THREADWORK_MSSTORE_PFX_PASSWORD: ${{ secrets.THREADWORK_MSSTORE_PFX_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: threadwork-fatjar
+          path: dist
+
+      - name: Generate application icon
+        shell: powershell
+        run: .\gradlew.bat --no-daemon :assets:generateAppIcon
+
+      - name: Build Windows app image
+        shell: powershell
+        run: |
+          $ErrorActionPreference = "Stop"
+          $version = "${{ needs.build.outputs.version }}"
+          $jpackageVersion = $version.Split("-", 2)[0].Split("+", 2)[0]
+          $jar = "threadwork-$version.jar"
+          if (!(Test-Path (Join-Path "dist" $jar))) { throw "Fat JAR not found: $jar" }
+          $jpackageInput = "dist\jpackage-input"
+          if (Test-Path $jpackageInput) { Remove-Item $jpackageInput -Recurse -Force }
+          New-Item $jpackageInput -ItemType Directory -Force | Out-Null
+          Copy-Item (Join-Path "dist" $jar) $jpackageInput
+          New-Item "dist\jpackage" -ItemType Directory -Force | Out-Null
+          & "$env:JAVA_HOME\bin\jpackage.exe" `
+            --type app-image `
+            --name Threadwork `
+            --app-version $jpackageVersion `
+            --vendor "Threadwork" `
+            --input (Resolve-Path $jpackageInput).Path `
+            --main-jar $jar `
+            --dest (Resolve-Path "dist\jpackage").Path
+
+      - uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Build and sign MSIX
+        shell: powershell
+        run: |
+          $ErrorActionPreference = "Stop"
+          foreach ($name in @(
+            "THREADWORK_MSSTORE_PACKAGE_NAME",
+            "THREADWORK_MSSTORE_PUBLISHER",
+            "THREADWORK_MSSTORE_PUBLISHER_DISPLAY_NAME",
+            "THREADWORK_MSSTORE_PFX_B64",
+            "THREADWORK_MSSTORE_PFX_PASSWORD"
+          )) {
+            if ([string]::IsNullOrWhiteSpace([Environment]::GetEnvironmentVariable($name))) {
+              throw "$name is not configured"
+            }
+          }
+
+          $versionInput = "${{ needs.build.outputs.version }}"
+          $versionCore = $versionInput.Split("-", 2)[0].Split("+", 2)[0]
+          $parts = $versionCore.Split(".")
+          if ($parts.Count -ne 3) { throw "Release tag must have the form x.y.z: $versionInput" }
+          $msixVersion = "$($parts[0]).$($parts[1]).$($parts[2]).0"
+
+          $appImage = (Resolve-Path "dist\jpackage\Threadwork").Path
+          $msixRoot = Join-Path (Resolve-Path "dist").Path "msix"
+          if (Test-Path $msixRoot) { Remove-Item $msixRoot -Recurse -Force }
+          New-Item $msixRoot -ItemType Directory -Force | Out-Null
+          Copy-Item -Path (Join-Path $appImage "*") -Destination $msixRoot -Recurse -Force
+
+          $assets = Join-Path $msixRoot "Assets"
+          New-Item $assets -ItemType Directory -Force | Out-Null
+          $iconSource = (Resolve-Path "assets\build\generated-resources\icons\app\256.png").Path
+          Copy-Item $iconSource (Join-Path $assets "Square150x150Logo.png") -Force
+          Copy-Item $iconSource (Join-Path $assets "Square44x44Logo.png") -Force
+          Copy-Item $iconSource (Join-Path $assets "StoreLogo.png") -Force
+
+          function XmlEscape([string] $value) {
+            return [System.Security.SecurityElement]::Escape($value)
+          }
+          $packageName = XmlEscape $env:THREADWORK_MSSTORE_PACKAGE_NAME
+          $publisher = XmlEscape $env:THREADWORK_MSSTORE_PUBLISHER
+          $publisherDisplayName = XmlEscape $env:THREADWORK_MSSTORE_PUBLISHER_DISPLAY_NAME
+          $manifest = @"
+          <?xml version="1.0" encoding="utf-8"?>
+          <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+                   xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+                   xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10"
+                   xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+                   IgnorableNamespaces="uap desktop rescap">
+            <Identity Name="$packageName" Publisher="$publisher" Version="$msixVersion" />
+            <Properties>
+              <DisplayName>Threadwork</DisplayName>
+              <PublisherDisplayName>$publisherDisplayName</PublisherDisplayName>
+              <Logo>Assets\StoreLogo.png</Logo>
+            </Properties>
+            <Resources>
+              <Resource Language="en-us" />
+            </Resources>
+            <Dependencies>
+              <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.17763.0" MaxVersionTested="10.0.26100.0" />
+            </Dependencies>
+            <Applications>
+              <Application Id="Threadwork" Executable="Threadwork.exe" EntryPoint="Windows.FullTrustApplication">
+                <uap:VisualElements DisplayName="Threadwork"
+                                    Description="Topology-first software design environment"
+                                    Square150x150Logo="Assets\Square150x150Logo.png"
+                                    Square44x44Logo="Assets\Square44x44Logo.png"
+                                    BackgroundColor="transparent" />
+              </Application>
+            </Applications>
+            <Capabilities>
+              <rescap:Capability Name="runFullTrust" />
+            </Capabilities>
+          </Package>
+          "@
+          $manifest | Out-File -Encoding utf8 (Join-Path $msixRoot "AppxManifest.xml")
+
+          $msixPath = Join-Path (Resolve-Path "dist").Path "threadwork-$versionInput.msix"
+          & makeappx.exe pack /d $msixRoot /p $msixPath /o
+
+          $pfxPath = Join-Path $env:RUNNER_TEMP "threadwork-signing.pfx"
+          [IO.File]::WriteAllBytes($pfxPath, [Convert]::FromBase64String($env:THREADWORK_MSSTORE_PFX_B64))
+          $signtool = Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin" -Recurse -Filter signtool.exe |
+            Sort-Object FullName -Descending | Select-Object -First 1
+          if ($null -eq $signtool) { throw "signtool.exe not found" }
+          & $signtool.FullName sign /fd SHA256 /f $pfxPath /p $env:THREADWORK_MSSTORE_PFX_PASSWORD /tr http://timestamp.digicert.com /td SHA256 $msixPath
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: threadwork-msix
+          path: dist/threadwork-${{ needs.build.outputs.version }}.msix
           if-no-files-found: error
 
   release:
     runs-on: ubuntu-latest
-    needs: build
+    needs:
+      - build
+      - build-msix
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: threadwork-linux
+          pattern: threadwork-*
           path: artifacts
+          merge-multiple: true
 
       - name: Create or update GitHub release
         env:
@@ -69,4 +229,4 @@ jobs:
           else
             gh release edit "$TAG" --draft="$DRAFT" --prerelease="$PRERELEASE"
           fi
-          gh release upload "$TAG" artifacts/threadwork-${TAG}.jar --clobber
+          gh release upload "$TAG" artifacts/* --clobber
