@@ -21,6 +21,9 @@ plugins {
 
 val iconsSourceDir = layout.projectDirectory.dir("icons")
 val generatedIconsDir = layout.buildDirectory.dir("generated-resources/icons")
+val fallbackRasterFont = layout.projectDirectory
+    .file("fonts/Monaspace Krypton/MonaspaceKrypton-Regular.otf")
+    .asFile
 
 sourceSets {
     main {
@@ -91,6 +94,8 @@ fun renderSvgToPng(source: java.io.File, target: java.io.File, width: Int, heigh
         runCatching { ProcessBuilder("convert", "--version").start().waitFor() == 0 }.getOrDefault(false) ->
             listOf(
                 "convert",
+                "-font",
+                fallbackRasterFont.absolutePath,
                 batikSource.absolutePath,
                 "-resize",
                 "${width}x$height",
@@ -127,6 +132,7 @@ val generateIcons by tasks.registering {
     description = "Rasterizes the UI sprite sheet into 24x24 and 32x32 PNG assets."
     inputs.file(iconsSourceDir.file("icons.svg"))
     inputs.file(iconsSourceDir.file("icons.mapping.csv"))
+    inputs.file(fallbackRasterFont)
     outputs.dir(generatedIconsDir)
     doLast {
         val sourceSvg = iconsSourceDir.file("icons.svg").asFile
@@ -160,7 +166,7 @@ val generateAppIcon by tasks.registering {
     val fullSource = iconsSourceDir.file("threadwork.svg")
     val smallSource = iconsSourceDir.file("threadwork-small.svg")
     val symbolicSource = iconsSourceDir.file("threadwork-symbolic.svg")
-    inputs.files(fullSource, smallSource, symbolicSource)
+    inputs.files(fullSource, smallSource, symbolicSource, fallbackRasterFont)
     outputs.dir(generatedIconsDir)
     doLast {
         val variants = listOf(
