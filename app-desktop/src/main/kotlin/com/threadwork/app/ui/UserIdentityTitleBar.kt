@@ -27,6 +27,7 @@ import javax.swing.JOptionPane
 import javax.swing.JPanel
 import javax.swing.JPopupMenu
 import javax.swing.SwingConstants
+import javax.swing.SwingUtilities
 import javax.swing.SwingWorker
 import javax.swing.Timer
 
@@ -109,6 +110,10 @@ internal class UserIdentityTitleBar(
                 runCatching { get() }
                     .onSuccess { identity ->
                         refresh(force = true)
+                        SwingUtilities.getWindowAncestor(dialogParent)?.apply {
+                            toFront()
+                            requestFocus()
+                        }
                         onStatus("Signed in as ${identity.designator()}")
                     }
                     .onFailure { failure ->

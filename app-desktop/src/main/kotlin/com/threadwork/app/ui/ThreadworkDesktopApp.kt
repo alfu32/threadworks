@@ -417,6 +417,7 @@ class ThreadworkDesktopApp(
     private lateinit var projectPanels: JTabbedPane
     private lateinit var archetypesPanel: WorkflowArchetypesPanel
     private lateinit var projectManagementPanel: ProjectManagementPanel
+    private lateinit var analysisPanel: NetworkAnalysisPanel
     private lateinit var userIdentityTitleBar: UserIdentityTitleBar
     private val modeButtons = mutableMapOf<CanvasMode, JToggleButton>()
     private var sheetButton: JToggleButton? = null
@@ -625,11 +626,14 @@ class ThreadworkDesktopApp(
                 "Archetypes",
                 archetypesPanel,
             )
+            analysisPanel = NetworkAnalysisPanel(repository, ::selectAnalysisNodes)
+            addTab("Analysis", analysisPanel)
             pluginContentTabs.forEach { tab ->
                 addTab(tab.title, tab.createPanel())
             }
             addChangeListener {
                 if (selectedComponent === projectManagementPanel) projectManagementPanel.refresh()
+                if (selectedComponent === analysisPanel) analysisPanel.refresh()
             }
         }
         val content = JPanel(BorderLayout()).apply {
@@ -2418,6 +2422,7 @@ class ThreadworkDesktopApp(
         canvas.repaint()
         onSelectionChanged()
         if (::projectManagementPanel.isInitialized) projectManagementPanel.refresh()
+        if (::analysisPanel.isInitialized) analysisPanel.refresh()
         checkpointHistory()
     }
 
@@ -2426,6 +2431,7 @@ class ThreadworkDesktopApp(
         canvas.refreshBoundsFromChildren()
         canvas.invalidateRenderCache()
         canvas.repaint()
+        if (::analysisPanel.isInitialized) analysisPanel.refresh()
         checkpointHistory()
     }
 
@@ -2438,6 +2444,13 @@ class ThreadworkDesktopApp(
         selection.clear()
         selection += nodeId
         onSelectionChanged()
+    }
+
+    private fun selectAnalysisNodes(nodeIds: Collection<NodeId>) {
+        selection.clear()
+        selection += nodeIds.filter { repository.getNode(it) != null }
+        onSelectionChanged()
+        if (::projectPanels.isInitialized) projectPanels.selectedIndex = 0
     }
 
     private fun refreshTree() {

@@ -278,13 +278,10 @@ private class LoopbackOAuthCallback : AutoCloseable {
         createContext("/oauth/callback") { exchange ->
             val parameters = parseQuery(exchange.requestURI.rawQuery.orEmpty())
             val successful = parameters["code"].isNullOrBlank().not() && parameters["error"].isNullOrBlank()
-            val response = if (successful) {
-                "Threadwork login completed. You can close this browser window."
-            } else {
-                "Threadwork login was not completed. You can close this browser window."
-            }
+            val response = callbackPage(successful)
             val bytes = response.toByteArray(StandardCharsets.UTF_8)
-            exchange.responseHeaders.add("Content-Type", "text/plain; charset=utf-8")
+            exchange.responseHeaders.add("Content-Type", "text/html; charset=utf-8")
+            exchange.responseHeaders.add("Cache-Control", "no-store")
             exchange.sendResponseHeaders(200, bytes.size.toLong())
             exchange.responseBody.use { it.write(bytes) }
             callback.complete(parameters)
@@ -308,6 +305,51 @@ private fun JsonObject.string(name: String): String? =
 
 private fun JsonObject.boolean(name: String): Boolean? =
     string(name)?.toBooleanStrictOrNull()
+
+private fun callbackPage(successful: Boolean): String {
+    val title = if (successful) "Threadwork login completed" else "Threadwork login was not completed"
+    val detail = if (successful) {
+        "The application is finishing the sign-in. This tab will close automatically."
+    } else {
+        "The application did not receive a successful sign-in. You can close this tab."
+    }
+    val closeScript = if (successful) {
+        "setTimeout(closeTab, 1500);"
+    } else {
+        ""
+    }
+    return """
+        <!doctype html>
+        <html lang="en">
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1">
+          <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'">
+          <title>$title</title>
+          <style>
+            :root { color-scheme: light dark; font-family: system-ui, sans-serif; }
+            body { display: grid; min-height: 100vh; place-items: center; margin: 0; }
+            main { max-width: 34rem; padding: 2rem; text-align: center; }
+            button { cursor: pointer; padding: .6rem 1rem; }
+          </style>
+        </head>
+        <body>
+          <main>
+            <h1>$title</h1>
+            <p id="detail">$detail</p>
+            <button type="button" onclick="closeTab()">Return to Threadwork</button>
+          </main>
+          <script>
+            function closeTab() {
+              window.close();
+              document.getElementById('detail').textContent = 'You can close this tab and return to Threadwork.';
+            }
+            $closeScript
+          </script>
+        </body>
+        </html>
+    """.trimIndent()
+}
 
 private fun uriWithQuery(base: String, parameters: Map<String, String>): URI =
     URI.create("$base?${formBody(parameters)}")
