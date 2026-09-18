@@ -15,6 +15,7 @@ import java.security.MessageDigest
 import java.security.SecureRandom
 import java.time.Duration
 import java.util.Base64
+import java.util.Properties
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -27,20 +28,34 @@ import kotlinx.serialization.json.jsonPrimitive
 data class OAuthClientRegistration(
     val clientId: String,
     val clientSecret: String = "",
+    val tenant: String = "common",
 )
 
 object OAuthClientConfiguration {
+    private const val RESOURCE_NAME = "/threadwork-oauth.properties"
+
     fun registration(provider: OAuthProvider): OAuthClientRegistration {
         val prefix = provider.id
         return OAuthClientRegistration(
             clientId = setting(prefix, "clientId", "THREADWORK_${prefix.uppercase()}_CLIENT_ID"),
             clientSecret = setting(prefix, "clientSecret", "THREADWORK_${prefix.uppercase()}_CLIENT_SECRET"),
+            tenant = setting(prefix, "tenant", "THREADWORK_${prefix.uppercase()}_TENANT")
+                .ifBlank { "common" },
         )
     }
 
     private fun setting(provider: String, property: String, environment: String): String =
         System.getProperty("threadwork.oauth.$provider.$property").orEmpty().trim()
             .ifBlank { System.getenv(environment).orEmpty().trim() }
+            .ifBlank { packagedProperties.getProperty("threadwork.oauth.$provider.$property").orEmpty().trim() }
+
+    private val packagedProperties: Properties by lazy {
+        Properties().apply {
+            OAuthClientConfiguration::class.java.getResourceAsStream(RESOURCE_NAME)?.use { input ->
+                input.reader(Charsets.UTF_8).use(::load)
+            }
+        }
+    }
 }
 
 class DesktopOAuthClient(
@@ -69,7 +84,7 @@ class DesktopOAuthClient(
             val state = randomUrlToken(32)
             val verifier = randomUrlToken(64)
             val challenge = base64Url(MessageDigest.getInstance("SHA-256").digest(verifier.toByteArray()))
-            val definition = providerDefinition(provider)
+            val definition = providerDefinition(provider, registration.tenant)
             val authorizationParameters = linkedMapOf(
                 "client_id" to registration.clientId,
                 "redirect_uri" to callback.redirectUri.toString(),
@@ -236,7 +251,7 @@ private data class OAuthProviderDefinition(
     val scope: String,
 )
 
-private fun providerDefinition(provider: OAuthProvider): OAuthProviderDefinition = when (provider) {
+private fun providerDefinition(provider: OAuthProvider, microsoftTenant: String = "common"): OAuthProviderDefinition = when (provider) {
     OAuthProvider.GOOGLE -> OAuthProviderDefinition(
         authorizationEndpoint = "https://accounts.google.com/o/oauth2/v2/auth",
         tokenEndpoint = "https://oauth2.googleapis.com/token",
@@ -248,8 +263,8 @@ private fun providerDefinition(provider: OAuthProvider): OAuthProviderDefinition
         scope = "read:user user:email",
     )
     OAuthProvider.MICROSOFT -> OAuthProviderDefinition(
-        authorizationEndpoint = "https://login.microsoftonline.com/common/oauth2/v2.0/authorize",
-        tokenEndpoint = "https://login.microsoftonline.com/common/oauth2/v2.0/token",
+        authorizationEndpoint = "https://login.microsoftonline.com/${microsoftTenant.ifBlank { "common" }}/oauth2/v2.0/authorize",
+        tokenEndpoint = "https://login.microsoftonline.com/${microsoftTenant.ifBlank { "common" }}/oauth2/v2.0/token",
         scope = "openid profile email User.Read",
     )
 }

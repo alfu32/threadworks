@@ -55,7 +55,14 @@ The built-in grid code editor provides multiple cursors and selections, configur
 
 The title-bar profile medallion supports Google, GitHub, and Microsoft OAuth sign-in. Identity details are shared through user preferences and expire after one week; access and refresh tokens remain in memory only.
 
-Configure OAuth application registrations with `THREADWORK_GOOGLE_CLIENT_ID`, `THREADWORK_GITHUB_CLIENT_ID`, or `THREADWORK_MICROSOFT_CLIENT_ID`. GitHub also requires `THREADWORK_GITHUB_CLIENT_SECRET`. Equivalent JVM properties use `threadwork.oauth.<provider>.clientId` and `threadwork.oauth.<provider>.clientSecret`.
+Configure OAuth application registrations in the packaged
+`app-desktop/src/main/resources/threadwork-oauth.properties` resource, or
+override them with `THREADWORK_GOOGLE_CLIENT_ID`,
+`THREADWORK_GITHUB_CLIENT_ID`, or `THREADWORK_MICROSOFT_CLIENT_ID`.
+Equivalent JVM properties use `threadwork.oauth.<provider>.clientId` and
+`threadwork.oauth.<provider>.clientSecret`; JVM properties take precedence
+over environment variables and packaged defaults. GitHub also requires its
+OAuth client secret for the current authorization-code exchange.
 
 ### Sheets and export
 

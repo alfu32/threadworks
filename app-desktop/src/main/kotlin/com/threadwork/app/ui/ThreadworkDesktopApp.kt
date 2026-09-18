@@ -175,6 +175,7 @@ import javax.swing.JColorChooser
 import javax.swing.JComponent
 import javax.swing.JDialog
 import javax.swing.DropMode
+import javax.swing.JFileChooser
 import javax.swing.Icon
 import javax.swing.JFrame
 import javax.swing.JLabel
@@ -207,6 +208,7 @@ import javax.swing.WindowConstants
 import javax.swing.event.TreeModelEvent
 import javax.swing.event.TreeModelListener
 import javax.swing.event.TreeExpansionEvent
+import javax.swing.filechooser.FileNameExtensionFilter
 import javax.swing.event.TreeExpansionListener
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
@@ -2332,20 +2334,33 @@ class ThreadworkDesktopApp(
     }
 
     private fun chooseDocumentPath(title: String, mode: Int): Path? {
-        val dialog = FileDialog(frame, title, mode).apply {
-            currentFile?.parent?.let { directory = it.toString() }
-            file = currentFile?.fileName?.toString() ?: if (mode == FileDialog.SAVE) DEFAULT_PROJECT_NAME else "*.$NATIVE_PROJECT_EXTENSION"
-            filenameFilter = FilenameFilter { _, name ->
-                name.endsWith(".$NATIVE_PROJECT_EXTENSION", ignoreCase = true) ||
-                    name.endsWith(".$LEGACY_PROJECT_EXTENSION", ignoreCase = true)
+        val chooser = JFileChooser(
+            currentFile?.parent?.toFile() ?: Path.of(".").toAbsolutePath().normalize().toFile(),
+        ).apply {
+            dialogTitle = title
+            fileFilter = FileNameExtensionFilter(
+                "Threadwork documents (*.$NATIVE_PROJECT_EXTENSION, *.$LEGACY_PROJECT_EXTENSION)",
+                NATIVE_PROJECT_EXTENSION,
+                LEGACY_PROJECT_EXTENSION,
+            )
+            isAcceptAllFileFilterUsed = false
+            selectedFile = currentFile?.toFile() ?: if (mode == FileDialog.SAVE) {
+                Path.of(DEFAULT_PROJECT_NAME).toFile()
+            } else {
+                null
             }
         }
-        dialog.isVisible = true
-        val fileName = dialog.file ?: return null
-        val directory = dialog.directory?.let(Path::of) ?: Path.of(".")
-        val chosen = directory.resolve(fileName)
-        if (mode != FileDialog.SAVE) return chosen
-        if (fileName.endsWith(".$NATIVE_PROJECT_EXTENSION", ignoreCase = true) ||
+        val result = if (mode == FileDialog.SAVE) {
+            chooser.showSaveDialog(frame)
+        } else {
+            chooser.showOpenDialog(frame)
+        }
+        if (result != JFileChooser.APPROVE_OPTION) return null
+
+        val chosen = chooser.selectedFile.toPath()
+        val fileName = chosen.fileName.toString()
+        if (mode != FileDialog.SAVE ||
+            fileName.endsWith(".$NATIVE_PROJECT_EXTENSION", ignoreCase = true) ||
             fileName.endsWith(".$LEGACY_PROJECT_EXTENSION", ignoreCase = true)
         ) return chosen
         return chosen.resolveSibling("${chosen.fileName}.$NATIVE_PROJECT_EXTENSION")

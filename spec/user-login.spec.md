@@ -11,13 +11,19 @@ profile photo needed to identify model changes.
 
 Desktop login uses the authorization-code flow with a loopback callback and
 PKCE. Provider application registrations supply client identifiers through
-environment variables or equivalent JVM properties:
+the packaged `app-desktop/src/main/resources/threadwork-oauth.properties`
+resource, environment variables, or equivalent JVM properties. JVM properties
+take precedence over environment variables, which take precedence over the
+packaged defaults:
 
 | Provider | Environment | JVM property |
 | --- | --- | --- |
 | Google | `THREADWORK_GOOGLE_CLIENT_ID` | `threadwork.oauth.google.clientId` |
 | GitHub | `THREADWORK_GITHUB_CLIENT_ID` | `threadwork.oauth.github.clientId` |
 | Microsoft | `THREADWORK_MICROSOFT_CLIENT_ID` | `threadwork.oauth.microsoft.clientId` |
+
+The packaged resource may also define
+`threadwork.oauth.microsoft.tenant`; it defaults to `common`.
 
 GitHub's token exchange also requires `THREADWORK_GITHUB_CLIENT_SECRET` or
 `threadwork.oauth.github.clientSecret`. Google may receive an optional secret
