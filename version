@@ -1,0 +1,83 @@
+{
+    "id": "document_1789750656766",
+    "name": "version",
+    "rootNodeId": "root",
+    "nodes": [
+        {
+            "id": "root",
+            "name": "version",
+            "kind": "Processor",
+            "parentId": null,
+            "children": [],
+            "incomingLinks": [],
+            "outgoingLinks": [],
+            "layout": {
+                "x": 0.0,
+                "y": 0.0,
+                "width": 200.0,
+                "height": 70.0,
+                "closedWidth": 200.0,
+                "closedHeight": 70.0,
+                "openWidth": 200.0,
+                "openHeight": 70.0,
+                "isExpanded": true
+            },
+            "fileLayoutStrategyId": "none",
+            "text": {
+                "initialization": "",
+                "initializationLanguageId": "",
+                "source": "",
+                "sourceLanguageId": "",
+                "specification": "",
+                "specificationLanguageId": "markdown",
+                "tests": "",
+                "testsLanguageId": "json",
+                "aiInstructions": "",
+                "aiInstructionsLanguageId": "markdown"
+            },
+            "binaryContent": null,
+            "technology": {
+                "languageId": "",
+                "technologyId": "",
+                "compilerId": "",
+                "fileExtension": "",
+                "contentType": ""
+            },
+            "revision": null,
+            "responsible": null,
+            "modified": {
+                "date": "",
+                "user": ""
+            },
+            "ports": [],
+            "link": null,
+            "typeDefinition": null,
+            "diagnostics": [],
+            "metadata": {},
+            "pluginData": {},
+            "nameDetail": "",
+            "status": null,
+            "statusChanges": [],
+            "assignee": null
+        }
+    ],
+    "metadata": {},
+    "masterRevision": {
+        "name": "",
+        "date": ""
+    },
+    "users": [
+        {
+            "identifier": "devlin",
+            "avatar": "",
+            "avatarData": "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",
+            "source": "local",
+            "userId": "",
+            "emailAddress": "",
+            "username": "",
+            "fullName": "",
+            "role": "",
+            "refreshedAt": "2026-09-18T16:57:36.820246745Z"
+        }
+    ]
+}

@@ -330,9 +330,43 @@ private fun randomUrlToken(byteCount: Int): String = ByteArray(byteCount)
 
 private fun base64Url(value: ByteArray): String = Base64.getUrlEncoder().withoutPadding().encodeToString(value)
 
+class OAuthBrowserUnavailableException(
+    val uri: URI,
+    cause: Throwable? = null,
+) : IllegalStateException(
+    "Could not open a browser automatically. Open this URL manually: $uri",
+    cause,
+)
+
 private fun browse(uri: URI) {
-    require(Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
-        "No desktop browser integration is available. Open this URL manually: $uri"
+    val desktopOpened = runCatching {
+        if (!Desktop.isDesktopSupported()) {
+            false
+        } else {
+            val desktop = Desktop.getDesktop()
+            if (!desktop.isSupported(Desktop.Action.BROWSE)) false else {
+                desktop.browse(uri)
+                true
+            }
+        }
+    }.getOrDefault(false)
+    if (desktopOpened) return
+
+    val browserCommands = when {
+        System.getProperty("os.name").startsWith("Windows", ignoreCase = true) ->
+            listOf(listOf("rundll32", "url.dll,FileProtocolHandler"))
+        System.getProperty("os.name").startsWith("Mac", ignoreCase = true) ->
+            listOf(listOf("open"))
+        else -> listOf(
+            listOf("xdg-open"),
+            listOf("gio", "open"),
+            listOf("sensible-browser"),
+        )
     }
-    Desktop.getDesktop().browse(uri)
+    browserCommands.firstOrNull { command ->
+        runCatching {
+            val process = ProcessBuilder(command + uri.toString()).start()
+            if (!process.waitFor(2, TimeUnit.SECONDS)) true else process.exitValue() == 0
+        }.getOrDefault(false)
+    } ?: throw OAuthBrowserUnavailableException(uri)
 }

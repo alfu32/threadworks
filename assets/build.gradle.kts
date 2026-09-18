@@ -78,14 +78,11 @@ fun renderSvgToPng(source: java.io.File, target: java.io.File, width: Int, heigh
         // Fall back to the external rasterizers below. Batik is preferred but not always
         // compatible with the SVG dialect used by the sprite sheet.
     }
-    if (batikSource != source) {
-        batikSource.delete()
-    }
     val command = when {
         runCatching { ProcessBuilder("inkscape", "--version").start().waitFor() == 0 }.getOrDefault(false) ->
             listOf(
                 "inkscape",
-                source.absolutePath,
+                batikSource.absolutePath,
                 "--export-type=png",
                 "--export-filename=${target.absolutePath}",
                 "--export-width=$width",
@@ -94,7 +91,7 @@ fun renderSvgToPng(source: java.io.File, target: java.io.File, width: Int, heigh
         runCatching { ProcessBuilder("convert", "--version").start().waitFor() == 0 }.getOrDefault(false) ->
             listOf(
                 "convert",
-                source.absolutePath,
+                batikSource.absolutePath,
                 "-resize",
                 "${width}x$height",
                 target.absolutePath,
@@ -108,6 +105,9 @@ fun renderSvgToPng(source: java.io.File, target: java.io.File, width: Int, heigh
     val output = process.inputStream.bufferedReader().readText()
     if (process.waitFor() != 0) {
         error("Rasterizing ${source.name} failed:\n$output")
+    }
+    if (batikSource != source) {
+        batikSource.delete()
     }
 }
 

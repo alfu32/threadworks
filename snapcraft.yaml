@@ -73,6 +73,7 @@ parts:
       - libxrender1
       - libxtst6
       - libxxf86vm1
+      - xdg-utils
     override-build: |
       set -eux
 

@@ -1,16 +1,21 @@
 package com.threadwork.app.ui
 
 import com.threadwork.app.identity.DesktopOAuthClient
+import com.threadwork.app.identity.OAuthBrowserUnavailableException
 import com.threadwork.app.identity.OAuthProvider
 import com.threadwork.app.identity.ThreadworkUserIdentity
 import com.threadwork.app.identity.UserIdentity
 import com.threadwork.app.identity.UserIdentityStore
 import com.threadwork.app.identity.designator
 import com.threadwork.app.identity.userAvatarIcon
+import java.awt.BorderLayout
 import java.awt.Component
 import java.awt.Dimension
 import java.awt.FlowLayout
 import java.awt.Font
+import java.awt.Toolkit
+import java.awt.datatransfer.StringSelection
+import java.net.URI
 import java.util.concurrent.ExecutionException
 import javax.swing.BorderFactory
 import javax.swing.BoxLayout
@@ -109,15 +114,57 @@ internal class UserIdentityTitleBar(
                     .onFailure { failure ->
                         refresh(force = true)
                         val cause = (failure as? ExecutionException)?.cause ?: failure
-                        JOptionPane.showMessageDialog(
-                            dialogParent,
-                            cause.message ?: "Login failed.",
-                            "User Login",
-                            JOptionPane.ERROR_MESSAGE,
-                        )
+                        if (cause is OAuthBrowserUnavailableException) {
+                            showBrowserFallback(cause.uri)
+                        } else {
+                            JOptionPane.showMessageDialog(
+                                dialogParent,
+                                cause.message ?: "Login failed.",
+                                "User Login",
+                                JOptionPane.ERROR_MESSAGE,
+                            )
+                        }
                     }
             }
         }.execute()
+    }
+
+    private fun showBrowserFallback(uri: URI) {
+        val url = uri.toString()
+        val urlField = javax.swing.JTextField(url).apply {
+            isEditable = false
+            toolTipText = url
+            preferredSize = Dimension(720, 28)
+        }
+        val copyButton = JButton("Copy URL").apply {
+            addActionListener {
+                runCatching {
+                    Toolkit.getDefaultToolkit().systemClipboard.setContents(StringSelection(url), null)
+                }.onSuccess {
+                    text = "Copied"
+                    onStatus("Login URL copied to the clipboard")
+                }.onFailure {
+                    onStatus("Could not copy the login URL")
+                }
+            }
+        }
+        val urlRow = JPanel(BorderLayout(8, 0)).apply {
+            add(urlField, BorderLayout.CENTER)
+            add(copyButton, BorderLayout.EAST)
+        }
+        val content = JPanel().apply {
+            layout = BoxLayout(this, BoxLayout.Y_AXIS)
+            border = BorderFactory.createEmptyBorder(4, 4, 4, 4)
+            add(JLabel("Open this URL in a browser to continue:"))
+            add(javax.swing.Box.createVerticalStrut(8))
+            add(urlRow)
+        }
+        JOptionPane.showMessageDialog(
+            dialogParent,
+            content,
+            "User Login",
+            JOptionPane.ERROR_MESSAGE,
+        )
     }
 
     private fun identitySummary(identity: UserIdentity?): JComponent = JPanel().apply {
