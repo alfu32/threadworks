@@ -142,7 +142,7 @@ jobs:
 
           $assets = Join-Path $msixRoot "Assets"
           New-Item $assets -ItemType Directory -Force | Out-Null
-          $iconSource = (Resolve-Path "assets\build\generated-resources\icons\app\256.png").Path
+          $iconSource = (Resolve-Path "assets\build\generated-resources\icons\icons\app\256.png").Path
           Copy-Item $iconSource (Join-Path $assets "Square150x150Logo.png") -Force
           Copy-Item $iconSource (Join-Path $assets "Square44x44Logo.png") -Force
           Copy-Item $iconSource (Join-Path $assets "StoreLogo.png") -Force
