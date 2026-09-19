@@ -7,6 +7,9 @@ core/src/main/kotlin/com/threadwork/Version.kt
 .idea
 assets/fonts/**/*.zip
 generated
+!compilers-impl/src/main/kotlin/com/threadwork/compiler/generated/
+!compilers-impl/src/main/kotlin/com/threadwork/compiler/generated/nodejs/
+!compilers-impl/src/main/kotlin/com/threadwork/compiler/generated/nodejs/JSCompiler.kt
 test-compilers
 examples/**
 !examples/**/
