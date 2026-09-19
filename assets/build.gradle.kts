@@ -4,6 +4,7 @@ buildscript {
     }
     dependencies {
         classpath("org.apache.xmlgraphics:batik-transcoder:1.17")
+        classpath("org.apache.xmlgraphics:batik-codec:1.17")
     }
 }
 
@@ -64,6 +65,7 @@ fun renderSvgToPng(source: java.io.File, target: java.io.File, width: Int, heigh
             deleteOnExit()
         }
     } ?: source
+    var batikFailure: Throwable? = null
     try {
         batikSource.inputStream().use { input ->
             target.outputStream().use { output ->
@@ -77,7 +79,8 @@ fun renderSvgToPng(source: java.io.File, target: java.io.File, width: Int, heigh
             }
         }
         return
-    } catch (_: Throwable) {
+    } catch (failure: Throwable) {
+        batikFailure = failure
         // Fall back to the external rasterizers below. Batik is preferred but not always
         // compatible with the SVG dialect used by the sprite sheet.
     }
@@ -101,7 +104,10 @@ fun renderSvgToPng(source: java.io.File, target: java.io.File, width: Int, heigh
                 "${width}x$height",
                 target.absolutePath,
             )
-        else -> error("No SVG rasterizer available for ${source.name}.")
+        else -> throw IllegalStateException(
+            "No SVG rasterizer available for ${source.name}; Batik failed: ${batikFailure?.message}",
+            batikFailure,
+        )
     }
     val process = ProcessBuilder(command)
         .directory(source.parentFile)
