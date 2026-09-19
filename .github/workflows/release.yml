@@ -224,9 +224,9 @@ jobs:
           PRERELEASE: ${{ inputs.prerelease }}
         run: |
           set -euo pipefail
-          if ! gh release view "$TAG" >/dev/null 2>&1; then
-            gh release create "$TAG" --draft="$DRAFT" --prerelease="$PRERELEASE"
+          if ! gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --draft="$DRAFT" --prerelease="$PRERELEASE"
           else
-            gh release edit "$TAG" --draft="$DRAFT" --prerelease="$PRERELEASE"
+            gh release edit "$TAG" --repo "$GITHUB_REPOSITORY" --draft="$DRAFT" --prerelease="$PRERELEASE"
           fi
-          gh release upload "$TAG" artifacts/* --clobber
+          gh release upload "$TAG" artifacts/* --repo "$GITHUB_REPOSITORY" --clobber
