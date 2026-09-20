@@ -1,0 +1,664 @@
+﻿Field,ID,Type (Type),default,en-us,ar,zh,en,fil,fr,hi,ja,ko,pt,pa,sd,es,tr,uk
+Description,2,Text,,"Threadwork is a topology-first desktop IDE for designing, inspecting, compiling, and documenting software systems as connected workflows.
+
+Threadwork keeps software architecture, data flow, implementation, and project management in one visual development environment. Design systems as connected nodes and links, define typed data channels, organize components into composites, and inspect how information moves through the network.
+
+Edit implementation code directly inside the model with compiler-aware syntax highlighting, code intelligence, declaration details, generated runtime support, and language-specific primitive types. Use compiler template sets and reusable archetypes to move from a model to generated project files.
+
+The project management view adds statuses, assignments, responsibility, revision history, and state transitions. Network analysis measures production, execution, dependency, and usage relationships, with raw P/E/D/U matrices that help identify structure, coupling, reachability, and optimization opportunities.
+
+Threadwork supports C, Go, Kotlin, JavaScript, PHP, and QuickJS workflows, typed object fields, arrays, maps, model-defined types, documentation generation, and local project storage. It is designed for developers who want a software system's workflow and structure to remain visible beside its implementation.","Threadwork هو بيئة تطوير مكتبية تضع الطوبولوجيا في المقام الأول لتصميم أنظمة البرمجيات وفحصها وتجميعها وتوثيقها باعتبارها مسارات عمل مترابطة.
+
+يجمع Threadwork بين بنية البرمجيات وتدفق البيانات والتنفيذ وإدارة المشروع في مساحة مرئية واحدة. صمّم الأنظمة باستخدام عقد وروابط مترابطة، وعرّف قنوات بيانات ذات أنواع، ونظّم المكونات داخل مكونات مركبة، وافحص حركة المعلومات عبر الشبكة.
+
+حرّر كود التنفيذ داخل النموذج مباشرة مع تلوين واعٍ بالمترجم، وذكاء للكود، وتفاصيل التعريفات، ودعم لبيئة التشغيل المولدة، وأنواع أولية خاصة بكل لغة. استخدم قوالب المترجمات والأنماط القابلة لإعادة الاستخدام للانتقال من النموذج إلى ملفات المشروع المولدة.
+
+تضيف إدارة المشروع الحالات والتكليف والمسؤولية وسجل المراجعات وانتقالات الحالة. يقيس تحليل الشبكة علاقات الإنتاج والتنفيذ والاعتماد والاستخدام، مع مصفوفات P/E/D/U خام تساعد على فهم البنية والاقتران وإمكانية الوصول وفرص التحسين.
+
+يدعم Threadwork مسارات C وGo وKotlin وJavaScript وPHP وQuickJS، وحقول الكائنات المكتوبة والمصفوفات والخرائط والأنواع المعرفة في النموذج وتوليد التوثيق والتخزين المحلي للمشروعات.","Threadwork 是一款以拓扑为核心的桌面集成开发环境，用于将软件系统设计、检查、编译和文档化为相互连接的工作流。
+
+Threadwork 将软件架构、数据流、实现和项目管理统一在一个可视化开发环境中。使用相互连接的节点和链接设计系统，定义带类型的数据通道，将组件组织为复合组件，并检查信息在网络中的流动。
+
+可直接在模型中编辑实现代码，获得编译器感知的语法高亮、代码智能、声明详情、生成的运行时支持以及语言专属的基本类型。使用编译器模板和可复用原型，将模型转换为生成的项目文件。
+
+项目管理视图提供状态、分配、负责人、修订历史和状态转换。网络分析测量生产、执行、依赖和使用关系，并提供原始 P/E/D/U 矩阵，帮助发现结构、耦合、可达性和优化机会。
+
+Threadwork 支持 C、Go、Kotlin、JavaScript、PHP 和 QuickJS 工作流，支持类型化对象字段、数组、映射、模型定义类型、文档生成和本地项目存储。","Threadwork is a topology-first desktop IDE for designing, inspecting, compiling, and documenting software systems as connected workflows.
+
+Threadwork keeps software architecture, data flow, implementation, and project management in one visual development environment. Design systems as connected nodes and links, define typed data channels, organize components into composites, and inspect how information moves through the network.
+
+Edit implementation code directly inside the model with compiler-aware syntax highlighting, code intelligence, declaration details, generated runtime support, and language-specific primitive types. Use compiler template sets and reusable archetypes to move from a model to generated project files.
+
+The project management view adds statuses, assignments, responsibility, revision history, and state transitions. Network analysis measures production, execution, dependency, and usage relationships, with raw P/E/D/U matrices that help identify structure, coupling, reachability, and optimization opportunities.
+
+Threadwork supports C, Go, Kotlin, JavaScript, PHP, and QuickJS workflows, typed object fields, arrays, maps, model-defined types, documentation generation, and local project storage. It is designed for developers who want a software system's workflow and structure to remain visible beside its implementation.","Ang Threadwork ay isang desktop IDE na inuuna ang topology para sa pagdidisenyo, pagsusuri, pag-compile, at pagdodokumento ng mga software system bilang magkakaugnay na workflow.
+
+Pinagsasama ng Threadwork ang software architecture, data flow, implementation, at project management sa isang visual na development environment. Magdisenyo gamit ang magkakaugnay na node at link, magtakda ng typed data channel, mag-ayos ng mga component bilang composite, at suriin ang daloy ng impormasyon sa network.
+
+Mag-edit ng implementation code sa loob mismo ng model gamit ang compiler-aware syntax highlighting, code intelligence, declaration details, generated runtime support, at language-specific primitive types. Gumamit ng compiler template at reusable archetype para gawing generated project files ang model.
+
+May status, assignment, responsibility, revision history, at state transition ang project management view. Sinusukat ng network analysis ang production, execution, dependency, at usage relationships, kasama ang raw P/E/D/U matrices para makita ang structure, coupling, reachability, at optimization opportunities.
+
+Sinusuportahan ng Threadwork ang C, Go, Kotlin, JavaScript, PHP, at QuickJS workflows, typed object fields, arrays, maps, model-defined types, documentation generation, at local project storage.","Threadwork est un IDE de bureau centré sur la topologie pour concevoir, inspecter, compiler et documenter des systèmes logiciels sous forme de workflows connectés.
+
+Threadwork réunit architecture logicielle, flux de données, implémentation et gestion de projet dans un environnement de développement visuel. Concevez avec des nœuds et des liens connectés, définissez des canaux de données typés, organisez les composants en composites et observez la circulation des informations dans le réseau.
+
+Modifiez le code d’implémentation directement dans le modèle grâce à la coloration syntaxique adaptée au compilateur, à l’intelligence de code, aux détails des déclarations, au runtime généré et aux types primitifs propres à chaque langage. Utilisez des modèles de compilateur et des archétypes réutilisables pour produire les fichiers du projet.
+
+La gestion de projet comprend les statuts, les affectations, les responsables, l’historique des révisions et les transitions d’état. L’analyse du réseau mesure les relations de production, d’exécution, de dépendance et d’utilisation, avec des matrices P/E/D/U brutes pour révéler structure, couplage, accessibilité et possibilités d’optimisation.
+
+Threadwork prend en charge les workflows C, Go, Kotlin, JavaScript, PHP et QuickJS, les champs d’objets typés, les tableaux, les maps, les types définis dans le modèle, la génération de documentation et le stockage local des projets.","Threadwork एक topology-first desktop IDE है, जो जुड़े हुए workflows के रूप में software systems को design, inspect, compile और document करने के लिए बनाई गई है।
+
+Threadwork software architecture, data flow, implementation और project management को एक visual development environment में जोड़ता है। जुड़े हुए nodes और links से systems बनाएं, typed data channels परिभाषित करें, components को composites में व्यवस्थित करें और network में information flow देखें।
+
+Compiler-aware syntax highlighting, code intelligence, declaration details, generated runtime support और language-specific primitive types के साथ model के अंदर implementation code संपादित करें। Model से generated project files बनाने के लिए compiler templates और reusable archetypes का उपयोग करें।
+
+Project management view में statuses, assignments, responsibility, revision history और state transitions शामिल हैं। Network analysis production, execution, dependency और usage relationships को मापता है और raw P/E/D/U matrices के माध्यम से structure, coupling, reachability और optimization opportunities दिखाता है।
+
+Threadwork C, Go, Kotlin, JavaScript, PHP और QuickJS workflows, typed object fields, arrays, maps, model-defined types, documentation generation और local project storage का समर्थन करता है।","Threadwork は、接続されたワークフローとしてソフトウェアシステムを設計、検査、コンパイル、文書化するための、トポロジーを中心にしたデスクトップ IDE です。
+
+ソフトウェアアーキテクチャ、データフロー、実装、プロジェクト管理をひとつのビジュアル開発環境にまとめます。接続されたノードとリンクでシステムを設計し、型付きデータチャネルを定義し、コンポーネントを複合体として整理し、ネットワーク上の情報の流れを確認できます。
+
+コンパイラー対応の構文ハイライト、コードインテリジェンス、宣言の詳細、生成ランタイム、言語固有のプリミティブ型を使って、モデル内で実装コードを直接編集できます。コンパイラーテンプレートと再利用可能なアーキタイプで、モデルからプロジェクトファイルを生成します。
+
+プロジェクト管理では、ステータス、担当者、責任者、リビジョン履歴、状態遷移を管理できます。ネットワーク分析は生成、実行、依存、使用の関係を測定し、P/E/D/U 行列で構造、結合、到達可能性、最適化の機会を確認できます。
+
+C、Go、Kotlin、JavaScript、PHP、QuickJS、型付きオブジェクトフィールド、配列、マップ、モデル定義型、ドキュメント生成、ローカルプロジェクト保存に対応しています。","Threadwork는 연결된 워크플로로 소프트웨어 시스템을 설계하고 검사하고 컴파일하고 문서화하는 토폴로지 중심의 데스크톱 IDE입니다.
+
+소프트웨어 아키텍처, 데이터 흐름, 구현, 프로젝트 관리를 하나의 시각적 개발 환경으로 통합합니다. 연결된 노드와 링크로 시스템을 설계하고, 타입이 있는 데이터 채널을 정의하며, 컴포넌트를 복합 구조로 구성하고 네트워크에서 정보가 이동하는 방식을 확인할 수 있습니다.
+
+컴파일러 인식 구문 강조, 코드 인텔리전스, 선언 정보, 생성된 런타임 지원, 언어별 기본 타입을 사용해 모델 안에서 구현 코드를 직접 편집하세요. 컴파일러 템플릿과 재사용 가능한 아키타입으로 모델에서 프로젝트 파일을 생성할 수 있습니다.
+
+프로젝트 관리 화면에서는 상태, 담당자, 책임자, 수정 기록, 상태 전환을 관리합니다. 네트워크 분석은 생성, 실행, 의존성, 사용 관계를 측정하며 원시 P/E/D/U 행렬로 구조, 결합도, 도달 가능성, 최적화 기회를 확인합니다.
+
+Threadwork는 C, Go, Kotlin, JavaScript, PHP, QuickJS 워크플로, 타입이 있는 객체 필드, 배열, 맵, 모델 정의 타입, 문서 생성, 로컬 프로젝트 저장을 지원합니다.","Threadwork é uma IDE desktop orientada à topologia para projetar, inspecionar, compilar e documentar sistemas de software como fluxos de trabalho conectados.
+
+Threadwork reúne arquitetura de software, fluxo de dados, implementação e gerenciamento de projetos em um ambiente visual de desenvolvimento. Crie sistemas com nós e links conectados, defina canais de dados tipados, organize componentes em compostos e examine o caminho das informações pela rede.
+
+Edite o código de implementação diretamente no modelo com realce de sintaxe orientado ao compilador, inteligência de código, detalhes de declarações, suporte de runtime gerado e tipos primitivos específicos da linguagem. Use modelos de compilador e arquétipos reutilizáveis para transformar o modelo em arquivos de projeto.
+
+A gestão de projetos inclui status, atribuições, responsáveis, histórico de revisões e transições de estado. A análise de rede mede relações de produção, execução, dependência e uso, com matrizes P/E/D/U brutas para revelar estrutura, acoplamento, alcançabilidade e oportunidades de otimização.
+
+Threadwork oferece suporte a fluxos de trabalho em C, Go, Kotlin, JavaScript, PHP e QuickJS, campos de objetos tipados, arrays, mapas, tipos definidos no modelo, geração de documentação e armazenamento local de projetos.","Threadwork ਇੱਕ topology-first desktop IDE ਹੈ ਜੋ ਜੁੜੇ ਹੋਏ workflows ਵਜੋਂ software systems ਨੂੰ design, inspect, compile ਅਤੇ document ਕਰਨ ਲਈ ਹੈ।
+
+Threadwork software architecture, data flow, implementation ਅਤੇ project management ਨੂੰ ਇੱਕ visual development environment ਵਿੱਚ ਜੋੜਦਾ ਹੈ। ਜੁੜੇ nodes ਅਤੇ links ਨਾਲ systems ਬਣਾਓ, typed data channels ਪਰਿਭਾਸ਼ਿਤ ਕਰੋ, components ਨੂੰ composites ਵਿੱਚ ਵਿਵਸਥਿਤ ਕਰੋ ਅਤੇ network ਵਿੱਚ information flow ਦੀ ਜਾਂਚ ਕਰੋ।
+
+Compiler-aware syntax highlighting, code intelligence, declaration details, generated runtime support ਅਤੇ language-specific primitive types ਨਾਲ model ਦੇ ਅੰਦਰ implementation code edit ਕਰੋ। Model ਤੋਂ generated project files ਬਣਾਉਣ ਲਈ compiler templates ਅਤੇ reusable archetypes ਵਰਤੋ।
+
+Project management view ਵਿੱਚ statuses, assignments, responsibility, revision history ਅਤੇ state transitions ਹਨ। Network analysis production, execution, dependency ਅਤੇ usage relationships ਨੂੰ ਮਾਪਦਾ ਹੈ ਅਤੇ raw P/E/D/U matrices ਰਾਹੀਂ structure, coupling, reachability ਅਤੇ optimization opportunities ਦਿਖਾਉਂਦਾ ਹੈ।
+
+Threadwork C, Go, Kotlin, JavaScript, PHP ਅਤੇ QuickJS workflows, typed object fields, arrays, maps, model-defined types, documentation generation ਅਤੇ local project storage ਨੂੰ support ਕਰਦਾ ਹੈ।","Threadwork هڪ topology-first desktop IDE آهي جيڪا ڳنڍيل workflows طور software systems کي design، inspect، compile ۽ document ڪرڻ لاءِ ٺاهي وئي آهي.
+
+Threadwork software architecture، data flow، implementation ۽ project management کي هڪ visual development environment ۾ گڏ ڪري ٿو. ڳنڍيل nodes ۽ links سان systems ٺاهيو، typed data channels مقرر ڪريو، components کي composites ۾ ترتيب ڏيو ۽ network ۾ information flow ڏسو.
+
+Compiler-aware syntax highlighting، code intelligence، declaration details، generated runtime support ۽ language-specific primitive types سان model اندر implementation code edit ڪريو. Model مان generated project files ٺاهڻ لاءِ compiler templates ۽ reusable archetypes استعمال ڪريو.
+
+Project management view ۾ statuses، assignments، responsibility، revision history ۽ state transitions شامل آهن. Network analysis production، execution، dependency ۽ usage relationships کي ماپي ٿو ۽ raw P/E/D/U matrices ذريعي structure، coupling، reachability ۽ optimization opportunities ظاهر ڪري ٿو.
+
+Threadwork C، Go، Kotlin، JavaScript، PHP ۽ QuickJS workflows، typed object fields، arrays، maps، model-defined types، documentation generation ۽ local project storage کي support ڪري ٿو.","Threadwork es un IDE de escritorio centrado en la topología para diseñar, inspeccionar, compilar y documentar sistemas de software como flujos de trabajo conectados.
+
+Threadwork reúne arquitectura de software, flujo de datos, implementación y gestión de proyectos en un entorno de desarrollo visual. Diseña con nodos y enlaces conectados, define canales de datos tipados, organiza componentes en compuestos e inspecciona cómo circula la información por la red.
+
+Edita el código de implementación directamente en el modelo con resaltado consciente del compilador, inteligencia de código, detalles de declaraciones, soporte de runtime generado y tipos primitivos específicos del lenguaje. Usa plantillas de compilador y arquetipos reutilizables para pasar del modelo a los archivos generados del proyecto.
+
+La vista de gestión incluye estados, asignaciones, responsables, historial de revisiones y transiciones de estado. El análisis de red mide relaciones de producción, ejecución, dependencia y uso, con matrices P/E/D/U sin procesar para identificar estructura, acoplamiento, alcanzabilidad y oportunidades de optimización.
+
+Threadwork admite flujos de trabajo en C, Go, Kotlin, JavaScript, PHP y QuickJS, campos de objetos tipados, arrays, mapas, tipos definidos en el modelo, generación de documentación y almacenamiento local de proyectos.","Threadwork, yazılım sistemlerini bağlı iş akışları olarak tasarlamak, incelemek, derlemek ve belgelemek için topolojiyi merkeze alan bir masaüstü IDE’sidir.
+
+Threadwork yazılım mimarisini, veri akışını, uygulamayı ve proje yönetimini tek bir görsel geliştirme ortamında birleştirir. Bağlantılı düğüm ve linklerle sistemler tasarlayın, tür bilgili veri kanalları tanımlayın, bileşenleri bileşik yapılar halinde düzenleyin ve bilgilerin ağdaki hareketini inceleyin.
+
+Derleyici farkındalığına sahip sözdizimi renklendirmesi, kod zekâsı, bildirim ayrıntıları, oluşturulan çalışma zamanı desteği ve dile özgü ilkel türlerle uygulama kodunu doğrudan model içinde düzenleyin. Modeli oluşturulan proje dosyalarına dönüştürmek için derleyici şablonlarını ve yeniden kullanılabilir arketipleri kullanın.
+
+Proje yönetimi görünümü durumları, atamaları, sorumluları, revizyon geçmişini ve durum geçişlerini içerir. Ağ analizi üretim, yürütme, bağımlılık ve kullanım ilişkilerini ölçer; ham P/E/D/U matrisleri yapı, bağlılık, erişilebilirlik ve iyileştirme fırsatlarını ortaya çıkarır.
+
+Threadwork C, Go, Kotlin, JavaScript, PHP ve QuickJS iş akışlarını, tür bilgili nesne alanlarını, dizileri, haritaları, model tanımlı türleri, belge oluşturmayı ve yerel proje depolamasını destekler.","Threadwork — це настільна IDE, орієнтована на топологію, для проєктування, перевірки, компіляції та документування програмних систем як пов’язаних робочих процесів.
+
+Threadwork поєднує архітектуру програмного забезпечення, потоки даних, реалізацію та керування проєктами в одному візуальному середовищі розробки. Проєктуйте системи за допомогою пов’язаних вузлів і ланок, визначайте типізовані канали даних, об’єднуйте компоненти в композити та перевіряйте рух інформації мережею.
+
+Редагуйте код реалізації безпосередньо в моделі з підсвічуванням синтаксису, що враховує компілятор, інтелектуальним аналізом коду, деталями оголошень, згенерованою підтримкою середовища виконання та примітивними типами конкретної мови. Використовуйте шаблони компіляторів і багаторазові архетипи для створення файлів проєкту з моделі.
+
+Подання керування проєктом містить статуси, призначення, відповідальних, історію ревізій і переходи станів. Аналіз мережі вимірює зв’язки виробництва, виконання, залежностей і використання, а необроблені матриці P/E/D/U допомагають знаходити структуру, зв’язність, досяжність і можливості оптимізації.
+
+Threadwork підтримує робочі процеси C, Go, Kotlin, JavaScript, PHP і QuickJS, типізовані поля об’єктів, масиви, мапи, типи, визначені в моделі, генерацію документації та локальне зберігання проєктів."
+ReleaseNotes,3,Text,,"- Added network analysis with production, execution, dependency, and usage metrics.
+- Added raw P/E/D/U matrix views with selectable endpoints and responsive layouts.
+- Deferred analysis recalculation until it is needed to keep editing responsive.
+- Added compiler-aware array and map types for links and model fields.
+- Added model-defined types as selectable map key types.
+- Improved OAuth configuration, browser fallback, MSIX packaging, Snap packaging, and Windows icon generation.
+- Fixed clean-build support for the Node.js compiler and release automation.","- إضافة تحليل الشبكة مع مقاييس الإنتاج والتنفيذ والاعتماد والاستخدام.
+- إضافة عروض مصفوفات P/E/D/U الخام مع تحديد نقاط النهاية وتخطيط متجاوب.
+- تأجيل إعادة حساب التحليل حتى الحاجة للحفاظ على سرعة التحرير.
+- إضافة أنواع المصفوفات والخرائط للروابط وحقول النموذج.
+- إتاحة الأنواع المعرفة في النموذج كمفاتيح للخرائط.
+- تحسين OAuth وفتح المتصفح وحزم MSIX وSnap وتوليد أيقونات Windows.
+- إصلاح البناء النظيف لمترجم Node.js وأتمتة الإصدارات.","- 新增生产、执行、依赖和使用指标的网络分析。
+- 新增可选择端点且支持响应式布局的原始 P/E/D/U 矩阵。
+- 仅在需要时重新计算分析，保持编辑流畅。
+- 为链接和模型字段新增编译器感知的数组和映射类型。
+- 支持使用模型定义类型作为映射键类型。
+- 改进 OAuth、浏览器回退、MSIX、Snap、Windows 图标和发布自动化。
+- 修复 Node.js 编译器的干净构建支持。","- Added network analysis with production, execution, dependency, and usage metrics.
+- Added raw P/E/D/U matrix views with selectable endpoints and responsive layouts.
+- Deferred analysis recalculation until it is needed to keep editing responsive.
+- Added compiler-aware array and map types for links and model fields.
+- Added model-defined types as selectable map key types.
+- Improved OAuth configuration, browser fallback, MSIX packaging, Snap packaging, and Windows icon generation.
+- Fixed clean-build support for the Node.js compiler and release automation.","- Nagdagdag ng network analysis para sa production, execution, dependency, at usage metrics.
+- Nagdagdag ng raw P/E/D/U matrix views na may selectable endpoints at responsive layout.
+- Ipinagpaliban ang recalculation ng analysis hanggang kailangan upang manatiling mabilis ang editing.
+- Nagdagdag ng compiler-aware array at map types para sa links at model fields.
+- Maaaring gamitin ang model-defined types bilang map key types.
+- Pinahusay ang OAuth, browser fallback, MSIX at Snap packaging, Windows icons, at release automation.
+- Inayos ang clean build support ng Node.js compiler.","- Ajout de l’analyse réseau avec des métriques de production, d’exécution, de dépendance et d’utilisation.
+- Ajout de vues matricielles P/E/D/U brutes avec sélection des extrémités et mise en page adaptative.
+- Recalcul de l’analyse différé jusqu’à son utilisation pour préserver la fluidité de l’édition.
+- Ajout des types tableau et map adaptés au compilateur pour les liens et les champs.
+- Les types définis dans le modèle peuvent désormais servir de clés de map.
+- Amélioration d’OAuth, du retour navigateur, des paquets MSIX et Snap, des icônes Windows et de l’automatisation des releases.
+- Correction de la compilation propre du compilateur Node.js.","- Production, execution, dependency और usage metrics के साथ network analysis जोड़ा गया।
+- Selectable endpoints और responsive layout के साथ raw P/E/D/U matrix views जोड़े गए।
+- Editing को तेज रखने के लिए analysis recalculation को आवश्यकता तक स्थगित किया गया।
+- Links और model fields के लिए compiler-aware array और map types जोड़े गए।
+- Model-defined types को map key types के रूप में चुना जा सकता है।
+- OAuth, browser fallback, MSIX और Snap packaging, Windows icons और release automation में सुधार।
+- Node.js compiler के clean build support को ठीक किया गया।","- 生成、実行、依存、使用の指標を含むネットワーク分析を追加。
+- 端点選択とレスポンシブレイアウトに対応した P/E/D/U 行列を追加。
+- 編集の応答性を保つため、分析の再計算を必要時に限定。
+- リンクとモデルフィールドにコンパイラー対応の配列・マップ型を追加。
+- モデル定義型をマップのキー型として選択可能に改善。
+- OAuth、ブラウザー復帰、MSIX、Snap、Windows アイコン、リリース自動化を改善。
+- Node.js コンパイラーのクリーンビルドを修正。","- 생성, 실행, 의존성, 사용 지표를 포함한 네트워크 분석을 추가했습니다.
+- 끝점 선택과 반응형 레이아웃을 지원하는 원시 P/E/D/U 행렬을 추가했습니다.
+- 편집 성능을 위해 필요한 경우에만 분석을 다시 계산합니다.
+- 링크와 모델 필드에 컴파일러 인식 배열 및 맵 타입을 추가했습니다.
+- 모델 정의 타입을 맵 키 타입으로 선택할 수 있습니다.
+- OAuth, 브라우저 복귀, MSIX와 Snap 패키징, Windows 아이콘, 릴리스 자동화를 개선했습니다.
+- Node.js 컴파일러의 클린 빌드를 수정했습니다.","- Adicionada análise de rede com métricas de produção, execução, dependência e uso.
+- Adicionadas visualizações de matrizes P/E/D/U brutas com seleção de extremos e layout responsivo.
+- O recálculo da análise agora ocorre somente quando necessário, mantendo a edição rápida.
+- Adicionados tipos array e map orientados ao compilador para links e campos.
+- Tipos definidos no modelo podem ser usados como chaves de mapas.
+- Melhorados OAuth, retorno do navegador, empacotamento MSIX e Snap, ícones do Windows e automação de releases.
+- Corrigido o build limpo do compilador Node.js.","- Production, execution, dependency ਅਤੇ usage metrics ਨਾਲ network analysis ਜੋੜਿਆ ਗਿਆ।
+- Selectable endpoints ਅਤੇ responsive layout ਵਾਲੇ raw P/E/D/U matrix views ਜੋੜੇ ਗਏ।
+- Editing ਨੂੰ ਤੇਜ਼ ਰੱਖਣ ਲਈ analysis recalculation ਨੂੰ ਲੋੜ ਤੱਕ ਮੁਲਤਵੀ ਕੀਤਾ ਗਿਆ।
+- Links ਅਤੇ model fields ਲਈ compiler-aware array ਅਤੇ map types ਜੋੜੇ ਗਏ।
+- Model-defined types ਨੂੰ map key types ਵਜੋਂ ਚੁਣਿਆ ਜਾ ਸਕਦਾ ਹੈ।
+- OAuth, browser fallback, MSIX ਅਤੇ Snap packaging, Windows icons ਅਤੇ release automation ਵਿੱਚ ਸੁਧਾਰ।
+- Node.js compiler ਦਾ clean build support ਠੀਕ ਕੀਤਾ ਗਿਆ।","- Production، execution، dependency ۽ usage metrics سان network analysis شامل ڪيو ويو.
+- Selectable endpoints ۽ responsive layout سان raw P/E/D/U matrix views شامل ڪيا ويا.
+- Editing کي تيز رکڻ لاءِ analysis recalculation ضرورت تائين ملتوي ڪئي وئي.
+- Links ۽ model fields لاءِ compiler-aware array ۽ map types شامل ڪيا ويا.
+- Model-defined types کي map key types طور چونڊي سگهجي ٿو.
+- OAuth، browser fallback، MSIX ۽ Snap packaging، Windows icons ۽ release automation بهتر ڪيا ويا.
+- Node.js compiler جي clean build support کي درست ڪيو ويو.","- Añadido análisis de red con métricas de producción, ejecución, dependencia y uso.
+- Añadidas vistas de matrices P/E/D/U sin procesar con selección de extremos y diseño adaptable.
+- El análisis se recalcula solo cuando es necesario para mantener la edición fluida.
+- Añadidos tipos array y map conscientes del compilador para enlaces y campos.
+- Los tipos definidos en el modelo pueden usarse como claves de mapas.
+- Mejorados OAuth, el retorno del navegador, los paquetes MSIX y Snap, los iconos de Windows y la automatización de versiones.
+- Corregida la compilación limpia del compilador Node.js.","- Üretim, yürütme, bağımlılık ve kullanım ölçümleriyle ağ analizi eklendi.
+- Seçilebilir uç noktalar ve duyarlı yerleşim içeren ham P/E/D/U matris görünümleri eklendi.
+- Düzenleme hızını korumak için analiz yalnızca gerektiğinde yeniden hesaplanıyor.
+- Linkler ve model alanları için derleyici uyumlu dizi ve harita türleri eklendi.
+- Model tanımlı türler harita anahtarı olarak seçilebilir.
+- OAuth, tarayıcı geri dönüşü, MSIX ve Snap paketleri, Windows simgeleri ve sürüm otomasyonu iyileştirildi.
+- Node.js derleyicisinin temiz derleme desteği düzeltildi.","- Додано аналіз мережі з показниками виробництва, виконання, залежностей і використання.
+- Додано подання необроблених матриць P/E/D/U з вибором кінцевих точок і адаптивною розкладкою.
+- Перерахунок аналізу відкладено до моменту потреби, щоб зберегти швидкість редагування.
+- Додано типи масивів і мап, що враховують компілятор, для ланок і полів моделі.
+- Типи, визначені в моделі, можна вибирати як типи ключів мап.
+- Покращено OAuth, повернення з браузера, пакування MSIX і Snap, піктограми Windows та автоматизацію релізів.
+- Виправлено чисте збирання компілятора Node.js."
+Title,4,Text,,Threadwork,Threadwork,Threadwork,Threadwork,Threadwork,Threadwork,Threadwork,Threadwork,Threadwork,Threadwork,Threadwork,Threadwork,Threadwork,Threadwork,Threadwork
+ShortTitle,5,Text,,Threadwork is a topology-first desktop IDE,Threadwork بيئة تطوير مكتبية تعتمد على الطوبولوجيا,Threadwork 是拓扑优先的桌面 IDE,Threadwork is a topology-first desktop IDE,Threadwork ay isang topology-first desktop IDE,Threadwork est une IDE de bureau centrée sur la topologie,Threadwork एक topology-first desktop IDE है,Threadwork はトポロジー中心のデスクトップ IDE,Threadwork는 토폴로지 중심 데스크톱 IDE입니다,Threadwork é uma IDE desktop orientada à topologia,Threadwork ਇੱਕ topology-first desktop IDE ਹੈ,Threadwork هڪ topology-first desktop IDE آهي,Threadwork es un IDE de escritorio centrado en topología,Threadwork topoloji merkezli bir masaüstü IDE’dir,Threadwork — топологічна настільна IDE
+SortTitle,6,Text,,,,,,,,,,,,,,,,
+VoiceTitle,7,Text,,"Threadwork is a topology-first desktop IDE for designing, inspecting, compiling, and documenting software systems as connected workflows.",Threadwork هو بيئة تطوير مكتبية تضع الطوبولوجيا في المقام الأول لتصميم أنظمة البرمجيات وفحصها وتجميعها وتوثيقها باعتبارها مسارات عمل مترابطة.,Threadwork 是一款以拓扑为核心的桌面集成开发环境，用于将软件系统设计、检查、编译和文档化为相互连接的工作流。,"Threadwork is a topology-first desktop IDE for designing, inspecting, compiling, and documenting software systems as connected workflows.","Ang Threadwork ay isang desktop IDE na inuuna ang topology para sa pagdidisenyo, pagsusuri, pag-compile, at pagdodokumento ng mga software system bilang magkakaugnay na workflow.","Threadwork est un IDE de bureau centré sur la topologie pour concevoir, inspecter, compiler et documenter des systèmes logiciels sous forme de workflows connectés.","Threadwork एक topology-first desktop IDE है, जो जुड़े हुए workflows के रूप में software systems को design, inspect, compile और document करने के लिए बनाई गई है।",Threadwork は、接続されたワークフローとしてソフトウェアシステムを設計、検査、コンパイル、文書化するための、トポロジーを中心にしたデスクトップ IDE です。,Threadwork는 연결된 워크플로로 소프트웨어 시스템을 설계하고 검사하고 컴파일하고 문서화하는 토폴로지 중심의 데스크톱 IDE입니다.,"Threadwork é uma IDE desktop orientada à topologia para projetar, inspecionar, compilar e documentar sistemas de software como fluxos de trabalho conectados.","Threadwork ਇੱਕ topology-first desktop IDE ਹੈ ਜੋ ਜੁੜੇ ਹੋਏ workflows ਵਜੋਂ software systems ਨੂੰ design, inspect, compile ਅਤੇ document ਕਰਨ ਲਈ ਹੈ।",Threadwork هڪ topology-first desktop IDE آهي جيڪا ڳنڍيل workflows طور software systems کي design، inspect، compile ۽ document ڪرڻ لاءِ ٺاهي وئي آهي.,"Threadwork es un IDE de escritorio centrado en la topología para diseñar, inspeccionar, compilar y documentar sistemas de software como flujos de trabajo conectados.","Threadwork, yazılım sistemlerini bağlı iş akışları olarak tasarlamak, incelemek, derlemek ve belgelemek için topolojiyi merkeze alan bir masaüstü IDE’sidir.","Threadwork — це настільна IDE, орієнтована на топологію, для проєктування, перевірки, компіляції та документування програмних систем як пов’язаних робочих процесів."
+ShortDescription,8,Text,,"Threadwork keeps software architecture, data flow, implementation, and project management in one visual development environment. Design systems as connected nodes and links, define typed data channels, organize components into composites, and inspect how information moves through the network.",يجمع Threadwork بين بنية البرمجيات وتدفق البيانات والتنفيذ وإدارة المشروع في مساحة مرئية واحدة. صمّم الأنظمة باستخدام عقد وروابط مترابطة، وعرّف قنوات بيانات ذات أنواع، ونظّم المكونات داخل مكونات مركبة، وافحص حركة المعلومات عبر الشبكة.,Threadwork 将软件架构、数据流、实现和项目管理统一在一个可视化开发环境中。使用相互连接的节点和链接设计系统，定义带类型的数据通道，将组件组织为复合组件，并检查信息在网络中的流动。,"Threadwork keeps software architecture, data flow, implementation, and project management in one visual development environment. Design systems as connected nodes and links, define typed data channels, organize components into composites, and inspect how information moves through the network.","Pinagsasama ng Threadwork ang software architecture, data flow, implementation, at project management sa isang visual na development environment. Magdisenyo gamit ang magkakaugnay na node at link, magtakda ng typed data channel, mag-ayos ng mga component bilang composite, at suriin ang daloy ng impormasyon sa network.","Threadwork réunit architecture logicielle, flux de données, implémentation et gestion de projet dans un environnement de développement visuel. Concevez avec des nœuds et des liens connectés, définissez des canaux de données typés, organisez les composants en composites et observez la circulation des informations dans le réseau.","Threadwork software architecture, data flow, implementation और project management को एक visual development environment में जोड़ता है। जुड़े हुए nodes और links से systems बनाएं, typed data channels परिभाषित करें, components को composites में व्यवस्थित करें और network में information flow देखें।",ソフトウェアアーキテクチャ、データフロー、実装、プロジェクト管理をひとつのビジュアル開発環境にまとめます。接続されたノードとリンクでシステムを設計し、型付きデータチャネルを定義し、コンポーネントを複合体として整理し、ネットワーク上の情報の流れを確認できます。,"소프트웨어 아키텍처, 데이터 흐름, 구현, 프로젝트 관리를 하나의 시각적 개발 환경으로 통합합니다. 연결된 노드와 링크로 시스템을 설계하고, 타입이 있는 데이터 채널을 정의하며, 컴포넌트를 복합 구조로 구성하고 네트워크에서 정보가 이동하는 방식을 확인할 수 있습니다.","Threadwork reúne arquitetura de software, fluxo de dados, implementação e gerenciamento de projetos em um ambiente visual de desenvolvimento. Crie sistemas com nós e links conectados, defina canais de dados tipados, organize componentes em compostos e examine o caminho das informações pela rede.","Threadwork software architecture, data flow, implementation ਅਤੇ project management ਨੂੰ ਇੱਕ visual development environment ਵਿੱਚ ਜੋੜਦਾ ਹੈ। ਜੁੜੇ nodes ਅਤੇ links ਨਾਲ systems ਬਣਾਓ, typed data channels ਪਰਿਭਾਸ਼ਿਤ ਕਰੋ, components ਨੂੰ composites ਵਿੱਚ ਵਿਵਸਥਿਤ ਕਰੋ ਅਤੇ network ਵਿੱਚ information flow ਦੀ ਜਾਂਚ ਕਰੋ।",Threadwork software architecture، data flow، implementation ۽ project management کي هڪ visual development environment ۾ گڏ ڪري ٿو. ڳنڍيل nodes ۽ links سان systems ٺاهيو، typed data channels مقرر ڪريو، components کي composites ۾ ترتيب ڏيو ۽ network ۾ information flow ڏسو.,"Threadwork reúne arquitectura de software, flujo de datos, implementación y gestión de proyectos en un entorno de desarrollo visual. Diseña con nodos y enlaces conectados, define canales de datos tipados, organiza componentes en compuestos e inspecciona cómo circula la información por la red.","Threadwork yazılım mimarisini, veri akışını, uygulamayı ve proje yönetimini tek bir görsel geliştirme ortamında birleştirir. Bağlantılı düğüm ve linklerle sistemler tasarlayın, tür bilgili veri kanalları tanımlayın, bileşenleri bileşik yapılar halinde düzenleyin ve bilgilerin ağdaki hareketini inceleyin.","Threadwork поєднує архітектуру програмного забезпечення, потоки даних, реалізацію та керування проєктами в одному візуальному середовищі розробки. Проєктуйте системи за допомогою пов’язаних вузлів і ланок, визначайте типізовані канали даних, об’єднуйте компоненти в композити та перевіряйте рух інформації мережею."
+DevStudio,9,Text,,alfu32/github.com,,,,,,,,,,,,,,
+CopyrightTrademarkInformation,12,Text,,(c) 2026 alfu32.github.com,,,,,,,,,,,,,,
+AdditionalLicenseTerms,13,Text,,,,,,,,,,,,,,,,
+DesktopScreenshot1,100,Relative path (or URL to file in Partner Center),,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3056775122471272671,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3056775122471272671,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3056775122471272671,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3056775122471272671,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3056775122471272671,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3056775122471272671,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3056775122471272671,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3056775122471272671,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3056775122471272671,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3056775122471272671,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3056775122471272671,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3056775122471272671,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3056775122471272671,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3056775122471272671,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3056775122471272671
+DesktopScreenshot2,101,Relative path (or URL to file in Partner Center),,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3059507654572029776,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3059507654572029776,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3059507654572029776,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3059507654572029776,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3059507654572029776,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3059507654572029776,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3059507654572029776,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3059507654572029776,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3059507654572029776,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3059507654572029776,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3059507654572029776,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3059507654572029776,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3059507654572029776,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3059507654572029776,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3059507654572029776
+DesktopScreenshot3,102,Relative path (or URL to file in Partner Center),,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3023459901093041356,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3023459901093041356,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3023459901093041356,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3023459901093041356,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3023459901093041356,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3023459901093041356,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3023459901093041356,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3023459901093041356,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3023459901093041356,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3023459901093041356,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3023459901093041356,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3023459901093041356,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3023459901093041356,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3023459901093041356,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3023459901093041356
+DesktopScreenshot4,103,Relative path (or URL to file in Partner Center),,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3009928231253323717,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3009928231253323717,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3009928231253323717,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3009928231253323717,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3009928231253323717,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3009928231253323717,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3009928231253323717,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3009928231253323717,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3009928231253323717,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3009928231253323717,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3009928231253323717,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3009928231253323717,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3009928231253323717,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3009928231253323717,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3009928231253323717
+DesktopScreenshot5,104,Relative path (or URL to file in Partner Center),,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3008524993520232924,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3008524993520232924,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3008524993520232924,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3008524993520232924,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3008524993520232924,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3008524993520232924,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3008524993520232924,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3008524993520232924,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3008524993520232924,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3008524993520232924,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3008524993520232924,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3008524993520232924,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3008524993520232924,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3008524993520232924,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3008524993520232924
+DesktopScreenshot6,105,Relative path (or URL to file in Partner Center),,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3066564462998529404,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3066564462998529404,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3066564462998529404,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3066564462998529404,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3066564462998529404,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3066564462998529404,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3066564462998529404,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3066564462998529404,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3066564462998529404,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3066564462998529404,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3066564462998529404,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3066564462998529404,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3066564462998529404,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3066564462998529404,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3066564462998529404
+DesktopScreenshot7,106,Relative path (or URL to file in Partner Center),,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3051494666113969307,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3051494666113969307,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3051494666113969307,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3051494666113969307,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3051494666113969307,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3051494666113969307,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3051494666113969307,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3051494666113969307,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3051494666113969307,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3051494666113969307,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3051494666113969307,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3051494666113969307,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3051494666113969307,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3051494666113969307,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3051494666113969307
+DesktopScreenshot8,107,Relative path (or URL to file in Partner Center),,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3068009671158517615,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3068009671158517615,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3068009671158517615,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3068009671158517615,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3068009671158517615,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3068009671158517615,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3068009671158517615,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3068009671158517615,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3068009671158517615,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3068009671158517615,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3068009671158517615,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3068009671158517615,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3068009671158517615,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3068009671158517615,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3068009671158517615
+DesktopScreenshot9,108,Relative path (or URL to file in Partner Center),,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3040170056995398452,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3040170056995398452,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3040170056995398452,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3040170056995398452,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3040170056995398452,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3040170056995398452,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3040170056995398452,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3040170056995398452,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3040170056995398452,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3040170056995398452,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3040170056995398452,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3040170056995398452,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3040170056995398452,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3040170056995398452,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3040170056995398452
+DesktopScreenshot10,109,Relative path (or URL to file in Partner Center),,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3056093381745192925,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3056093381745192925,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3056093381745192925,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3056093381745192925,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3056093381745192925,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3056093381745192925,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3056093381745192925,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3056093381745192925,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3056093381745192925,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3056093381745192925,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3056093381745192925,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3056093381745192925,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3056093381745192925,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3056093381745192925,https://developer.microsoft.com/en-us/dashboard/apps/9PK5ZMRG0MN6/submissions/1152921505701929474/listings/1152922700027641957/listingassets/3056093381745192925
+DesktopScreenshot11,110,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+DesktopScreenshot12,111,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+DesktopScreenshot13,112,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+DesktopScreenshot14,113,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+DesktopScreenshot15,114,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+DesktopScreenshot16,115,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+DesktopScreenshot17,116,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+DesktopScreenshot18,117,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+DesktopScreenshot19,118,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+DesktopScreenshot20,119,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+DesktopScreenshot21,120,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+DesktopScreenshot22,121,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+DesktopScreenshot23,122,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+DesktopScreenshot24,123,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+DesktopScreenshot25,124,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+DesktopScreenshot26,125,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+DesktopScreenshot27,126,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+DesktopScreenshot28,127,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+DesktopScreenshot29,128,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+DesktopScreenshot30,129,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+DesktopScreenshotCaption1,150,Text,,,,,,,,,,,,,,,,
+DesktopScreenshotCaption2,151,Text,,,,,,,,,,,,,,,,
+DesktopScreenshotCaption3,152,Text,,,,,,,,,,,,,,,,
+DesktopScreenshotCaption4,153,Text,,,,,,,,,,,,,,,,
+DesktopScreenshotCaption5,154,Text,,,,,,,,,,,,,,,,
+DesktopScreenshotCaption6,155,Text,,,,,,,,,,,,,,,,
+DesktopScreenshotCaption7,156,Text,,,,,,,,,,,,,,,,
+DesktopScreenshotCaption8,157,Text,,,,,,,,,,,,,,,,
+DesktopScreenshotCaption9,158,Text,,,,,,,,,,,,,,,,
+DesktopScreenshotCaption10,159,Text,,,,,,,,,,,,,,,,
+DesktopScreenshotCaption11,160,Text,,,,,,,,,,,,,,,,
+DesktopScreenshotCaption12,161,Text,,,,,,,,,,,,,,,,
+DesktopScreenshotCaption13,162,Text,,,,,,,,,,,,,,,,
+DesktopScreenshotCaption14,163,Text,,,,,,,,,,,,,,,,
+DesktopScreenshotCaption15,164,Text,,,,,,,,,,,,,,,,
+DesktopScreenshotCaption16,165,Text,,,,,,,,,,,,,,,,
+DesktopScreenshotCaption17,166,Text,,,,,,,,,,,,,,,,
+DesktopScreenshotCaption18,167,Text,,,,,,,,,,,,,,,,
+DesktopScreenshotCaption19,168,Text,,,,,,,,,,,,,,,,
+DesktopScreenshotCaption20,169,Text,,,,,,,,,,,,,,,,
+DesktopScreenshotCaption21,170,Text,,,,,,,,,,,,,,,,
+DesktopScreenshotCaption22,171,Text,,,,,,,,,,,,,,,,
+DesktopScreenshotCaption23,172,Text,,,,,,,,,,,,,,,,
+DesktopScreenshotCaption24,173,Text,,,,,,,,,,,,,,,,
+DesktopScreenshotCaption25,174,Text,,,,,,,,,,,,,,,,
+DesktopScreenshotCaption26,175,Text,,,,,,,,,,,,,,,,
+DesktopScreenshotCaption27,176,Text,,,,,,,,,,,,,,,,
+DesktopScreenshotCaption28,177,Text,,,,,,,,,,,,,,,,
+DesktopScreenshotCaption29,178,Text,,,,,,,,,,,,,,,,
+DesktopScreenshotCaption30,179,Text,,,,,,,,,,,,,,,,
+MobileScreenshot1,200,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+MobileScreenshot2,201,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+MobileScreenshot3,202,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+MobileScreenshot4,203,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+MobileScreenshot5,204,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+MobileScreenshot6,205,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+MobileScreenshot7,206,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+MobileScreenshot8,207,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+MobileScreenshot9,208,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+MobileScreenshot10,209,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+MobileScreenshot11,210,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+MobileScreenshot12,211,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+MobileScreenshot13,212,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+MobileScreenshot14,213,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+MobileScreenshot15,214,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+MobileScreenshot16,215,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+MobileScreenshot17,216,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+MobileScreenshot18,217,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+MobileScreenshot19,218,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+MobileScreenshot20,219,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+MobileScreenshot21,220,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+MobileScreenshot22,221,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+MobileScreenshot23,222,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+MobileScreenshot24,223,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+MobileScreenshot25,224,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+MobileScreenshot26,225,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+MobileScreenshot27,226,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+MobileScreenshot28,227,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+MobileScreenshot29,228,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+MobileScreenshot30,229,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+MobileScreenshotCaption1,250,Text,,,,,,,,,,,,,,,,
+MobileScreenshotCaption2,251,Text,,,,,,,,,,,,,,,,
+MobileScreenshotCaption3,252,Text,,,,,,,,,,,,,,,,
+MobileScreenshotCaption4,253,Text,,,,,,,,,,,,,,,,
+MobileScreenshotCaption5,254,Text,,,,,,,,,,,,,,,,
+MobileScreenshotCaption6,255,Text,,,,,,,,,,,,,,,,
+MobileScreenshotCaption7,256,Text,,,,,,,,,,,,,,,,
+MobileScreenshotCaption8,257,Text,,,,,,,,,,,,,,,,
+MobileScreenshotCaption9,258,Text,,,,,,,,,,,,,,,,
+MobileScreenshotCaption10,259,Text,,,,,,,,,,,,,,,,
+MobileScreenshotCaption11,260,Text,,,,,,,,,,,,,,,,
+MobileScreenshotCaption12,261,Text,,,,,,,,,,,,,,,,
+MobileScreenshotCaption13,262,Text,,,,,,,,,,,,,,,,
+MobileScreenshotCaption14,263,Text,,,,,,,,,,,,,,,,
+MobileScreenshotCaption15,264,Text,,,,,,,,,,,,,,,,
+MobileScreenshotCaption16,265,Text,,,,,,,,,,,,,,,,
+MobileScreenshotCaption17,266,Text,,,,,,,,,,,,,,,,
+MobileScreenshotCaption18,267,Text,,,,,,,,,,,,,,,,
+MobileScreenshotCaption19,268,Text,,,,,,,,,,,,,,,,
+MobileScreenshotCaption20,269,Text,,,,,,,,,,,,,,,,
+MobileScreenshotCaption21,270,Text,,,,,,,,,,,,,,,,
+MobileScreenshotCaption22,271,Text,,,,,,,,,,,,,,,,
+MobileScreenshotCaption23,272,Text,,,,,,,,,,,,,,,,
+MobileScreenshotCaption24,273,Text,,,,,,,,,,,,,,,,
+MobileScreenshotCaption25,274,Text,,,,,,,,,,,,,,,,
+MobileScreenshotCaption26,275,Text,,,,,,,,,,,,,,,,
+MobileScreenshotCaption27,276,Text,,,,,,,,,,,,,,,,
+MobileScreenshotCaption28,277,Text,,,,,,,,,,,,,,,,
+MobileScreenshotCaption29,278,Text,,,,,,,,,,,,,,,,
+MobileScreenshotCaption30,279,Text,,,,,,,,,,,,,,,,
+XboxScreenshot1,300,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+XboxScreenshot2,301,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+XboxScreenshot3,302,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+XboxScreenshot4,303,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+XboxScreenshot5,304,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+XboxScreenshot6,305,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+XboxScreenshot7,306,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+XboxScreenshot8,307,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+XboxScreenshot9,308,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+XboxScreenshot10,309,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+XboxScreenshot11,310,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+XboxScreenshot12,311,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+XboxScreenshot13,312,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+XboxScreenshot14,313,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+XboxScreenshot15,314,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+XboxScreenshot16,315,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+XboxScreenshot17,316,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+XboxScreenshot18,317,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+XboxScreenshot19,318,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+XboxScreenshot20,319,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+XboxScreenshot21,320,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+XboxScreenshot22,321,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+XboxScreenshot23,322,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+XboxScreenshot24,323,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+XboxScreenshot25,324,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+XboxScreenshot26,325,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+XboxScreenshot27,326,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+XboxScreenshot28,327,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+XboxScreenshot29,328,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+XboxScreenshot30,329,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+XboxScreenshotCaption1,350,Text,,,,,,,,,,,,,,,,
+XboxScreenshotCaption2,351,Text,,,,,,,,,,,,,,,,
+XboxScreenshotCaption3,352,Text,,,,,,,,,,,,,,,,
+XboxScreenshotCaption4,353,Text,,,,,,,,,,,,,,,,
+XboxScreenshotCaption5,354,Text,,,,,,,,,,,,,,,,
+XboxScreenshotCaption6,355,Text,,,,,,,,,,,,,,,,
+XboxScreenshotCaption7,356,Text,,,,,,,,,,,,,,,,
+XboxScreenshotCaption8,357,Text,,,,,,,,,,,,,,,,
+XboxScreenshotCaption9,358,Text,,,,,,,,,,,,,,,,
+XboxScreenshotCaption10,359,Text,,,,,,,,,,,,,,,,
+XboxScreenshotCaption11,360,Text,,,,,,,,,,,,,,,,
+XboxScreenshotCaption12,361,Text,,,,,,,,,,,,,,,,
+XboxScreenshotCaption13,362,Text,,,,,,,,,,,,,,,,
+XboxScreenshotCaption14,363,Text,,,,,,,,,,,,,,,,
+XboxScreenshotCaption15,364,Text,,,,,,,,,,,,,,,,
+XboxScreenshotCaption16,365,Text,,,,,,,,,,,,,,,,
+XboxScreenshotCaption17,366,Text,,,,,,,,,,,,,,,,
+XboxScreenshotCaption18,367,Text,,,,,,,,,,,,,,,,
+XboxScreenshotCaption19,368,Text,,,,,,,,,,,,,,,,
+XboxScreenshotCaption20,369,Text,,,,,,,,,,,,,,,,
+XboxScreenshotCaption21,370,Text,,,,,,,,,,,,,,,,
+XboxScreenshotCaption22,371,Text,,,,,,,,,,,,,,,,
+XboxScreenshotCaption23,372,Text,,,,,,,,,,,,,,,,
+XboxScreenshotCaption24,373,Text,,,,,,,,,,,,,,,,
+XboxScreenshotCaption25,374,Text,,,,,,,,,,,,,,,,
+XboxScreenshotCaption26,375,Text,,,,,,,,,,,,,,,,
+XboxScreenshotCaption27,376,Text,,,,,,,,,,,,,,,,
+XboxScreenshotCaption28,377,Text,,,,,,,,,,,,,,,,
+XboxScreenshotCaption29,378,Text,,,,,,,,,,,,,,,,
+XboxScreenshotCaption30,379,Text,,,,,,,,,,,,,,,,
+HolographicScreenshot1,400,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+HolographicScreenshot2,401,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+HolographicScreenshot3,402,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+HolographicScreenshot4,403,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+HolographicScreenshot5,404,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+HolographicScreenshot6,405,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+HolographicScreenshot7,406,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+HolographicScreenshot8,407,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+HolographicScreenshot9,408,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+HolographicScreenshot10,409,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+HolographicScreenshot11,410,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+HolographicScreenshot12,411,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+HolographicScreenshot13,412,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+HolographicScreenshot14,413,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+HolographicScreenshot15,414,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+HolographicScreenshot16,415,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+HolographicScreenshot17,416,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+HolographicScreenshot18,417,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+HolographicScreenshot19,418,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+HolographicScreenshot20,419,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+HolographicScreenshot21,420,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+HolographicScreenshot22,421,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+HolographicScreenshot23,422,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+HolographicScreenshot24,423,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+HolographicScreenshot25,424,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+HolographicScreenshot26,425,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+HolographicScreenshot27,426,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+HolographicScreenshot28,427,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+HolographicScreenshot29,428,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+HolographicScreenshot30,429,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+HolographicScreenshotCaption1,450,Text,,,,,,,,,,,,,,,,
+HolographicScreenshotCaption2,451,Text,,,,,,,,,,,,,,,,
+HolographicScreenshotCaption3,452,Text,,,,,,,,,,,,,,,,
+HolographicScreenshotCaption4,453,Text,,,,,,,,,,,,,,,,
+HolographicScreenshotCaption5,454,Text,,,,,,,,,,,,,,,,
+HolographicScreenshotCaption6,455,Text,,,,,,,,,,,,,,,,
+HolographicScreenshotCaption7,456,Text,,,,,,,,,,,,,,,,
+HolographicScreenshotCaption8,457,Text,,,,,,,,,,,,,,,,
+HolographicScreenshotCaption9,458,Text,,,,,,,,,,,,,,,,
+HolographicScreenshotCaption10,459,Text,,,,,,,,,,,,,,,,
+HolographicScreenshotCaption11,460,Text,,,,,,,,,,,,,,,,
+HolographicScreenshotCaption12,461,Text,,,,,,,,,,,,,,,,
+HolographicScreenshotCaption13,462,Text,,,,,,,,,,,,,,,,
+HolographicScreenshotCaption14,463,Text,,,,,,,,,,,,,,,,
+HolographicScreenshotCaption15,464,Text,,,,,,,,,,,,,,,,
+HolographicScreenshotCaption16,465,Text,,,,,,,,,,,,,,,,
+HolographicScreenshotCaption17,466,Text,,,,,,,,,,,,,,,,
+HolographicScreenshotCaption18,467,Text,,,,,,,,,,,,,,,,
+HolographicScreenshotCaption19,468,Text,,,,,,,,,,,,,,,,
+HolographicScreenshotCaption20,469,Text,,,,,,,,,,,,,,,,
+HolographicScreenshotCaption21,470,Text,,,,,,,,,,,,,,,,
+HolographicScreenshotCaption22,471,Text,,,,,,,,,,,,,,,,
+HolographicScreenshotCaption23,472,Text,,,,,,,,,,,,,,,,
+HolographicScreenshotCaption24,473,Text,,,,,,,,,,,,,,,,
+HolographicScreenshotCaption25,474,Text,,,,,,,,,,,,,,,,
+HolographicScreenshotCaption26,475,Text,,,,,,,,,,,,,,,,
+HolographicScreenshotCaption27,476,Text,,,,,,,,,,,,,,,,
+HolographicScreenshotCaption28,477,Text,,,,,,,,,,,,,,,,
+HolographicScreenshotCaption29,478,Text,,,,,,,,,,,,,,,,
+HolographicScreenshotCaption30,479,Text,,,,,,,,,,,,,,,,
+SurfaceHubScreenshot11,510,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+SurfaceHubScreenshot12,511,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+SurfaceHubScreenshot13,512,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+SurfaceHubScreenshot14,513,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+SurfaceHubScreenshot15,514,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+SurfaceHubScreenshot16,515,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+SurfaceHubScreenshot17,516,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+SurfaceHubScreenshot18,517,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+SurfaceHubScreenshot19,518,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+SurfaceHubScreenshot20,519,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+SurfaceHubScreenshot21,520,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+SurfaceHubScreenshot22,521,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+SurfaceHubScreenshot23,522,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+SurfaceHubScreenshot24,523,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+SurfaceHubScreenshot25,524,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+SurfaceHubScreenshot26,525,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+SurfaceHubScreenshot27,526,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+SurfaceHubScreenshot28,527,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+SurfaceHubScreenshot29,528,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+SurfaceHubScreenshot30,529,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+SurfaceHubScreenshotCaption11,560,Text,,,,,,,,,,,,,,,,
+SurfaceHubScreenshotCaption12,561,Text,,,,,,,,,,,,,,,,
+SurfaceHubScreenshotCaption13,562,Text,,,,,,,,,,,,,,,,
+SurfaceHubScreenshotCaption14,563,Text,,,,,,,,,,,,,,,,
+SurfaceHubScreenshotCaption15,564,Text,,,,,,,,,,,,,,,,
+SurfaceHubScreenshotCaption16,565,Text,,,,,,,,,,,,,,,,
+SurfaceHubScreenshotCaption17,566,Text,,,,,,,,,,,,,,,,
+SurfaceHubScreenshotCaption18,567,Text,,,,,,,,,,,,,,,,
+SurfaceHubScreenshotCaption19,568,Text,,,,,,,,,,,,,,,,
+SurfaceHubScreenshotCaption20,569,Text,,,,,,,,,,,,,,,,
+SurfaceHubScreenshotCaption21,570,Text,,,,,,,,,,,,,,,,
+SurfaceHubScreenshotCaption22,571,Text,,,,,,,,,,,,,,,,
+SurfaceHubScreenshotCaption23,572,Text,,,,,,,,,,,,,,,,
+SurfaceHubScreenshotCaption24,573,Text,,,,,,,,,,,,,,,,
+SurfaceHubScreenshotCaption25,574,Text,,,,,,,,,,,,,,,,
+SurfaceHubScreenshotCaption26,575,Text,,,,,,,,,,,,,,,,
+SurfaceHubScreenshotCaption27,576,Text,,,,,,,,,,,,,,,,
+SurfaceHubScreenshotCaption28,577,Text,,,,,,,,,,,,,,,,
+SurfaceHubScreenshotCaption29,578,Text,,,,,,,,,,,,,,,,
+SurfaceHubScreenshotCaption30,579,Text,,,,,,,,,,,,,,,,
+StoreLogo720x1080,600,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+StoreLogo1080x1080,601,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+StoreLogo300x300,602,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+OverrideLogosForWin10,603,True/False,,False,,,,,,,,,,,,,,
+StoreLogoOverride150x150,604,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+StoreLogoOverride71x71,605,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+PromoImage1920x1080,606,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+PromoImage2400x1200,607,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+XboxBrandedKeyArt584x800,608,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+XboxTitledHero1920x1080,609,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+XboxFeaturedPromo1080x1080,610,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+OptionalPromo358x358,611,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+OptionalPromo1000x800,612,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+OptionalPromo414x180,613,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+Feature1,700,Text,,Topology-first software IDE,بيئة تطوير برمجيات تعتمد على الطوبولوجيا,拓扑优先软件 IDE,Topology-first software IDE,Topology-first software IDE,IDE logiciel centré sur la topologie,Topology-first software IDE,トポロジー中心のソフトウェア IDE,토폴로지 중심 소프트웨어 IDE,IDE de software orientada à topologia,Topology-first software IDE,Topology-first software IDE,IDE de software centrado en topología,Topoloji öncelikli yazılım IDE’si,Топологічна IDE для програмного забезпечення
+Feature2,701,Text,,Visual software architecture,تصميم مرئي لبنية البرمجيات,可视化软件架构,Visual software architecture,Visual na software architecture,Architecture logicielle visuelle,Visual software architecture,ビジュアルソフトウェアアーキテクチャ,시각적 소프트웨어 아키텍처,Arquitetura de software visual,Visual software architecture,Visual software architecture,Arquitectura de software visual,Görsel yazılım mimarisi,Візуальна архітектура програм
+Feature3,702,Text,,Flow-based programming,برمجة قائمة على تدفق المعلومات,基于数据流的编程,Flow-based programming,Flow-based programming,Programmation par flux,Flow-based programming,フローベースプログラミング,플로 기반 프로그래밍,Programação baseada em fluxo,Flow-based programming,Flow-based programming,Programación basada en flujo,Akış tabanlı programlama,Програмування на основі потоків
+Feature4,703,Text,,Typed data channels,قنوات بيانات ذات أنواع,类型化数据通道,Typed data channels,Typed data channels,Canaux de données typés,Typed data channels,型付きデータチャネル,타입이 있는 데이터 채널,Canais de dados tipados,Typed data channels,Typed data channels,Canales de datos tipados,Tür bilgili veri kanalları,Типізовані канали даних
+Feature5,704,Text,,Compiler-aware code editing,تحرير كود واعٍ بالمترجم,编译器感知代码编辑,Compiler-aware code editing,Compiler-aware code editing,Édition de code adaptée au compilateur,Compiler-aware code editing,コンパイラー対応コード編集,컴파일러 인식 코드 편집,Edição de código orientada ao compilador,Compiler-aware code editing,Compiler-aware code editing,Edición de código con información del compilador,Derleyici uyumlu kod düzenleme,Редагування коду з підтримкою компілятора
+Feature6,705,Text,,Multi-language code generation,توليد كود متعدد اللغات,多语言代码生成,Multi-language code generation,Multi-language code generation,Génération de code multilingue,Multi-language code generation,多言語コード生成,다국어 코드 생성,Geração de código multilíngue,Multi-language code generation,Multi-language code generation,Generación de código multilingüe,Çok dilli kod oluşturma,Багатомовна генерація коду
+Feature7,706,Text,,Reusable archetypes and templates,أنماط وقوالب قابلة لإعادة الاستخدام,可复用原型和模板,Reusable archetypes and templates,Reusable archetypes at templates,Archétypes et modèles réutilisables,Reusable archetypes और templates,再利用可能なアーキタイプとテンプレート,재사용 가능한 아키타입과 템플릿,Arquétipos e modelos reutilizáveis,Reusable archetypes ਅਤੇ templates,Reusable archetypes ۽ templates,Arquetipos y plantillas reutilizables,Yeniden kullanılabilir arketip ve şablonlar,Багаторазові архетипи й шаблони
+Feature8,707,Text,,Project management and revision history,إدارة المشروع وسجل المراجعات,项目管理与修订历史,Project management and revision history,Project management at revision history,Gestion de projet et historique,Project management और revision history,プロジェクト管理と履歴,프로젝트 관리와 수정 기록,Gestão de projetos e histórico,Project management ਅਤੇ revision history,Project management ۽ revision history,Gestión de proyectos e historial,Proje yönetimi ve revizyon geçmişi,Керування проєктами та історія ревізій
+Feature9,708,Text,,P/E/D/U network analysis,تحليل شبكة P/E/D/U,P/E/D/U 网络分析,P/E/D/U network analysis,P/E/D/U network analysis,Analyse réseau P/E/D/U,P/E/D/U network analysis,P/E/D/U ネットワーク分析,P/E/D/U 네트워크 분석,Análise de rede P/E/D/U,P/E/D/U network analysis,P/E/D/U network analysis,Análisis de red P/E/D/U,P/E/D/U ağ analizi,Аналіз мережі P/E/D/U
+Feature10,709,Text,,Local-first project storage,تخزين محلي للمشروعات,本地项目存储,Local-first project storage,Local-first project storage,Stockage local des projets,Local project storage,ローカルプロジェクト保存,로컬 프로젝트 저장,Armazenamento local de projetos,Local project storage,Local project storage,Almacenamiento local de proyectos,Yerel proje depolama,Локальне зберігання проєктів
+Feature11,710,Text,,Go development,,,,,,,,,,,,,,
+Feature12,711,Text,,Kotlin development,,,,,,,,,,,,,,
+Feature13,712,Text,,JavaScript development,,,,,,,,,,,,,,
+Feature14,713,Text,,PHP development,,,,,,,,,,,,,,
+Feature15,714,Text,,project management,,,,,,,,,,,,,,
+Feature16,715,Text,,network analysis,,,,,,,,,,,,,,
+Feature17,716,Text,,software documentation,,,,,,,,,,,,,,
+Feature18,717,Text,,local-first development,,,,,,,,,,,,,,
+Feature19,718,Text,,,,,,,,,,,,,,,,
+Feature20,719,Text,,,,,,,,,,,,,,,,
+MinimumHardwareReq1,800,Text,,,,,,,,,,,,,,,,
+MinimumHardwareReq2,801,Text,,,,,,,,,,,,,,,,
+MinimumHardwareReq3,802,Text,,,,,,,,,,,,,,,,
+MinimumHardwareReq4,803,Text,,,,,,,,,,,,,,,,
+MinimumHardwareReq5,804,Text,,,,,,,,,,,,,,,,
+MinimumHardwareReq6,805,Text,,,,,,,,,,,,,,,,
+MinimumHardwareReq7,806,Text,,,,,,,,,,,,,,,,
+MinimumHardwareReq8,807,Text,,,,,,,,,,,,,,,,
+MinimumHardwareReq9,808,Text,,,,,,,,,,,,,,,,
+MinimumHardwareReq10,809,Text,,,,,,,,,,,,,,,,
+MinimumHardwareReq11,810,Text,,,,,,,,,,,,,,,,
+RecommendedHardwareReq1,850,Text,,,,,,,,,,,,,,,,
+RecommendedHardwareReq2,851,Text,,,,,,,,,,,,,,,,
+RecommendedHardwareReq3,852,Text,,,,,,,,,,,,,,,,
+RecommendedHardwareReq4,853,Text,,,,,,,,,,,,,,,,
+RecommendedHardwareReq5,854,Text,,,,,,,,,,,,,,,,
+RecommendedHardwareReq6,855,Text,,,,,,,,,,,,,,,,
+RecommendedHardwareReq7,856,Text,,,,,,,,,,,,,,,,
+RecommendedHardwareReq8,857,Text,,,,,,,,,,,,,,,,
+RecommendedHardwareReq9,858,Text,,,,,,,,,,,,,,,,
+RecommendedHardwareReq10,859,Text,,,,,,,,,,,,,,,,
+RecommendedHardwareReq11,860,Text,,,,,,,,,,,,,,,,
+SearchTerm1,900,Text,,topology-first IDE,بيئة تطوير طوبولوجية,拓扑优先 IDE,topology-first IDE,topology-first IDE,IDE topologique,topology-first IDE,トポロジー IDE,토폴로지 IDE,IDE de topologia,topology-first IDE,topology-first IDE,IDE topológico,topoloji IDE,топологічна IDE
+SearchTerm2,901,Text,,visual software architecture,بنية برمجيات مرئية,可视化软件架构,visual software architecture,visual software architecture,architecture logicielle visuelle,visual software architecture,ビジュアル設計,시각적 소프트웨어 아키텍처,arquitetura de software visual,visual software architecture,visual software architecture,arquitectura de software visual,görsel yazılım mimarisi,візуальна архітектура ПЗ
+SearchTerm3,902,Text,,flow-based programming,برمجة تدفقية,数据流编程,flow-based programming,flow-based programming,programmation par flux,flow-based programming,フロープログラミング,플로 프로그래밍,programação por fluxo,flow-based programming,flow-based programming,programación por flujo,akış tabanlı programlama,потокове програмування
+SearchTerm4,903,Text,,typed data channels,قنوات بيانات مكتوبة,类型化数据通道,typed data channels,typed data channels,canaux de données typés,typed data channels,型付きデータ,타입 데이터 채널,canais de dados tipados,typed data channels,typed data channels,canales de datos tipados,türlü veri kanalları,типізовані канали
+SearchTerm5,904,Text,,code generation,توليد الكود,代码生成,code generation,code generation,génération de code,code generation,コード生成,코드 생성,geração de código,code generation,code generation,generación de código,kod oluşturma,генерація коду
+SearchTerm6,905,Text,,network analysis,تحليل الشبكات,网络分析,network analysis,network analysis,analyse réseau,network analysis,ネットワーク分析,네트워크 분석,análise de rede,network analysis,network analysis,análisis de redes,ağ analizi,аналіз мережі
+SearchTerm7,906,Text,,project management,إدارة المشاريع,项目管理,project management,project management,gestion de projet,project management,プロジェクト管理,프로젝트 관리,gestão de projetos,project management,project management,gestión de proyectos,proje yönetimi,керування проєктами
+TrailerToPlayAtTopOfListing,999,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+Trailer1,1000,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+Trailer2,1001,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+Trailer3,1002,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+Trailer4,1003,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+Trailer5,1004,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+Trailer6,1005,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+Trailer7,1006,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+Trailer8,1007,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+Trailer9,1008,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+Trailer10,1009,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+Trailer11,1010,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+Trailer12,1011,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+Trailer13,1012,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+Trailer14,1013,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+Trailer15,1014,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+TrailerTitle1,1020,Text,,,,,,,,,,,,,,,,
+TrailerTitle2,1021,Text,,,,,,,,,,,,,,,,
+TrailerTitle3,1022,Text,,,,,,,,,,,,,,,,
+TrailerTitle4,1023,Text,,,,,,,,,,,,,,,,
+TrailerTitle5,1024,Text,,,,,,,,,,,,,,,,
+TrailerTitle6,1025,Text,,,,,,,,,,,,,,,,
+TrailerTitle7,1026,Text,,,,,,,,,,,,,,,,
+TrailerTitle8,1027,Text,,,,,,,,,,,,,,,,
+TrailerTitle9,1028,Text,,,,,,,,,,,,,,,,
+TrailerTitle10,1029,Text,,,,,,,,,,,,,,,,
+TrailerTitle11,1030,Text,,,,,,,,,,,,,,,,
+TrailerTitle12,1031,Text,,,,,,,,,,,,,,,,
+TrailerTitle13,1032,Text,,,,,,,,,,,,,,,,
+TrailerTitle14,1033,Text,,,,,,,,,,,,,,,,
+TrailerTitle15,1034,Text,,,,,,,,,,,,,,,,
+TrailerThumbnail1,1040,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+TrailerThumbnail2,1041,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+TrailerThumbnail3,1042,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+TrailerThumbnail4,1043,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+TrailerThumbnail5,1044,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+TrailerThumbnail6,1045,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+TrailerThumbnail7,1046,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+TrailerThumbnail8,1047,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+TrailerThumbnail9,1048,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+TrailerThumbnail10,1049,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+TrailerThumbnail11,1050,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+TrailerThumbnail12,1051,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+TrailerThumbnail13,1052,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+TrailerThumbnail14,1053,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+TrailerThumbnail15,1054,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+TrailerClosedCaption1,1055,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+TrailerClosedCaption2,1056,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+TrailerClosedCaption3,1057,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+TrailerClosedCaption4,1058,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+TrailerClosedCaption5,1059,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+TrailerClosedCaption6,1060,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+TrailerClosedCaption7,1061,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+TrailerClosedCaption8,1062,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+TrailerClosedCaption9,1063,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+TrailerClosedCaption10,1064,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+TrailerClosedCaption11,1065,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+TrailerClosedCaption12,1066,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+TrailerClosedCaption13,1067,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+TrailerClosedCaption14,1068,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+TrailerClosedCaption15,1069,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+TrailerAudioDescription1,1070,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+TrailerAudioDescription2,1071,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+TrailerAudioDescription3,1072,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+TrailerAudioDescription4,1073,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+TrailerAudioDescription5,1074,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+TrailerAudioDescription6,1075,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+TrailerAudioDescription7,1076,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+TrailerAudioDescription8,1077,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+TrailerAudioDescription9,1078,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+TrailerAudioDescription10,1079,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+TrailerAudioDescription11,1080,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+TrailerAudioDescription12,1081,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+TrailerAudioDescription13,1082,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+TrailerAudioDescription14,1083,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+TrailerAudioDescription15,1084,Relative path (or URL to file in Partner Center),,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,

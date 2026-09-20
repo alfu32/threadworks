@@ -84,9 +84,17 @@ parts:
       export PATH="$JAVA_HOME/bin:$PATH"
 
       APP_JAR="${THREADWORK_SNAP_JAR:-}"
+      REQUESTED_VERSION="${THREADWORK_SNAP_VERSION:-${V:-}}"
+      REQUESTED_VERSION="${REQUESTED_VERSION#v}"
       if [ -n "$APP_JAR" ]; then
         if [ ! -f "$APP_JAR" ]; then
           echo "THREADWORK_SNAP_JAR does not point to a file: $APP_JAR" >&2
+          exit 1
+        fi
+      elif [ -n "$REQUESTED_VERSION" ]; then
+        APP_JAR="dist/threadwork-$REQUESTED_VERSION.jar"
+        if [ ! -f "$APP_JAR" ]; then
+          echo "No fat JAR found for requested Snap version $REQUESTED_VERSION: $APP_JAR" >&2
           exit 1
         fi
       else
@@ -101,8 +109,7 @@ parts:
       fi
 
       JAR_VERSION="$(basename "$APP_JAR" .jar | sed 's/^threadwork-//')"
-      SNAP_VERSION="${THREADWORK_SNAP_VERSION:-${V:-$JAR_VERSION}}"
-      SNAP_VERSION="${SNAP_VERSION#v}"
+      SNAP_VERSION="${REQUESTED_VERSION:-$JAR_VERSION}"
       INSTALL_ROOT="$CRAFT_PART_INSTALL/opt/threadwork"
 
       install -d "$INSTALL_ROOT" "$CRAFT_PART_INSTALL/bin" "$CRAFT_PART_INSTALL/snap/gui"
