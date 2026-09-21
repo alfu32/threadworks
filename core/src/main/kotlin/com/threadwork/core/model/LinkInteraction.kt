@@ -13,6 +13,7 @@ object LinkInteractionKinds {
     const val Library = "lib"
     const val Source = "src"
     const val Runnable = "run"
+    const val TypeUsage = "type-usage"
 
     val catalog: List<LinkInteractionKindDescriptor> = listOf(
         LinkInteractionKindDescriptor(Auto, "Automatic (legacy)", capability = false),
@@ -20,6 +21,7 @@ object LinkInteractionKinds {
         LinkInteractionKindDescriptor(Library, "Library capability (lib)", capability = true),
         LinkInteractionKindDescriptor(Source, "Source capability (src)", capability = true),
         LinkInteractionKindDescriptor(Runnable, "Runnable capability (run)", capability = true),
+        LinkInteractionKindDescriptor(TypeUsage, "Type usage", capability = true),
     )
 
     private val byId = catalog.associateBy(LinkInteractionKindDescriptor::id)

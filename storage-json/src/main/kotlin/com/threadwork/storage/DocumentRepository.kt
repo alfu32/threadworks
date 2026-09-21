@@ -498,7 +498,6 @@ class InMemoryDocumentRepository(
     private fun requireValidEndpoint(id: NodeId, role: String): Node =
         requireNode(id).also { endpoint ->
             require(!endpoint.isLink) { "Link $role '$id' cannot be another link" }
-            require(!endpoint.isType) { "Link $role '$id' cannot be a type declaration" }
         }
 
     private fun synchronizeAllLinks() {
@@ -513,7 +512,7 @@ class InMemoryDocumentRepository(
         val link = linkNode.link ?: return
         val source = document.nodes[link.sourceNodeId] ?: return
         val target = document.nodes[link.targetNodeId] ?: return
-        if (source.isLink || target.isLink || source.isType || target.isType) return
+        if (source.isLink || target.isLink) return
 
         val expectedParentId = document.closestCommonAncestorId(source.id, target.id) ?: document.rootNodeId
         if (linkNode.parentId != expectedParentId) {

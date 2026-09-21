@@ -12,6 +12,7 @@ import com.threadwork.core.model.ProjectStatus
 import com.threadwork.core.model.Revision
 import com.threadwork.core.model.TypeDefinition
 import com.threadwork.core.model.TypeFieldDefinition
+import com.threadwork.core.model.linksUsingType
 import com.threadwork.core.validation.DocumentValidator
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -144,6 +145,26 @@ class InMemoryDocumentRepositoryTest {
             DocumentValidator.validate(repository.getDocument(), BuiltInTypeIds.all)
                 .any { it.message.contains("unknown type") },
         )
+    }
+
+    @Test
+    fun `type usage link may connect a type to a processing node without ports on the type`() {
+        val repository = InMemoryDocumentRepository(newDocument("type usage"))
+        val root = repository.getDocument().rootNodeId
+        val type = repository.createNode(root, "WorkOrder", NodeKind.Type)
+        val worker = repository.createNode(root, "worker", NodeKind.Processor)
+        repository.addPort(worker.id, NodePort("in", "in", PortDirection.Input))
+
+        val link = repository.createLink(root, "WorkOrder usage", type.id, "type", worker.id, "in")
+        repository.updateLinkData(
+            link.id,
+            requireNotNull(link.link).copy(interactionKind = com.threadwork.core.model.LinkInteractionKinds.TypeUsage),
+        )
+
+        assertTrue(DocumentValidator.validate(repository.getDocument()).isEmpty())
+        assertEquals(listOf(link.id), repository.getDocument().linksUsingType(type.id).map { it.id })
+        assertTrue(type.outgoingLinks.contains(link.id))
+        assertTrue(worker.incomingLinks.contains(link.id))
     }
 
     @Test

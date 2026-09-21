@@ -104,6 +104,7 @@ internal fun DesignerPalette.strokeForNode(document: ThreadworkDocument, node: N
 }
 
 fun DesignerPalette.colorForLink(stereotype: LinkStereotype): Color = when (stereotype) {
+    LinkStereotype.TypeUsage -> this[DesignerColorKey.TypeStroke]
     LinkStereotype.UsageImport -> this[DesignerColorKey.LinkLibrary]
     LinkStereotype.ErrorPipe -> this[DesignerColorKey.LinkError]
     LinkStereotype.DependencyInjection -> this[DesignerColorKey.LinkDependency]

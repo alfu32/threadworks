@@ -34,6 +34,7 @@ enum class LinkStereotype {
     ErrorPipe,
     UsageImport,
     DependencyInjection,
+    TypeUsage,
     SourceCapability,
     RunnableCapability,
 }
@@ -96,6 +97,7 @@ object NodeClassifier {
     private val capabilityLinks = setOf(
         LinkStereotype.UsageImport,
         LinkStereotype.DependencyInjection,
+        LinkStereotype.TypeUsage,
         LinkStereotype.SourceCapability,
         LinkStereotype.RunnableCapability,
     )
@@ -113,6 +115,7 @@ object LinkClassifier {
         val interactionKind = LinkInteractionKinds.canonicalId(link.interactionKind)
 
         return when {
+            interactionKind == LinkInteractionKinds.TypeUsage && source?.isType == true -> LinkStereotype.TypeUsage
             interactionKind == LinkInteractionKinds.Library -> LinkStereotype.DependencyInjection
             interactionKind == LinkInteractionKinds.Source -> LinkStereotype.SourceCapability
             interactionKind == LinkInteractionKinds.Runnable -> LinkStereotype.RunnableCapability
@@ -143,6 +146,12 @@ object LinkClassifier {
     fun isCapability(document: ThreadworkDocument, linkNode: Node): Boolean =
         classify(document, linkNode) in capabilityStereotypes
 
+    fun isRuntimeCapability(document: ThreadworkDocument, linkNode: Node): Boolean =
+        isCapability(document, linkNode) && classify(document, linkNode) != LinkStereotype.TypeUsage
+
+    fun isDataFlow(document: ThreadworkDocument, linkNode: Node): Boolean =
+        !isCapability(document, linkNode)
+
     private fun classifyDataLink(
         linkNode: Node,
         targetStereotype: NodeStereotype?,
@@ -170,6 +179,7 @@ object LinkClassifier {
     private val capabilityStereotypes = setOf(
         LinkStereotype.UsageImport,
         LinkStereotype.DependencyInjection,
+        LinkStereotype.TypeUsage,
         LinkStereotype.SourceCapability,
         LinkStereotype.RunnableCapability,
     )

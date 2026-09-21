@@ -165,6 +165,21 @@ fun defaultCodeIntelligence(
 
     node.incomingLinks.mapNotNull(document::getElementById).forEach { linkNode ->
         when (LinkClassifier.classify(document, linkNode)) {
+            LinkStereotype.TypeUsage -> {
+                val source = linkNode.link?.sourceNodeId?.let(document::getElementById)
+                if (source?.isType == true) {
+                    val info = defaultTypeInformation(document, source, source.name, emptyList()) ?: return@forEach
+                    typeInfos.putIfAbsent(source.name, info)
+                    symbols += CompilerCodeSymbol(
+                        name = source.name,
+                        kind = CompilerCodeSymbolKind.Type,
+                        typeName = source.name,
+                        detail = "type used by ${node.name}",
+                        documentation = info.declaration,
+                        originNodeId = source.id,
+                    )
+                }
+            }
             LinkStereotype.UsageImport,
             LinkStereotype.DependencyInjection -> {
                 val source = linkNode.link?.sourceNodeId?.let(document::getElementById)
@@ -212,7 +227,7 @@ fun defaultCodeIntelligence(
         }
     }
     node.outgoingLinks.mapNotNull(document::getElementById).forEach { linkNode ->
-        if (!LinkClassifier.isCapability(document, linkNode)) {
+        if (LinkClassifier.isDataFlow(document, linkNode)) {
             addDataLink(linkNode, input = false)
         }
     }

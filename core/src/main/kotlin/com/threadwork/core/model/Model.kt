@@ -402,7 +402,9 @@ fun ThreadworkDocument.linkTypeDisplayName(linkNode: Node): String {
 
 fun ThreadworkDocument.linksUsingType(typeNodeId: NodeId): List<Node> =
     linkNodes().filter { node ->
-        node.link?.effectiveTypeExpression(this)?.containsType(typeNodeId.value) == true
+        val link = node.link ?: return@filter false
+        link.effectiveTypeExpression(this)?.containsType(typeNodeId.value) == true ||
+            (link.interactionKind == LinkInteractionKinds.TypeUsage && link.sourceNodeId == typeNodeId)
     }
 
 fun TypeExpression.containsType(typeId: String): Boolean =

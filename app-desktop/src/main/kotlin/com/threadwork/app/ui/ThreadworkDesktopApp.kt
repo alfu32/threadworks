@@ -3767,7 +3767,7 @@ class GraphCanvas(
         if (mode != CanvasMode.CreateLink) return
         val source = linkSource?.let(repository::getNode) ?: return
         val cursor = linkPreviewPoint ?: return
-        if (source.isLink || source.isType || !isVisibleInCanvas(source)) return
+        if (source.isLink || !isVisibleInCanvas(source)) return
         val anchor = previewSourceAnchor(source, cursor)
         val points = previewLinkPoints(source, anchor, cursor)
         if (points.size < 2) return
@@ -6521,12 +6521,17 @@ class GraphCanvas(
             }
             CanvasMode.CreateLink -> {
                 val clickedType = hit?.let(repository::getNode)?.takeIf(Node::isType)
-                if (linkSource?.let(repository::getNode)?.isType == true && hitLink != null) {
+                if (linkSource?.let(repository::getNode)?.isType == true && hitLink != null && hit == null) {
                     assignTypeToLink(linkSource!!, hitLink)
                     linkSource = null
                     onSelectionChanged()
                 } else if (linkSource?.let(repository::getNode)?.isType == true) {
-                    // A Type gesture only assigns an existing link; it never creates a data-flow edge.
+                    val target = hit?.let(repository::getNode)?.takeUnless(Node::isLink)
+                    if (target == null) return
+                    createTypeUsageLink(linkSource!!, target.id)
+                    linkSource = null
+                    linkPreviewPoint = null
+                    onSelectionChanged()
                 } else if (clickedType != null) {
                     linkSource = clickedType.id
                     linkPreviewPoint = null
@@ -6627,7 +6632,7 @@ class GraphCanvas(
     private fun updateLinkPreview(point: Point) {
         linkPreviewPoint = linkSource
             ?.let(repository::getNode)
-            ?.takeUnless { it.isLink || it.isType }
+            ?.takeUnless(Node::isLink)
             ?.let { point }
     }
 
@@ -6736,6 +6741,30 @@ class GraphCanvas(
         selection += link.id
         routeCache.remove(link.id)
         invalidateRoutesFor(listOf(sourceId, targetId))
+        repository.markDirty()
+    }
+
+    private fun createTypeUsageLink(typeId: NodeId, targetId: NodeId) {
+        val type = repository.requireNode(typeId)
+        val target = repository.requireNode(targetId)
+        if (!type.isType || target.isLink) return
+        if (!target.isType) ensureDefaultPort(target.id, PortDirection.Input, "in")
+        val link = repository.createLink(
+            null,
+            "${type.name} used by ${target.name}",
+            type.id,
+            "type",
+            target.id,
+            if (target.isType) "type" else "in",
+        )
+        repository.updateLinkData(
+            link.id,
+            requireNotNull(link.link).copy(interactionKind = LinkInteractionKinds.TypeUsage),
+        )
+        selection.clear()
+        selection += link.id
+        routeCache.remove(link.id)
+        invalidateRoutesFor(listOf(type.id, target.id))
         repository.markDirty()
     }
 
@@ -6975,6 +7004,7 @@ class GraphCanvas(
 
     private fun linkDashPattern(stereotype: LinkStereotype, backflow: Boolean): String? = when {
         backflow -> "10 6"
+        stereotype == LinkStereotype.TypeUsage -> "3 5"
         stereotype == LinkStereotype.DependencyInjection -> "8 6"
         stereotype == LinkStereotype.SourceCapability -> "14 4 3 4"
         stereotype == LinkStereotype.RunnableCapability -> "4 4"
@@ -6983,6 +7013,7 @@ class GraphCanvas(
 
     private fun linkDashArray(stereotype: LinkStereotype, backflow: Boolean): FloatArray? = when {
         backflow -> floatArrayOf(10f, 6f)
+        stereotype == LinkStereotype.TypeUsage -> floatArrayOf(3f, 5f)
         stereotype == LinkStereotype.DependencyInjection -> floatArrayOf(8f, 6f)
         stereotype == LinkStereotype.SourceCapability -> floatArrayOf(14f, 4f, 3f, 4f)
         stereotype == LinkStereotype.RunnableCapability -> floatArrayOf(4f, 4f)
@@ -6992,6 +7023,7 @@ class GraphCanvas(
     private fun linkStroke(stereotype: LinkStereotype, selected: Boolean, backflow: Boolean): Stroke {
         val width = when {
             selected -> 3f
+            stereotype == LinkStereotype.TypeUsage -> 1.8f
             stereotype == LinkStereotype.UsageImport -> 1.8f
             stereotype == LinkStereotype.ErrorPipe -> 2f
             stereotype == LinkStereotype.DependencyInjection -> 1.6f

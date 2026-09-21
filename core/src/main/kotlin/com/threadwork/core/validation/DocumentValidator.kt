@@ -14,6 +14,8 @@ import com.threadwork.core.model.compositeBoundaryIdsBetween
 import com.threadwork.core.model.TypeExpression
 import com.threadwork.core.model.TypeQualifiers
 import com.threadwork.core.model.effectiveTypeExpression
+import com.threadwork.core.classification.LinkClassifier
+import com.threadwork.core.classification.LinkStereotype
 
 object DocumentValidator {
     /**
@@ -94,10 +96,12 @@ object DocumentValidator {
         if (target == null) diagnostics += error("Link target '${link.targetNodeId}' does not exist", node.id)
         if (source?.isLink == true) diagnostics += error("Link source '${link.sourceNodeId}' cannot be another link", node.id)
         if (target?.isLink == true) diagnostics += error("Link target '${link.targetNodeId}' cannot be another link", node.id)
-        if (source?.isType == true) diagnostics += error("Link source '${link.sourceNodeId}' cannot be a type declaration", node.id)
-        if (target?.isType == true) diagnostics += error("Link target '${link.targetNodeId}' cannot be a type declaration", node.id)
+        val isTypeUsage = source?.isType == true &&
+            LinkClassifier.classify(document, node) == LinkStereotype.TypeUsage
+        if (source?.isType == true && !isTypeUsage) diagnostics += error("Link source '${link.sourceNodeId}' cannot be a type declaration", node.id)
+        if (target?.isType == true && !isTypeUsage) diagnostics += error("Link target '${link.targetNodeId}' cannot be a type declaration", node.id)
 
-        if (source != null && target != null && !source.isLink && !target.isLink && !source.isType && !target.isType) {
+        if (source != null && target != null && !source.isLink && !target.isLink && (!source.isType || isTypeUsage) && (!target.isType || isTypeUsage)) {
             val expectedParentId = document.closestCommonAncestorId(source.id, target.id) ?: document.rootNodeId
             if (node.parentId != expectedParentId) {
                 diagnostics += error("Link '${node.id}' must belong to closest common parent '$expectedParentId'", node.id)
@@ -123,10 +127,14 @@ object DocumentValidator {
             )
         }
 
-        source?.ports?.find { it.name == link.sourcePortName && it.direction == PortDirection.Output }
-            ?: diagnostics.add(error("Source output port '${link.sourcePortName}' does not exist", node.id))
-        target?.ports?.find { it.name == link.targetPortName && it.direction == PortDirection.Input }
-            ?: diagnostics.add(error("Target input port '${link.targetPortName}' does not exist", node.id))
+        if (source?.isType != true) {
+            source?.ports?.find { it.name == link.sourcePortName && it.direction == PortDirection.Output }
+                ?: diagnostics.add(error("Source output port '${link.sourcePortName}' does not exist", node.id))
+        }
+        if (target?.isType != true) {
+            target?.ports?.find { it.name == link.targetPortName && it.direction == PortDirection.Input }
+                ?: diagnostics.add(error("Target input port '${link.targetPortName}' does not exist", node.id))
+        }
     }
 
     private fun validatePorts(node: Node, diagnostics: MutableList<Diagnostic>) {

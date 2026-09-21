@@ -346,11 +346,11 @@ abstract class TemplateSetCompiler : StructuredCompiler() {
         }
         val languageId = document.effectiveLanguageId(node.id).lowercase()
         val dataInputs = node.incomingLinks.mapNotNull(document::getElementById)
-            .filterNot { LinkClassifier.isCapability(document, it) }
+            .filter { LinkClassifier.isDataFlow(document, it) }
         val dataOutputs = node.outgoingLinks.mapNotNull(document::getElementById)
-            .filterNot { LinkClassifier.isCapability(document, it) }
+            .filter { LinkClassifier.isDataFlow(document, it) }
         val capabilities = node.incomingLinks.mapNotNull(document::getElementById)
-            .filter { LinkClassifier.isCapability(document, it) }
+            .filter { LinkClassifier.isRuntimeCapability(document, it) }
         val symbol = indexedNodeSymbol(document, node)
         return when (languageId) {
             "kotlin" -> {
@@ -1203,6 +1203,7 @@ private fun linkProvenanceComment(document: ThreadworkDocument, node: Node): Str
     val type = when (LinkClassifier.classify(document, node)) {
         LinkStereotype.UsageImport,
         LinkStereotype.DependencyInjection -> "dependency"
+        LinkStereotype.TypeUsage -> "type usage"
         LinkStereotype.SourceCapability -> "source capability"
         LinkStereotype.RunnableCapability -> "run capability"
         LinkStereotype.Transport,
@@ -1380,6 +1381,7 @@ internal fun stereotypeForTemplateContext(document: ThreadworkDocument, node: No
             LinkStereotype.ErrorPipe -> NodeStereotype.ErrorPipe
             LinkStereotype.UsageImport,
             LinkStereotype.DependencyInjection -> NodeStereotype.DependencyInjection
+            LinkStereotype.TypeUsage -> NodeStereotype.Type
             LinkStereotype.SourceCapability,
             LinkStereotype.RunnableCapability -> NodeStereotype.DependencyInjection
         }

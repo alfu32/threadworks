@@ -166,7 +166,8 @@ data class GraphSnapshot(
                     when (LinkClassifier.classify(document, linkNode)) {
                         LinkStereotype.ErrorPipe -> errorEdges += edge
                         LinkStereotype.UsageImport,
-                        LinkStereotype.DependencyInjection -> dependencyEdges += edge.copy(
+                        LinkStereotype.DependencyInjection,
+                        LinkStereotype.TypeUsage -> dependencyEdges += edge.copy(
                             source = link.targetNodeId,
                             target = link.sourceNodeId,
                         )

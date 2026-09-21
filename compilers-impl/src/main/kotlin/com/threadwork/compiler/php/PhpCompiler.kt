@@ -124,7 +124,7 @@ class PhpCompiler : TemplateSetCompiler() {
         val arguments = mutableListOf("array &\$context")
         val dataArguments = node.incomingLinks.mapNotNull(document.nodes::get) +
             node.outgoingLinks.mapNotNull(document.nodes::get)
-                .filterNot { LinkClassifier.isCapability(document, it) }
+                .filter { LinkClassifier.isDataFlow(document, it) }
         dataArguments.distinctBy { it.id }.forEach { linkNode ->
             val argument = "\$${compilerArgumentName(linkNode.name)}"
             when (LinkClassifier.classify(document, linkNode)) {

@@ -8,6 +8,8 @@ import com.threadwork.core.model.LinkInteractionKinds
 import com.threadwork.core.model.ThreadworkDocument
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 class NodeClassifierTest {
     @Test
@@ -240,5 +242,35 @@ class NodeClassifierTest {
         )
 
         assertEquals(LinkStereotype.Transport, LinkClassifier.classify(document, link))
+    }
+
+    @Test
+    fun `type usage is a capability classification without being runtime capability`() {
+        val root = Node(NodeId("root"), "root", NodeKind.Group)
+        val type = Node(NodeId("type"), "WorkOrder", NodeKind.Type)
+        val consumer = Node(NodeId("consumer"), "worker", NodeKind.Processor)
+        val link = Node(
+            id = NodeId("usage"),
+            name = "WorkOrder usage",
+            kind = NodeKind.Link,
+            link = LinkData(
+                type.id,
+                "type",
+                consumer.id,
+                "in",
+                interactionKind = LinkInteractionKinds.TypeUsage,
+            ),
+        )
+        val document = ThreadworkDocument(
+            id = "doc",
+            name = "doc",
+            rootNodeId = root.id,
+            nodes = mutableMapOf(root.id to root, type.id to type, consumer.id to consumer, link.id to link),
+        )
+
+        assertEquals(LinkStereotype.TypeUsage, LinkClassifier.classify(document, link))
+        assertTrue(LinkClassifier.isCapability(document, link))
+        assertFalse(LinkClassifier.isRuntimeCapability(document, link))
+        assertFalse(LinkClassifier.isDataFlow(document, link))
     }
 }
