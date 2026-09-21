@@ -855,15 +855,26 @@ class GridCodeEditorAdapter : JPanel(), CodeEditorAdapter {
             if (visualRow.startColumn != 0) continue
             val label = (visualRow.lineIndex + 1).toString().padStart((lines.size + 1).toString().length)
             val labelX = charWidth * 2
+            val baseline = row * lineHeight + metrics.ascent
             g2.color = palette.mutedText
-            g2.drawString(label, labelX, row * lineHeight + metrics.ascent)
+            g2.drawString(label, labelX, baseline)
             foldRangeStartingAt(visualRow.lineIndex)?.let { fold ->
+                val collapsed = collapsedFoldStarts.contains(fold.startLine)
+                val markerX = foldMarkerX(label, metrics, charWidth)
                 g2.color = palette.foldMarker
                 g2.drawString(
-                    if (collapsedFoldStarts.contains(fold.startLine)) "+" else "-",
-                    labelX + metrics.stringWidth(label) + max(2, charWidth / 3),
-                    row * lineHeight + metrics.ascent,
+                    if (collapsed) "+" else "-",
+                    markerX,
+                    baseline,
                 )
+                if (collapsed) {
+                    g2.drawLine(
+                        labelX,
+                        baseline + 2,
+                        labelX + metrics.stringWidth(label),
+                        baseline + 2,
+                    )
+                }
             }
             diagnostics.firstOrNull { it.line == visualRow.lineIndex + 1 }?.let { diagnostic ->
                 g2.color = when (diagnostic.severity) {
@@ -1240,7 +1251,10 @@ class GridCodeEditorAdapter : JPanel(), CodeEditorAdapter {
         (height - pinnedHeaderHeight(getFontMetrics(editorFont))).coerceAtLeast(1)
 
     private fun gutterWidth(metrics: FontMetrics, charWidth: Int): Int =
-        (lines.size + 1).toString().length * charWidth + charWidth * 3
+        (lines.size + 1).toString().length * charWidth + charWidth * 4
+
+    private fun foldMarkerX(label: String, metrics: FontMetrics, charWidth: Int): Int =
+        charWidth * 2 + metrics.stringWidth(label) + max(2, charWidth / 3)
 
     private fun visualRows(metrics: FontMetrics, charWidth: Int, gutterWidth: Int): List<VisualRow> {
         val wrapColumns = max(1, (width - gutterWidth - charWidth) / charWidth)
@@ -1390,7 +1404,16 @@ class GridCodeEditorAdapter : JPanel(), CodeEditorAdapter {
         val rowIndex = (scrollVisualRow + bodyY / lineHeight).coerceIn(0, rows.lastIndex)
         val row = rows.getOrNull(rowIndex) ?: return false
         val fold = foldRangeStartingAt(row.lineIndex) ?: return false
-        val gutterMarker = point.x in 0..charWidth && bodyY / lineHeight == rowIndex - scrollVisualRow
+        val label = (row.lineIndex + 1).toString().padStart((lines.size + 1).toString().length)
+        val markerX = foldMarkerX(label, metrics, charWidth)
+        val markerWidth = max(metrics.stringWidth("+"), metrics.stringWidth("-"))
+        val markerRowY = (rowIndex - scrollVisualRow) * lineHeight
+        val gutterMarker = Rectangle(
+            markerX - 3,
+            markerRowY,
+            markerWidth + 8,
+            lineHeight,
+        ).contains(point.x, bodyY)
         val summaryMarker = if (row.foldedEndLine > row.lineIndex) {
             val summary = foldedSummary(row, charWidth, gutter)
             val markerX = gutter + metrics.stringWidth(summary.prefix)

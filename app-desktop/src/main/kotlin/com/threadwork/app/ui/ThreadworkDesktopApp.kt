@@ -302,7 +302,7 @@ class ThreadworkDesktopApp(
     private val canvas = GraphCanvas(
         repository,
         selection,
-        { onSelectionChanged() },
+        { requestSelectionRefresh() },
         ::refreshAll,
         ::onCanvasModeChanged,
         ::updateTileProgress,
@@ -435,6 +435,14 @@ class ThreadworkDesktopApp(
     private var analysisReportDirty = true
     private var applyingHistory = false
     private var currentFile: Path? = null
+    private var pendingSelectionSection: NodeTextSection? = null
+    private val selectionRefreshTimer = Timer(50) {
+        val section = pendingSelectionSection
+        pendingSelectionSection = null
+        applySelectionChanged(section)
+    }.apply {
+        isRepeats = false
+    }
     private val applicationIdentityLabel = JLabel(
         "Threadwork-${Version.CURRENT.semver}",
         ThreadworkIcons.titleBarIcon(),
@@ -2393,11 +2401,22 @@ class ThreadworkDesktopApp(
         status.text = operation.statusText
     }
 
+    private fun requestSelectionRefresh(activeSection: NodeTextSection? = null) {
+        pendingSelectionSection = activeSection ?: pendingSelectionSection
+        selectionRefreshTimer.restart()
+    }
+
     private fun onSelectionChanged(activeSection: NodeTextSection? = null) {
+        selectionRefreshTimer.stop()
+        pendingSelectionSection = null
+        applySelectionChanged(activeSection)
+    }
+
+    private fun applySelectionChanged(activeSection: NodeTextSection? = null) {
         inspector.bind(selection.firstOrNull())
         editorTabs.bind(selection.toList(), activeSection)
         refreshSelectedEntitiesTree()
-        canvas.invalidateRenderCache()
+        if (canvas.selectionAffectsStaticScene()) canvas.invalidateRenderCache()
         canvas.repaint()
         selection.singleOrNull()?.let { nodeId ->
             val languageId = repository.getDocument().effectiveTextLanguageId(nodeId, NodeTextSection.Declaration)
@@ -2876,6 +2895,7 @@ class GraphCanvas(
     private var zoom = 1.0
     private var panX = 0.0
     private var panY = 0.0
+    private var renderSelectionState = true
     private var showSheet = false
     private var sheetFormatChoice = AUTO_SHEET_FORMAT
     private var sheetScale = 1
@@ -3171,6 +3191,8 @@ class GraphCanvas(
         tileCache.clear()
         onTileProgress(0, 0, false)
     }
+
+    fun selectionAffectsStaticScene(): Boolean = showSheet
 
     fun setPalette(palette: DesignerPalette) {
         activePalette = palette
@@ -3742,7 +3764,13 @@ class GraphCanvas(
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
         g2.font = designerFont
         drawCachedStaticScene(g2)
-        drawScreenOverlay(g2)
+        // Keep transient interaction graphics out of the cached model scene.
+        val overlay = g2.create() as Graphics2D
+        try {
+            drawScreenOverlay(overlay)
+        } finally {
+            overlay.dispose()
+        }
     }
 
     private fun drawScreenOverlay(g2: Graphics2D) {
@@ -3763,10 +3791,46 @@ class GraphCanvas(
         }
         drawLinkPreview(g2)
         drawArchetypePreview(g2)
+        drawSelectionHighlights(g2)
         drawSelectionBounds(g2)
         drawViewportHierarchyPath(g2)
         g2.stroke = previousStroke
         g2.font = previousFont
+    }
+
+    private fun drawSelectionHighlights(g2: Graphics2D) {
+        if (selection.isEmpty()) return
+        val selectionColor = activePalette[DesignerColorKey.Selection]
+        val previousColor = g2.color
+        val previousStroke = g2.stroke
+        try {
+            g2.color = selectionColor
+            selection.mapNotNull(repository::getNode).forEach { node ->
+                if (node.isLink) {
+                    if (isDependencyAnnotation(node)) {
+                        dependencyAnnotationBounds(node).forEach { bounds ->
+                            g2.stroke = BasicStroke(2f)
+                            g2.draw(modelRectToScreen(bounds).apply { grow(2, 2) })
+                        }
+                    } else {
+                        val points = (cachedRoute(node.id) ?: routeLink(node))
+                            ?.let(::renderedRoutePoints)
+                            .orEmpty()
+                            .map(::modelPointToScreen)
+                        if (points.size >= 2) {
+                            g2.stroke = BasicStroke(max(1.0, 3.0 * zoom).toFloat())
+                            points.zipWithNext().forEach { (from, to) -> g2.drawLine(from.x, from.y, to.x, to.y) }
+                        }
+                    }
+                } else if (isVisibleInCanvas(node)) {
+                    g2.stroke = BasicStroke(max(1.0, 3.0 * zoom).toFloat())
+                    g2.draw(modelRectToScreen(node.layout.rect()))
+                }
+            }
+        } finally {
+            g2.color = previousColor
+            g2.stroke = previousStroke
+        }
     }
 
     private fun drawLinkPreview(g2: Graphics2D) {
@@ -3964,6 +4028,12 @@ class GraphCanvas(
         )
     }
 
+    private fun modelPointToScreen(point: Point): Point =
+        Point(
+            ((point.x + panX) * zoom).roundToInt(),
+            ((point.y + panY) * zoom).roundToInt(),
+        )
+
     private fun drawViewportHierarchyPath(g2: Graphics2D) {
         val viewport = viewportModelRect(padding = 0)
         val fillingNode = visibleNodes()
@@ -4062,7 +4132,13 @@ class GraphCanvas(
         g2.fillRect(0, 0, image.width, image.height)
         g2.scale(bucketZoom, bucketZoom)
         g2.translate(-tileLeft, -tileTop)
-        drawStaticScene(g2, tileViewport)
+        val previousSelectionState = renderSelectionState
+        renderSelectionState = false
+        try {
+            drawStaticScene(g2, tileViewport)
+        } finally {
+            renderSelectionState = previousSelectionState
+        }
         g2.dispose()
         return image
     }
@@ -4125,7 +4201,7 @@ class GraphCanvas(
         val links = allLinks
             .filter { viewport == null || linkMayIntersectViewport(it, viewport) }
         orderedVisibleNodes(scopeIds)
-            .filter { viewport == null || it.id in selection || it.layout.rect().intersects(viewport) }
+            .filter { viewport == null || (renderSelectionState && it.id in selection) || it.layout.rect().intersects(viewport) }
             .forEach { drawNode(g2, it) }
         links.filterNot(::isDependencyAnnotation).forEach { drawLink(g2, it) }
         // Annotation row indices must be derived from the complete link set. Tile-local
@@ -5418,7 +5494,7 @@ class GraphCanvas(
 
     private fun drawNode(g2: Graphics2D, node: Node) {
         val r = node.layout.rect()
-        val selected = node.id in selection
+        val selected = renderSelectionState && node.id in selection
         val stereotype = nodeStereotype(node)
         val previousStroke = g2.stroke
         val previousFont = g2.font
@@ -5543,7 +5619,7 @@ class GraphCanvas(
     private fun drawCompositeToggle(g2: Graphics2D, node: Node) {
         val label = if (node.layout.isExpanded) "-" else "+"
         val rect = compositeToggleRect(node,label) ?: return
-        val selected = node.id in selection
+        val selected = renderSelectionState && node.id in selection
         val stroke = if (selected) activePalette[DesignerColorKey.Selection] else activePalette[DesignerColorKey.TextMuted]
         val previousColor = g2.color
         val previousStroke = g2.stroke
@@ -5577,7 +5653,7 @@ class GraphCanvas(
         if (renderedPoints.size < 2) return
         val previousStroke = g2.stroke
         val previousFont = g2.font
-        val selected = node.id in selection
+        val selected = renderSelectionState && node.id in selection
         val stereotype = LinkClassifier.classify(repository.getDocument(), node)
         val color = linkColor(stereotype, selected)
         g2.color = color
@@ -5925,7 +6001,7 @@ class GraphCanvas(
         links.forEachIndexed { index, linkNode ->
             val link = linkNode.link ?: return@forEachIndexed
             repository.getNode(link.targetNodeId) ?: return@forEachIndexed
-            val selected = linkNode.id in selection
+            val selected = renderSelectionState && linkNode.id in selection
             val label = dependencyInjectionLabel(linkNode, library)
             val labelWidth = max(
                 DEPENDENCY_SOURCE_MIN_WIDTH,
@@ -5966,7 +6042,7 @@ class GraphCanvas(
         val rowHeight = 24
         val startY = r.y - rows.size * rowHeight - 16
         val stemBottom = r.y
-        val selected = rows.any { it.first.id in selection }
+        val selected = renderSelectionState && rows.any { it.first.id in selection }
         val stemColor = if (selected) activePalette[DesignerColorKey.Selection] else annotationColor(rows.first().first, false)
         g2.color = stemColor
         g2.stroke = BasicStroke(if (selected) 2.2f else 1.5f)
@@ -5978,11 +6054,11 @@ class GraphCanvas(
                 ((g2.fontMetrics.stringWidth(label) + DEPENDENCY_LABEL_HORIZONTAL_PADDING) *
                     DEPENDENCY_TARGET_RULE_RATIO).roundToInt(),
             )
-            val color = annotationColor(linkNode, linkNode.id in selection)
+            val color = annotationColor(linkNode, renderSelectionState && linkNode.id in selection)
             g2.color = color
             g2.fillOval(x - 5, y - 5, 10, 10)
             g2.drawLine(x, y, x + width, y)
-            if (linkNode.id in selection) {
+            if (renderSelectionState && linkNode.id in selection) {
                 g2.stroke = BasicStroke(2.4f)
                 g2.drawLine(x, y + 2, x + width, y + 2)
                 g2.stroke = BasicStroke(1.5f)
@@ -6012,7 +6088,7 @@ class GraphCanvas(
                     (dependencyRowOffset + index) * DEPENDENCY_ANNOTATION_ROW_HEIGHT
                 val x = r.x + r.width + 34
                 val anchorY = y + 12
-                val selected = link.id in selection
+                val selected = renderSelectionState && link.id in selection
                 val color = if (selected) activePalette[DesignerColorKey.Selection] else activePalette[DesignerColorKey.TypeStroke]
                 g2.color = color
                 g2.stroke = BasicStroke(if (selected) 2.4f else 1.5f)
