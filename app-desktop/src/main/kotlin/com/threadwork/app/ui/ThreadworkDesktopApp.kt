@@ -3588,9 +3588,15 @@ class GraphCanvas(
     }
 
     private fun requiredDependencyAnnotationHeight(node: Node): Double {
-        val annotationCount = node.outgoingLinks
+        val explicitCount = node.outgoingLinks
             .mapNotNull(repository::getNode)
             .count { isVisibleLink(it) && isDependencyAnnotation(it) }
+        val derivedCount = if (node.isType) {
+            derivedTypeDependencies(null).count { it.source.id == node.id }
+        } else {
+            0
+        }
+        val annotationCount = explicitCount + derivedCount
         if (annotationCount == 0) return 0.0
         return (
             DEPENDENCY_ANNOTATION_TOP_PADDING +
@@ -4127,6 +4133,7 @@ class GraphCanvas(
         drawDependencyAnnotations(g2, allLinks.filter(::isDependencyAnnotation))
         // Type annotations belong to the type node and must survive route tile culling.
         drawTypeUsageAnnotations(g2, allLinks, scopeIds)
+        drawTypeFieldDependencyAnnotations(g2, scopeIds)
     }
 
     private fun linkMayIntersectViewport(linkNode: Node, viewport: Rectangle): Boolean {
@@ -4707,6 +4714,7 @@ class GraphCanvas(
         links.filterNot(::isDependencyAnnotation).forEach { svgLink(svg, it) }
         svgDependencyAnnotations(svg, links.filter(::isDependencyAnnotation))
         svgTypeUsageAnnotations(svg, links, scopeIds)
+        svgTypeFieldDependencyAnnotations(svg, scopeIds)
     }
 
     private fun svgNode(svg: StringBuilder, node: Node) {
@@ -4980,16 +4988,168 @@ class GraphCanvas(
             val type = typeId?.let(::NodeId)?.let(repository::getNode)?.takeIf(Node::isType) ?: return@forEach
             if (scopeIds != null && type.id !in scopeIds) return@forEach
             val r = type.layout.rect()
+            val dependencyRowOffset = type.outgoingLinks
+                .mapNotNull(repository::getNode)
+                .count(::isDependencyAnnotation) +
+                derivedTypeDependencies(scopeIds).count { it.source.id == type.id }
             usages.forEachIndexed { index, link ->
                 val label = link.name
                 val width = max(110, label.length * 8 + 24)
-                val y = r.y + 10 + index * 32
+                val y = r.y + DEPENDENCY_ANNOTATION_TOP_PADDING +
+                    (dependencyRowOffset + index) * DEPENDENCY_ANNOTATION_ROW_HEIGHT
                 val x = r.x + r.width + 34
                 val anchorY = y + 12
                 svgLine(svg, r.x + r.width, anchorY, x, anchorY, "#00897b", strokeWidth = 1.5)
                 svgCircle(svg, r.x + r.width, anchorY, 4, "#00897b")
                 svgRect(svg, Rectangle(x, y, width, 24), fill = "#f1fbf9", stroke = "#00897b", strokeWidth = 1.5)
                 svgText(svg, label, x + 10, y + 17, 12, "#00695c")
+            }
+        }
+    }
+
+    private data class DerivedTypeDependency(
+        val source: Node,
+        val target: Node,
+        val fieldNames: List<String>,
+    )
+
+    private fun derivedTypeDependencies(scopeIds: Set<NodeId>?): List<DerivedTypeDependency> {
+        val document = repository.getDocument()
+        val explicitPairs = document.nodes.values.filter(Node::isLink)
+            .filter { LinkClassifier.classify(document, it) == LinkStereotype.TypeUsage }
+            .mapNotNull { linkNode ->
+                val link = linkNode.link ?: return@mapNotNull null
+                link.sourceNodeId to link.targetNodeId
+            }
+            .toSet()
+        return document.typeNodes()
+            .filter { scopeIds == null || it.id in scopeIds }
+            .flatMap { target ->
+                target.typeDefinition?.fields.orEmpty()
+                    .mapNotNull { field ->
+                        val expression = field.effectiveTypeExpression(document)
+                        val referencedTypeIds = buildList {
+                            fun collect(expression: TypeExpression) {
+                                if (expression.isNamed) add(expression.typeId)
+                                expression.arguments.forEach(::collect)
+                            }
+                            collect(expression)
+                        }
+                        val source = referencedTypeIds
+                            .mapNotNull { document.getElementById(it) }
+                            .firstOrNull(Node::isType)
+                        if (source == null || source.id == target.id || source.id to target.id in explicitPairs) {
+                            null
+                        } else {
+                            source to field.name.trim().ifBlank { "field" }
+                        }
+                    }
+                    .groupBy({ it.first }, { it.second })
+                    .map { (source, fields) -> DerivedTypeDependency(source, target, fields.distinct()) }
+            }
+            .filter {
+                (scopeIds == null || it.source.id in scopeIds) &&
+                    isVisibleInCanvas(it.source) && isVisibleInCanvas(it.target)
+            }
+    }
+
+    private fun drawTypeFieldDependencyAnnotations(g2: Graphics2D, scopeIds: Set<NodeId>?) {
+        val dependencies = derivedTypeDependencies(scopeIds)
+        dependencies.groupBy { it.source.id }.forEach { (sourceId, sourceDependencies) ->
+            val source = repository.getNode(sourceId) ?: return@forEach
+            val explicitCount = source.outgoingLinks
+                .mapNotNull(repository::getNode)
+                .count(::isDependencyAnnotation)
+            val r = source.layout.rect()
+            val previousStroke = g2.stroke
+            val previousFont = g2.font
+            g2.font = designerFont.deriveFont(DEPENDENCY_ANNOTATION_FONT_SIZE)
+            sourceDependencies.forEachIndexed { index, dependency ->
+                val label = "${dependency.target.name} : ${dependency.fieldNames.joinToString(", ")}".trim()
+                val labelWidth = max(
+                    DEPENDENCY_SOURCE_MIN_WIDTH,
+                    g2.fontMetrics.stringWidth(label) + DEPENDENCY_LABEL_HORIZONTAL_PADDING,
+                )
+                val row = explicitCount + index
+                val y = r.y + DEPENDENCY_ANNOTATION_TOP_PADDING + row * DEPENDENCY_ANNOTATION_ROW_HEIGHT
+                val x = r.x + r.width + DEPENDENCY_SOURCE_GAP
+                val anchor = Point(r.x + r.width, y + DEPENDENCY_ANNOTATION_LABEL_HEIGHT / 2)
+                val color = activePalette[DesignerColorKey.TypeStroke]
+                g2.color = color
+                g2.stroke = BasicStroke(1.5f)
+                g2.drawLine(anchor.x, anchor.y, x, anchor.y)
+                g2.fillOval(anchor.x - 4, anchor.y - 4, 8, 8)
+                g2.color = activePalette[DesignerColorKey.AnnotationFill]
+                g2.fillRect(x, y, labelWidth, DEPENDENCY_ANNOTATION_LABEL_HEIGHT)
+                g2.color = color
+                g2.drawRect(x, y, labelWidth, DEPENDENCY_ANNOTATION_LABEL_HEIGHT)
+                g2.drawString(label, x + 8, y + 17)
+            }
+            g2.stroke = previousStroke
+            g2.font = previousFont
+        }
+
+        dependencies.groupBy { it.target.id }.forEach { (targetId, targetDependencies) ->
+            val target = repository.getNode(targetId) ?: return@forEach
+            val explicitLinks = target.incomingLinks.mapNotNull(repository::getNode).filter(::isDependencyAnnotation)
+            val r = target.layout.rect()
+            val rowHeight = 24
+            val x = r.x + 36
+            val startY = r.y - (explicitLinks.size + targetDependencies.size) * rowHeight - 20
+            val color = activePalette[DesignerColorKey.TypeStroke]
+            g2.color = color
+            g2.stroke = BasicStroke(1.5f)
+            g2.drawLine(x, startY, x, r.y)
+            targetDependencies.forEachIndexed { index, dependency ->
+                val row = explicitLinks.size + index
+                val y = startY + row * rowHeight + 8
+                val label = "${dependency.source.name} : ${dependency.fieldNames.joinToString(", ")}".trim()
+                val width = max(DEPENDENCY_TARGET_MIN_WIDTH, dependencyAnnotationWidth(label, DEPENDENCY_TARGET_MIN_WIDTH))
+                g2.fillOval(x - 5, y - 5, 10, 10)
+                g2.drawLine(x, y, x + width, y)
+                g2.drawString(label, x + 10, y - 4)
+            }
+        }
+    }
+
+    private fun svgTypeFieldDependencyAnnotations(svg: StringBuilder, scopeIds: Set<NodeId>?) {
+        val dependencies = derivedTypeDependencies(scopeIds)
+        dependencies.groupBy { it.source.id }.forEach { (sourceId, sourceDependencies) ->
+            val source = repository.getNode(sourceId) ?: return@forEach
+            val explicitCount = source.outgoingLinks
+                .mapNotNull(repository::getNode)
+                .count(::isDependencyAnnotation)
+            val r = source.layout.rect()
+            sourceDependencies.forEachIndexed { index, dependency ->
+                val label = "${dependency.target.name} : ${dependency.fieldNames.joinToString(", ")}".trim()
+                val row = explicitCount + index
+                val y = r.y + DEPENDENCY_ANNOTATION_TOP_PADDING + row * DEPENDENCY_ANNOTATION_ROW_HEIGHT
+                val x = r.x + r.width + DEPENDENCY_SOURCE_GAP
+                val color = hex(activePalette[DesignerColorKey.TypeStroke])
+                svgLine(svg, r.x + r.width, y + DEPENDENCY_ANNOTATION_LABEL_HEIGHT / 2, x, y + DEPENDENCY_ANNOTATION_LABEL_HEIGHT / 2, color, strokeWidth = 1.5)
+                svgCircle(svg, r.x + r.width, y + DEPENDENCY_ANNOTATION_LABEL_HEIGHT / 2, 4, color)
+                val width = dependencyAnnotationWidth(label, DEPENDENCY_SOURCE_MIN_WIDTH)
+                svgRect(svg, Rectangle(x, y, width, DEPENDENCY_ANNOTATION_LABEL_HEIGHT), fill = hex(activePalette[DesignerColorKey.AnnotationFill]), stroke = color, strokeWidth = 1.5)
+                svgText(svg, label, x + 8, y + 17, DEPENDENCY_ANNOTATION_FONT_SIZE.roundToInt(), color)
+            }
+        }
+        dependencies.groupBy { it.target.id }.forEach { (targetId, targetDependencies) ->
+            val target = repository.getNode(targetId) ?: return@forEach
+            val explicitLinks = target.incomingLinks.mapNotNull(repository::getNode).filter(::isDependencyAnnotation)
+            val r = target.layout.rect()
+            val rowHeight = 24
+            val x = r.x + 36
+            val startY = r.y - (explicitLinks.size + targetDependencies.size) * rowHeight - 20
+            val color = hex(activePalette[DesignerColorKey.TypeStroke])
+            svgLine(svg, x, startY, x, r.y, color, strokeWidth = 1.5)
+            targetDependencies.forEachIndexed { index, dependency ->
+                val row = explicitLinks.size + index
+                val y = startY + row * rowHeight + 8
+                val label = "${dependency.source.name} : ${dependency.fieldNames.joinToString(", ")}".trim()
+                val width = dependencyTargetRuleWidth(label)
+                svgCircle(svg, x, y, 5, color)
+                svgLine(svg, x, y, x + width, y, color, strokeWidth = 1.5)
+                svgText(svg, label, x + 10, y - 4, DEPENDENCY_ANNOTATION_FONT_SIZE.roundToInt(), color)
             }
         }
     }
@@ -5838,13 +5998,18 @@ class GraphCanvas(
             val type = typeId?.let(::NodeId)?.let(repository::getNode)?.takeIf(Node::isType) ?: return@forEach
             if (scopeIds != null && type.id !in scopeIds) return@forEach
             val r = type.layout.rect()
+            val dependencyRowOffset = type.outgoingLinks
+                .mapNotNull(repository::getNode)
+                .count(::isDependencyAnnotation) +
+                derivedTypeDependencies(scopeIds).count { it.source.id == type.id }
             val previousStroke = g2.stroke
             val previousFont = g2.font
             g2.font = designerFont.deriveFont(12f)
             usages.forEachIndexed { index, link ->
                 val label = link.name
                 val width = max(110, monospaceTextWidth(label, 8, 24))
-                val y = r.y + 10 + index * 32
+                val y = r.y + DEPENDENCY_ANNOTATION_TOP_PADDING +
+                    (dependencyRowOffset + index) * DEPENDENCY_ANNOTATION_ROW_HEIGHT
                 val x = r.x + r.width + 34
                 val anchorY = y + 12
                 val selected = link.id in selection
