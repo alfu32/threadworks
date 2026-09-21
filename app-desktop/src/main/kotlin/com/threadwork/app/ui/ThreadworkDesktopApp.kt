@@ -5867,6 +5867,7 @@ class GraphCanvas(
     private fun isDependencyAnnotation(linkNode: Node): Boolean = when (LinkClassifier.classify(repository.getDocument(), linkNode)) {
             LinkStereotype.UsageImport,
             LinkStereotype.DependencyInjection,
+            LinkStereotype.TypeUsage,
             LinkStereotype.SourceCapability,
             LinkStereotype.RunnableCapability -> true
             else -> false
