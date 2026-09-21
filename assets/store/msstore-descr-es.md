@@ -4,6 +4,10 @@
 
 Threadwork
 
+## Short title
+
+Threadwork, IDE topológico
+
 ## Description
 
 Threadwork es un IDE de escritorio centrado en la topología para diseñar, inspeccionar, compilar y documentar sistemas de software como flujos de trabajo conectados.
