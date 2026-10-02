@@ -144,6 +144,10 @@ import java.io.StringReader
 import java.lang.management.ManagementFactory
 import java.nio.file.Path
 import java.nio.file.Files
+import java.nio.ByteBuffer
+import java.nio.charset.Charset
+import java.nio.charset.CodingErrorAction
+import java.nio.charset.StandardCharsets
 import java.net.URLClassLoader
 import java.time.Instant
 import java.time.LocalDateTime
@@ -261,6 +265,7 @@ class ThreadworkDesktopApp(
         const val DEFAULT_PROJECT_NAME = "document.orch"
         const val MAX_HISTORY_SNAPSHOTS = 100
         const val DOCUMENTATION_PAGE_BREAK = "<!-- threadwork:page-break -->"
+        val WINDOWS_1252 = Charset.forName("windows-1252")
         val BINARY_FILE_EXTENSIONS = setOf("dll", "so", "dylib", "bin", "exe")
         val RASTER_IMAGE_EXTENSIONS = setOf("png", "jpeg", "jpg", "gif", "webm")
         val IMPORT_LANGUAGE_BY_EXTENSION = mapOf(
@@ -968,13 +973,14 @@ class ThreadworkDesktopApp(
     private fun importDroppedFiles(files: List<Path>, dropPoint: Point) {
         val accepted = files.mapNotNull { path ->
             val extension = path.fileName.toString().substringAfterLast('.', "").lowercase()
-            val kind = importedFileKind(extension)
-            if (kind == null) {
-                status.text = "Unsupported dropped file: ${path.fileName}"
-                return@mapNotNull null
-            }
             runCatching {
-                ImportedFile(path, kind, Files.readAllBytes(path))
+                val bytes = Files.readAllBytes(path)
+                val kind = importedFileKind(extension, bytes)
+                if (kind == null) {
+                    status.text = "Unsupported dropped file: ${path.fileName}"
+                    return@mapNotNull null
+                }
+                ImportedFile(path, kind, bytes, if (kind.isBinary) null else decodeTextContent(bytes))
             }.onFailure {
                 status.text = "Could not read ${path.fileName}: ${it.message}"
             }.getOrNull()
@@ -1005,8 +1011,8 @@ class ThreadworkDesktopApp(
                 imported.kind.isSvg || !imported.kind.isBinary -> repository.updateNodeText(
                     node.id,
                     NodeText(
-                        declaration = imported.bytes.toString(Charsets.UTF_8),
-                        declarationLanguageId = imported.kind.languageId.orEmpty(),
+                        declaration = imported.textContent ?: imported.bytes.toString(Charsets.UTF_8),
+                        declarationLanguageId = imported.kind.languageId ?: VOID_LANGUAGE_ID,
                     ),
                 )
                 else -> repository.updateNodeBinaryContent(node.id, imported.bytes)
@@ -1020,7 +1026,7 @@ class ThreadworkDesktopApp(
         refreshAll()
     }
 
-    private fun importedFileKind(extension: String): ImportedFileKind? = when {
+    private fun importedFileKind(extension: String, bytes: ByteArray): ImportedFileKind? = when {
         extension in BINARY_FILE_EXTENSIONS -> ImportedFileKind(
             extension = extension,
             languageId = null,
@@ -1056,13 +1062,46 @@ class ThreadworkDesktopApp(
                 else -> "text/plain"
             },
         )
-        else -> null
+        else -> decodeTextContent(bytes)?.let {
+            ImportedFileKind(
+                extension = extension,
+                languageId = VOID_LANGUAGE_ID,
+                contentType = "text/plain",
+            )
+        }
+    }
+
+    private fun decodeTextContent(bytes: ByteArray): String? {
+        if (bytes.isEmpty()) return ""
+        val (charsets, bomSize) = when {
+            bytes.size >= 3 &&
+                bytes[0] == 0xef.toByte() && bytes[1] == 0xbb.toByte() && bytes[2] == 0xbf.toByte() ->
+                listOf(StandardCharsets.UTF_8) to 3
+            bytes.size >= 2 && bytes[0] == 0xff.toByte() && bytes[1] == 0xfe.toByte() ->
+                listOf(StandardCharsets.UTF_16LE) to 2
+            bytes.size >= 2 && bytes[0] == 0xfe.toByte() && bytes[1] == 0xff.toByte() ->
+                listOf(StandardCharsets.UTF_16BE) to 2
+            else -> listOf(StandardCharsets.UTF_8, WINDOWS_1252) to 0
+        }
+        return charsets.firstNotNullOfOrNull { charset ->
+            val content = runCatching {
+                charset.newDecoder()
+                    .onMalformedInput(CodingErrorAction.REPORT)
+                    .onUnmappableCharacter(CodingErrorAction.REPORT)
+                    .decode(ByteBuffer.wrap(bytes, bomSize, bytes.size - bomSize))
+                    .toString()
+            }.getOrNull() ?: return@firstNotNullOfOrNull null
+            content.takeUnless { text ->
+                text.any { it == '\u0000' || (it.isISOControl() && it !in "\n\r\t\u000c") }
+            }
+        }
     }
 
     private data class ImportedFile(
         val path: Path,
         val kind: ImportedFileKind,
         val bytes: ByteArray,
+        val textContent: String?,
     )
 
     private data class ImportedFileKind(
