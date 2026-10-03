@@ -22,5 +22,6 @@ include(
     "compilers-impl",
     "builtin-archetype",
     "assets",
+    "mcp-server",
     "app-desktop",
 )

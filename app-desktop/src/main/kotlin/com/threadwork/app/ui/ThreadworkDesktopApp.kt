@@ -97,6 +97,12 @@ import com.threadwork.storage.DocumentRepository
 import com.threadwork.storage.InMemoryDocumentRepository
 import com.threadwork.storage.KotlinxJsonDocumentStore
 import com.threadwork.storage.newDocument
+import com.threadwork.mcp.McpCommandDescriptor
+import com.threadwork.mcp.McpDocumentGateway
+import com.threadwork.mcp.McpServerController
+import com.threadwork.mcp.McpTechnologyDescriptor
+import com.threadwork.mcp.ThreadworkMcpContext
+import com.threadwork.mcp.ThreadworkMcpService
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
@@ -424,10 +430,36 @@ class ThreadworkDesktopApp(
     private lateinit var archetypesPanel: WorkflowArchetypesPanel
     private lateinit var projectManagementPanel: ProjectManagementPanel
     private lateinit var analysisPanel: NetworkAnalysisPanel
+    private lateinit var mcpPanel: McpServerPanel
     private lateinit var userIdentityTitleBar: UserIdentityTitleBar
     private val modeButtons = mutableMapOf<CanvasMode, JToggleButton>()
     private var sheetButton: JToggleButton? = null
     private val commands = linkedMapOf<String, AppCommand>()
+    private val mcpDocumentGateway: McpDocumentGateway = object : McpDocumentGateway {
+        override fun <T> read(block: (ThreadworkDocument) -> T): T = onEdt {
+            block(repository.getDocument())
+        }
+
+        override fun <T> mutate(label: String, block: (DocumentRepository) -> T): T = onEdt {
+            block(repository).also {
+                status.text = label
+                refreshAll()
+            }
+        }
+    }
+    private val mcpServer = McpServerController(
+        ThreadworkMcpService(
+            gateway = mcpDocumentGateway,
+            context = ThreadworkMcpContext(
+                applicationVersion = Version.CURRENT.semver,
+                technologies = ::mcpTechnologies,
+                commands = {
+                    commands.values.map { command -> McpCommandDescriptor(command.id, command.title) }
+                },
+                executeCommand = ::executeMcpCommand,
+            ),
+        ),
+    )
     private val pluginToolbarButtons = mutableListOf<PluginToolbarButton>()
     private val pluginContentTabs = mutableListOf<PluginContentTab>()
     private val historyJson = Json {
@@ -485,6 +517,7 @@ class ThreadworkDesktopApp(
         frame.isVisible = true
         frame.rootPane.putClientProperty(FlatClientProperties.TITLE_BAR_SHOW_TITLE, false)
         frame.rootPane.putClientProperty(FlatClientProperties.TITLE_BAR_SHOW_ICON, false)
+        mcpServer.start()
     }
 
     private fun loadInitialFile() {
@@ -643,6 +676,8 @@ class ThreadworkDesktopApp(
             )
             analysisPanel = NetworkAnalysisPanel(::refreshNetworkAnalysis, ::selectAnalysisNodes)
             addTab("Analysis", analysisPanel)
+            mcpPanel = McpServerPanel(mcpServer)
+            addTab("MCP", mcpPanel)
             pluginContentTabs.forEach { tab ->
                 addTab(tab.title, tab.createPanel())
             }
@@ -837,6 +872,39 @@ class ThreadworkDesktopApp(
                 .onFailure { status.text = "Plugin ${plugin.id} failed: ${it.message}" }
         }
     }
+
+    private fun <T> onEdt(action: () -> T): T {
+        if (SwingUtilities.isEventDispatchThread()) return action()
+        var result: Result<T>? = null
+        SwingUtilities.invokeAndWait { result = runCatching(action) }
+        return result?.getOrThrow() ?: error("The Swing event dispatch did not return a result")
+    }
+
+    private fun executeMcpCommand(id: String): Boolean = onEdt {
+        val command = commands[id] ?: return@onEdt false
+        if (!command.enabled()) return@onEdt false
+        command.action()
+        true
+    }
+
+    private fun mcpTechnologies(): List<McpTechnologyDescriptor> = compilerPlugins.flatMap { compiler ->
+        val provided = compiler.providedTechnologies
+        val technologies = if (provided.isNotEmpty()) {
+            provided
+        } else {
+            compiler.supportedLanguageIds.flatMap { languageId ->
+                compiler.supportedTechnologyIds.map { technologyId -> CompilerTechnology(languageId, technologyId) }
+            }
+        }
+        technologies.map { technology ->
+            McpTechnologyDescriptor(
+                compilerId = compiler.id,
+                compilerName = compiler.displayName,
+                languageId = technology.languageId,
+                technologyId = technology.technologyId,
+            )
+        }
+    }.distinctBy { listOf(it.compilerId, it.languageId, it.technologyId) }
 
     private fun executeCommand(id: String) {
         val command = commands[id] ?: return
@@ -1114,6 +1182,7 @@ class ThreadworkDesktopApp(
 
     private fun quit() {
         autosave()
+        mcpServer.stop()
         frame.dispose()
         kotlin.system.exitProcess(0)
     }

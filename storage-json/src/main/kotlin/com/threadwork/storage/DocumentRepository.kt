@@ -23,6 +23,7 @@ import com.threadwork.core.model.closestCommonAncestorId
 import com.threadwork.core.model.compositeBoundaryIdsBetween
 import java.util.UUID
 import java.time.Instant
+import kotlinx.serialization.json.JsonObject
 
 private val legacyCapabilityTransportKinds = setOf(
     "usage",
@@ -48,12 +49,17 @@ interface DocumentRepository {
 
     fun renameNode(id: NodeId, name: String)
     fun updateNodeNameDetail(id: NodeId, nameDetail: String)
+    fun updateNodeKind(id: NodeId, kind: NodeKind)
     fun updateNodeLayout(id: NodeId, layout: NodeLayout)
     fun updateNodeText(id: NodeId, text: NodeText)
     fun updateNodeBinaryContent(id: NodeId, content: ByteArray?)
     fun updateNodeTechnology(id: NodeId, technology: TechnologyMetadata)
     fun updateNodeFileLayoutStrategy(id: NodeId, strategyId: String)
     fun updateNodeMetadata(id: NodeId, metadata: Map<String, String>)
+    fun updateDocumentMetadata(metadata: Map<String, String>)
+    fun updateNodePluginData(id: NodeId, pluginData: Map<String, JsonObject>)
+    fun updateNodePorts(id: NodeId, ports: List<NodePort>)
+    fun updateNodeRevision(id: NodeId, revision: Revision?)
     fun updateNodeResponsible(id: NodeId, responsible: String?)
     fun updateNodeAssignee(id: NodeId, assignee: String?)
     fun registerUser(user: ModelUser)
@@ -167,6 +173,21 @@ class InMemoryDocumentRepository(
         markDirty()
     }
 
+    override fun updateNodeKind(id: NodeId, kind: NodeKind) {
+        val node = requireNode(id)
+        if (node.kind == kind) return
+        require(node.link == null || kind == NodeKind.Link) {
+            "Linked entity '$id' cannot change kind while it has link data"
+        }
+        node.kind = kind
+        if (kind == NodeKind.Type && node.typeDefinition == null) {
+            node.typeDefinition = TypeDefinition()
+        }
+        touchNodes(listOf(id))
+        synchronizeAllLinks()
+        markDirty()
+    }
+
     override fun updateNodeLayout(id: NodeId, layout: NodeLayout) {
         val node = requireNode(id)
         if (node.layout == layout) return
@@ -213,6 +234,44 @@ class InMemoryDocumentRepository(
         if (node.metadata == metadata) return
         node.metadata.clear()
         node.metadata.putAll(metadata)
+        touchNodes(listOf(id))
+        markDirty()
+    }
+
+    override fun updateDocumentMetadata(metadata: Map<String, String>) {
+        if (document.metadata == metadata) return
+        document.metadata.clear()
+        document.metadata.putAll(metadata)
+        markDirty()
+    }
+
+    override fun updateNodePluginData(id: NodeId, pluginData: Map<String, JsonObject>) {
+        val node = requireNode(id)
+        if (node.pluginData == pluginData) return
+        node.pluginData.clear()
+        node.pluginData.putAll(pluginData.mapValues { (_, value) -> JsonObject(value) })
+        touchNodes(listOf(id))
+        markDirty()
+    }
+
+    override fun updateNodePorts(id: NodeId, ports: List<NodePort>) {
+        val node = requireNode(id)
+        require(ports.map(NodePort::id).distinct().size == ports.size) {
+            "Node '$id' contains duplicate port ids"
+        }
+        if (node.ports == ports) return
+        node.ports.clear()
+        node.ports.addAll(ports.map { port ->
+            port.copy(metadata = port.metadata.toMutableMap())
+        })
+        touchNodes(listOf(id))
+        markDirty()
+    }
+
+    override fun updateNodeRevision(id: NodeId, revision: Revision?) {
+        val node = requireNode(id)
+        if (node.revision == revision) return
+        node.revision = revision?.copy()
         touchNodes(listOf(id))
         markDirty()
     }

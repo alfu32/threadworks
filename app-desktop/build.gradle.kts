@@ -58,6 +58,7 @@ dependencies {
     implementation(project(":compilers-impl"))
     implementation(project(":builtin-archetype"))
     implementation(project(":assets"))
+    implementation(project(":mcp-server"))
     implementation("com.formdev:flatlaf:3.7.2")
     implementation("com.vladsch.flexmark:flexmark:0.64.8")
     implementation("com.vladsch.flexmark:flexmark-ext-tables:0.64.8")
