@@ -158,9 +158,10 @@ jobs:
           <?xml version="1.0" encoding="utf-8"?>
           <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
                    xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+                   xmlns:uap3="http://schemas.microsoft.com/appx/manifest/uap/windows10/3"
                    xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10"
                    xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
-                   IgnorableNamespaces="uap desktop rescap">
+                   IgnorableNamespaces="uap uap3 desktop rescap">
             <Identity Name="$packageName" Publisher="$publisher" Version="$msixVersion" />
             <Properties>
               <DisplayName>Threadwork</DisplayName>
@@ -180,6 +181,27 @@ jobs:
                                     Square150x150Logo="Assets\Square150x150Logo.png"
                                     Square44x44Logo="Assets\Square44x44Logo.png"
                                     BackgroundColor="transparent" />
+                <Extensions>
+                  <uap3:Extension Category="windows.appExecutionAlias"
+                                  Executable="Threadwork.exe"
+                                  EntryPoint="Windows.FullTrustApplication">
+                    <uap3:AppExecutionAlias>
+                      <desktop:ExecutionAlias Alias="threadwork.exe" />
+                    </uap3:AppExecutionAlias>
+                  </uap3:Extension>
+                  <uap:Extension Category="windows.fileTypeAssociation">
+                    <uap3:FileTypeAssociation Name="threadworkprojects"
+                                              Parameters="desktop &quot;%1&quot;"
+                                              MultiSelectModel="Single">
+                      <uap:DisplayName>Threadwork project</uap:DisplayName>
+                      <uap:Logo>Assets\StoreLogo.png</uap:Logo>
+                      <uap:SupportedFileTypes>
+                        <uap:FileType>.orch</uap:FileType>
+                        <uap:FileType>.tdwk</uap:FileType>
+                      </uap:SupportedFileTypes>
+                    </uap3:FileTypeAssociation>
+                  </uap:Extension>
+                </Extensions>
               </Application>
             </Applications>
             <Capabilities>
