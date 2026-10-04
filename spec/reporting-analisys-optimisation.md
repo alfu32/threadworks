@@ -1,5 +1,11 @@
 Implement a comprehensive graph-analysis system in **Threadwork** for the existing processing-network model.
 
+The analysis follows the [Threadwork Design Guide](../docs/design-guide.md).
+Its most important architectural question is not only whether principal data
+can reach a sink, but whether each processing responsibility has a visible,
+coherent result and failure domain. Error links are therefore first-class
+topology, not incidental diagnostics.
+
 ## Context
 
 Threadwork models executable processing networks composed primarily of:
@@ -22,6 +28,19 @@ The graph is directed.
 A direct link from a node to itself is legal.
 
 Self-links are relatively uncommon but meaningful. In the principal-data graph they can represent explicit state/memorization/feedback behavior.
+
+The guide's operation model is:
+
+```text
+Operation<T, E> = Success(T) | Failure(E)
+```
+
+Libraries define the operations and their error families. Processing nodes
+employ those operations and route their outcomes. Analysis should highlight a
+node that combines unrelated failure points, lacks an expected error route, or
+depends on a library through the principal runtime graph instead of a
+capability/dependency relationship. These are observations and recommendations
+unless a separate validator rule explicitly makes them invalid.
 
 The analysis UI already has or will have an **Analysis tab**. Extend this tab with structured analysis sections described below.
 
@@ -1289,12 +1308,15 @@ Preserve these assumptions:
 9. Cycles are not automatically errors.
 10. Self-links are not automatically errors.
 11. Missing error routing is a quality observation, not necessarily an invalid model.
-12. Analysis must distinguish factual indicators from qualitative interpretation.
-13. Recommendations must follow from explicit analysis findings.
-14. Analysis is read-only.
-15. Model-changing actions require explicit user invocation.
-16. Any model/layout transformation must support the existing undo/redo mechanism.
-17. The same node mapping/order must be maintained across `P`, `E`, and `D`.
+12. A processing node normally represents one specialized operation with one principal result and one coherent error family.
+13. Libraries define reusable algorithms/capabilities; processing nodes employ them and should not hide unrelated capability work.
+14. Expected operation errors are part of the modeled graph and should be analyzed as deliberately as principal data.
+15. Analysis must distinguish factual indicators from qualitative interpretation.
+16. Recommendations must follow from explicit analysis findings.
+17. Analysis is read-only.
+18. Model-changing actions require explicit user invocation.
+19. Any model/layout transformation must support the existing undo/redo mechanism.
+20. The same node mapping/order must be maintained across `P`, `E`, and `D`.
 
 The end result should make the Analysis tab function as an architectural assistant for a Threadwork network:
 
@@ -1313,4 +1335,3 @@ offer safe actions
 ```
 
 Do not limit the implementation to displaying raw graph-theory metrics. The purpose is to translate graph structure into useful Threadwork-specific architectural information and, where appropriate, safe operations on the model.
-

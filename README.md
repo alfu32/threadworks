@@ -2,7 +2,33 @@
 
 **Software, designed in two dimensions.**
 
-Threadwork is a topology-first IDE and compilation framework for engineered software systems. Instead of treating a project primarily as a linear collection of source files, Threadwork treats its two-dimensional node-and-link topology as the system's central design artifact. Source code remains important, but it lives inside components whose responsibilities, interfaces, tests, ownership, and relationships are explicit.
+## What Threadwork is
+
+Threadwork is a topology-first application for designing, explaining,
+implementing, testing, and generating software systems. Its central artifact
+is a typed network of responsibilities rather than a file tree: libraries
+define reusable capabilities, processing nodes employ them, types define the
+values crossing boundaries, and links make data, errors, calls, dependencies,
+and recovery paths visible.
+
+Threadwork is intended to support the complete design-to-implementation
+process:
+
+1. State a problem and its intended behavior.
+2. Break it into specialized responsibilities and coherent failure domains.
+3. Define result, error, and data contracts.
+4. Sketch the communication and dependency topology.
+5. Implement algorithms and class/method libraries separately from their use.
+6. Attach specifications, tests, and implementation text to the same model.
+7. Validate, analyze, compile, generate documentation, and hand the design to
+   another human or coding agent.
+
+The governing principles are collected in the
+[`Threadwork Design Guide`](docs/design-guide.md). In brief, a library
+operation produces either a principal result or a declared error; a processing
+node invokes and routes that operation; and the network makes responsibility,
+communication, and failure handling explicit. The guide is the default design
+language, not a rigid restriction: informed exceptions remain possible.
 
 The project is under active development. The repository contains the working Kotlin desktop application, persistent object model, compiler framework, built-in compilers, plugin interfaces, technical-sheet exporter, and source specifications.
 
@@ -13,6 +39,7 @@ Conventional IDEs present software mainly as files and text. Threadwork adds a s
 - **Topology carries design intent.** The arrangement and connectivity of components expose architecture that is difficult to recover from source files alone.
 - **Systems decompose telescopically.** A composite can contain processors, links, libraries, and more composites, allowing design from the whole system down to individual implementation units.
 - **Interfaces are explicit.** Links identify the variables carried between nodes and hold the technology-specific type definition for that data.
+- **Results and failures are explicit.** A library operation produces a principal result or a declared error family; processing nodes route both through visible topology.
 - **Every box is a contract.** A node can carry a declaration, instantiation, specification, tests, and usage instructions, each with its own language identifier.
 - **Accountability is granular.** Revision, modification, and responsible-person metadata support delegated work and engineering review at component level.
 - **Technical drawings are first-class output.** The canvas is designed for readable routing and export on ISO sheets with a border, title block, folding marks, and parts list.

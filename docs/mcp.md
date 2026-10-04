@@ -8,6 +8,24 @@ http://127.0.0.1:8765/mcp
 
 The server supports the current stateless MCP protocol (`2026-07-28`) through `server/discover` and retains the legacy `initialize` handshake for older clients. It does not require an account or internet connection. The server is reachable only from the local machine.
 
+## Design guide first
+
+MCP is an interface to the Threadwork design model, not a replacement for
+design reasoning. Before creating or changing a workflow, agents should read
+the [Threadwork Design Guide](design-guide.md). It is the project manifesto:
+
+- libraries define reusable algorithms and capabilities;
+- processing nodes employ those capabilities and route their result or typed
+  error;
+- Type entities define values crossing boundaries;
+- links expose data flow, error flow, calls, dependencies, and recovery.
+
+The guide is advisory. It establishes the normal architecture without
+preventing a human or machine designer from making an explicit, justified
+exception. The MCP resource `threadwork://agent-guide` contains the same core
+principles together with protocol, mutation, C implementation, layout, and
+persistence instructions for agents that cannot read this repository.
+
 ## Codex
 
 With the app running, register the endpoint once:
@@ -39,7 +57,13 @@ The tools are grouped around the open model:
 - Register or refresh model users.
 - Execute enabled desktop commands by command ID.
 
-The `threadwork://instructions`, `threadwork://technologies`, `threadwork://commands`, and `threadwork://design` resources provide agent guidance and JSON views of the current app state. The server instructions tell an agent to read before editing, use stable entity IDs, use repository-backed mutations, and validate after structural changes.
+The `threadwork://instructions`, `threadwork://agent-guide`,
+`threadwork://technologies`, `threadwork://commands`, and
+`threadwork://design` resources provide agent guidance and JSON views of the
+current app state. The server instructions tell an agent to read the design
+guide before editing, use stable entity IDs, use repository-backed mutations,
+keep algorithms in libraries, keep processing nodes thin, preserve result and
+error contracts, and validate after structural changes.
 
 ## Security boundary
 

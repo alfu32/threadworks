@@ -490,7 +490,7 @@ class ThreadworkMcpService(
         appendLine("threadwork.get_design returns the complete JSON model. threadwork.get_fragment returns a JSON slice for one entity and optionally its descendants and related links.")
         appendLine("Use threadwork.list_technologies before assigning compiler technology. Use threadwork.validate_design after structural changes.")
         appendLine("New entities inherit parent technology and file layout: omit technology and fileLayoutStrategyId unless an explicit override is intended; the stored layout sentinel is 'none'.")
-        appendLine("Read ${ThreadworkMcpGuide.RESOURCE_URI} for the complete agent workflow, mutation semantics, topology conventions, C/library rules, layout guidance, and persistence behavior.")
+        appendLine("Read ${ThreadworkMcpGuide.RESOURCE_URI} first: it is the machine-facing Threadwork design manifesto plus the complete workflow, mutation semantics, topology conventions, C/library rules, layout guidance, and persistence behavior.")
         appendLine("The desktop command catalog is available through threadwork.get_command_catalog and commands can be invoked with threadwork.execute_command when the command is enabled.")
         appendLine("Available technologies:")
         context.technologies().distinctBy { listOf(it.compilerId, it.languageId, it.technologyId) }

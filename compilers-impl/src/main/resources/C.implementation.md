@@ -1,5 +1,18 @@
 # Threadwork C Compiler — Implementation Specification
 
+This specification follows the [Threadwork Design Guide](../../../../docs/design-guide.md).
+The C compiler must preserve the following boundary:
+
+```text
+library function       defines a reusable operation and its error family
+processing function    invokes that operation and forwards result/error
+generated topology     shows data, errors, calls, and dependencies
+```
+
+The C representation may use an explicit status code, result struct, or
+output parameters. In every case, an expected inability to perform an
+operation is a controlled result, not an unclassified failure.
+
 ## 1. Scope
 
 The C compiler SHALL implement a native C17 backend for Threadwork using the existing `TemplateSetCompiler` infrastructure.
@@ -434,6 +447,13 @@ static int {{ initializerSymbol }}(threadwork_context *context);
 static int {{ runSymbol }}(threadwork_context *context);
 ```
 
+The generated processor wrapper is an employment boundary, not the place for
+an additional hidden algorithm. Its normal responsibilities are to invoke the
+library capability selected by the design, forward the principal result, and
+forward or route the capability's declared error. If a processor performs a
+substantial transformation or recovery policy, it should be modeled as an
+explicit capability/processing step instead.
+
 The forward-declaration template therefore emits:
 
 ```c
@@ -730,6 +750,13 @@ int threadwork_transport(
     const char *target
 );
 ```
+
+The status code above is the minimum transport/runtime status. Capability
+operations should additionally preserve their typed error family, either in a
+result structure or through an explicit error value associated with the
+operation. `THREADWORK_ERROR` without an inspectable category is suitable only
+for an infrastructure/runtime failure, not as a substitute for a modeled
+business error.
 
 ## Memory ownership
 

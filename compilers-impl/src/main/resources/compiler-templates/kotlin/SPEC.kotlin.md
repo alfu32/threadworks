@@ -1,5 +1,10 @@
 # Kotlin/JVM Compiler Template Set
 
+This template set follows the [Threadwork Design Guide](../../../../../../docs/design-guide.md).
+Reusable algorithms and class/method implementations belong in libraries;
+generated processing functions employ those capabilities and preserve their
+principal result and operation-error contracts in the generated topology.
+
 This directory defines the built-in naive Kotlin/JVM compiler. The manifest maps
 semantic roles to Pebble resources. `NaiveKotlinCompiler` loads the set, while
 `TemplateSetCompiler` traverses nodes child-first, selects templates, assembles

@@ -22,6 +22,26 @@ The system shall consist of:
 
 The rewrite should preserve the successful conceptual model from the current implementation while reducing architectural complexity.
 
+## 1.1 Design Guide Alignment
+
+This specification implements the [Threadwork Design Guide](../docs/design-guide.md).
+The guide is the architectural manifesto for human designers and coding
+agents. In particular, the implementation shall keep these concerns visible:
+
+```text
+library          defines a reusable algorithm or capability
+processing node  employs a capability and routes its result or error
+type             defines a value contract crossing a boundary
+network          shows data flow, error flow, calls, dependencies, and recovery
+```
+
+Expected operation failure is part of the operation contract, not an
+unclassified second control-flow channel. A library operation is modeled as a
+principal result plus a declared error family. A processing node should remain
+an orchestration boundary and should not hide unrelated capabilities or
+failure domains. These are design defaults, not restrictions against explicit,
+documented exceptions.
+
 ---
 
 ## 2. High-Level Architecture
@@ -556,6 +576,25 @@ The repository owns link topology invariants. It stores each link under its
 endpoints' closest common ancestor and records each crossed composite in
 `compositeBoundaryIds`. Links cannot use links or Type declarations as normal
 data endpoints.
+
+### 6.8.1 Result and Error Contracts
+
+Every modeled operation has the conceptual shape:
+
+```text
+Operation<T, E> = Success(T) | Failure(E)
+```
+
+`T` is the principal result and `E` is one coherent error category. The
+technology-specific representation may be a result object, an error enum with
+out parameters, an exception adapter, or another explicit ABI, but expected
+failure must remain inspectable and routable.
+
+Processing nodes normally invoke a library capability and forward its result
+and error. If a node performs independent validation, transformation, retry,
+fallback, or policy, that behavior should be represented as another
+capability or processing boundary rather than hidden inside a pass-through
+wrapper.
 
 ### 6.9 Link Interaction Kinds and Compiled Capabilities
 
@@ -1428,6 +1467,12 @@ The generated project should be buildable with Gradle if the generated user code
 
 The first compiler shall emit a minimal runtime support layer.
 
+Generated runtime contracts shall preserve the design guide's totalized
+operation model. A processor invocation may produce a principal value or a
+declared operation error; the generated runtime must not silently discard
+either outcome. Error transport and handling remain visible in the graph even
+when the target language uses an exception adapter internally.
+
 Conceptual runtime:
 
 ```kotlin
@@ -1475,6 +1520,11 @@ fun runComposite(context: RuntimeContext) {
 ## 16. Diagnostics
 
 Diagnostics shall be associated with the original node where possible.
+
+Diagnostics distinguish design, wiring, compiler, and infrastructure defects
+from expected operation errors. Expected errors belong to the modeled result
+and error topology; diagnostics report violations or failures outside that
+normal contract.
 
 ```kotlin
 data class CompilerDiagnostic(
@@ -1641,6 +1691,13 @@ These should be avoided until the core model, editor, and naive compiler work re
 ## 22. Agent Work Packages
 
 The implementation should be split into coding-agent tasks.
+
+Every agent package begins by reading the [Threadwork Design
+Guide](../docs/design-guide.md). Package boundaries should follow the same
+ontology: reusable algorithms in libraries, application of those algorithms
+in processing nodes, and explicit result/error/type/link contracts. Agents
+must not turn a convenient implementation helper into a new graph node unless
+it has an independent responsibility or failure domain.
 
 ### Package 1 — Core Model
 
@@ -1829,6 +1886,42 @@ No concurrency until the model and generated-project workflow are stable.
 
 ---
 
+### Rule 7
+
+Libraries define reusable operations. Processing nodes employ those operations
+and route their principal result and coherent error family.
+
+---
+
+### Rule 8
+
+Expected operation failures are explicit data. They must not be silently
+swallowed or hidden as unrelated exceptions.
+
+---
+
+### Rule 9
+
+A processing node should not combine unrelated failure domains. Fetching,
+transforming, validating, and transmitting normally belong to separate
+capabilities when their results or recovery policies differ.
+
+---
+
+### Rule 10
+
+Types and links are architectural contracts. Types describe values; links show
+where values, errors, calls, and dependencies travel.
+
+---
+
+### Rule 11
+
+These rules guide design and validation but do not prohibit an explicit,
+documented exception.
+
+---
+
 ## 24. Summary
 
-The rewrite shall be a Kotlin desktop application centered around a single shared node model. The active document shall live in memory and be saved/loaded as JSON. The UI shall use Compose Multiplatform, with CodeMirror embedded in a WebView only for rich text/code editing. The editor must receive metadata-aware completions from Kotlin services based on the selected node, its ports, links, parent, children, siblings, imports, language, and technology. The first compiler shall be a naive Kotlin/JVM project generator that produces a buildable source-code project from the node hierarchy.
+The rewrite shall be a Kotlin desktop application centered around a single shared node model and the [Threadwork Design Guide](../docs/design-guide.md). The active document shall live in memory and be saved/loaded as JSON. The UI shall use Compose Multiplatform, with CodeMirror embedded in a WebView only for rich text/code editing. The editor must receive metadata-aware completions from Kotlin services based on the selected node, its ports, links, parent, children, siblings, imports, language, and technology. Libraries shall define reusable capabilities, processing nodes shall employ and route their result/error contracts, and the topology shall make the main data and failure network visible. The first compiler shall be a naive Kotlin/JVM project generator that produces a buildable source-code project from the node hierarchy.

@@ -36,6 +36,23 @@ Plugins are independent extensions that inspect, transform, analyze, compile, te
 
 The desktop application acts as the host platform.
 
+The plugin architecture follows the [Threadwork Design Guide](../docs/design-guide.md).
+Plugins extend the ontology; they do not flatten it back into an opaque source
+tree. In particular:
+
+```text
+library plugins       provide reusable algorithms/capabilities
+processing nodes      employ capabilities and expose result/error contracts
+types and links       describe values, failures, calls, and dependencies
+analysis plugins      inspect the principal and error topology
+compiler plugins      preserve those contracts in generated artifacts
+```
+
+Expected operation errors are distinct from plugin-host defects. A test runner,
+compiler, or exporter may report an operation error through the modeled result
+and error contract, while startup, wiring, or plugin implementation defects
+remain diagnostics.
+
 ```text
 +------------------------------------------------------+
 | Kotlin Desktop Host Application                      |
@@ -1194,6 +1211,29 @@ The system is a general model-extension and artifact-generation platform.
 The MVP plugin system uses trusted local JARs.
 
 Sandboxing is not part of the first implementation.
+
+---
+
+### Rule 7
+
+Plugins should preserve the separation between business definition in reusable
+libraries and business employment in processing nodes.
+
+---
+
+### Rule 8
+
+Plugin-produced results and expected errors should remain inspectable and
+routable through the Threadwork model rather than being collapsed into opaque
+host exceptions.
+
+---
+
+### Rule 9
+
+Plugin validation and analysis may recommend decomposition or error routing;
+the normal design guide is advisory unless a specific contract declares a
+condition invalid.
 
 ---
 

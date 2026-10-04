@@ -1,5 +1,20 @@
 # Developing a C Compiler Template Set
 
+This guide implements the [Threadwork Design Guide](../../../../docs/design-guide.md).
+The C backend must preserve its separation between library definition,
+processing-node employment, and visible result/error topology:
+
+```text
+library function       owns the C algorithm and controlled error category
+processing function    invokes the library and forwards result/error
+type and link          describe the values and failure paths crossing boundaries
+```
+
+The generated C ABI may use status codes, result structs, output parameters,
+or an equivalent representation, but expected operation failure must never be
+silently discarded. A processing template should remain orchestration, not a
+second hidden algorithm.
+
 This guide describes a practical, single-file C compiler for Threadwork using
 the existing `TemplateSetCompiler` kernel. It is an implementation plan, not a
 claim that C can use the JavaScript/PHP templates unchanged. C requires
@@ -123,7 +138,7 @@ transport. One possible ABI is:
 ```c
 typedef struct threadwork_context threadwork_context;
 
-void threadwork_transport(
+int threadwork_transport(
     threadwork_context *context,
     const char *link_reference,
     const char *source,
@@ -146,6 +161,17 @@ contain project-specific processor logic. A useful division is:
   and optional scheduling hooks;
 - user declarations: domain behavior and concrete wire type definitions.
 
+The generated operation contract is conceptually:
+
+```text
+Operation<T, E> = Success(T) | Failure(E)
+```
+
+Library code owns the `E` family for its capability. Generated processor code
+invokes that capability and routes the principal `T` or the operation error;
+it must not turn an error into an unrelated empty result or invent a second
+business operation inside the wrapper.
+
 The existing Node.js and PHP sets already provide a `runtime.support` template
 that implements named-link queue transport. Kotlin provides the same concepts as
 `RuntimeContext`/`runLink`, emitted in `Runtime.kt` for file layouts and inline at
@@ -161,8 +187,8 @@ Forward declarations are a separate generation phase from definitions. A
 definition is encountered. For processors and composites this normally means:
 
 ```c
-void {{ initializerSymbol }}(threadwork_context *context);
-void {{ runSymbol }}(threadwork_context *context);
+int {{ initializerSymbol }}(threadwork_context *context);
+int {{ runSymbol }}(threadwork_context *context);
 ```
 
 If one entity requires both entry points, its template may emit both prototype
@@ -200,12 +226,16 @@ before the function prototype block.
 split is retained:
 
 ```c
-void {{ initializerSymbol }}(threadwork_context *context) {
+int {{ initializerSymbol }}(threadwork_context *context) {
 {{ instantiationIndent4 }}
+
+    return THREADWORK_OK;
 }
 
-void {{ runSymbol }}(threadwork_context *context) {
+int {{ runSymbol }}(threadwork_context *context) {
 {{ declarationIndent4 }}
+
+    return THREADWORK_OK;
 }
 ```
 

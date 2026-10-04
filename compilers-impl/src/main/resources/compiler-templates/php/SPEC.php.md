@@ -1,5 +1,10 @@
 # PHP Compiler Template Set
 
+This template set follows the [Threadwork Design Guide](../../../../../../docs/design-guide.md).
+Libraries define reusable capabilities, processing functions employ and route
+their results/errors, and generated links preserve the visible data,
+dependency, and failure topology.
+
 This directory defines the built-in PHP compiler as a Pebble template set.
 `compiler.properties` binds compiler roles to `.peb` files and is loaded by
 `PhpCompiler`. The generic compiler kernel performs traversal, child-first

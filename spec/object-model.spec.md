@@ -1,5 +1,36 @@
 # Threadwork Object Model Specification
 
+This specification is governed by the [Threadwork Design Guide](../docs/design-guide.md).
+The guide defines why the model has processing nodes, libraries, Type entities,
+and explicit data/error/dependency links; this document defines how those
+concepts are persisted and connected.
+
+## 0. Design Ontology
+
+The model distinguishes three layers:
+
+```text
+library          business definition: reusable algorithm or capability
+processing node  business employment: invoke and route an operation
+network          business topology: show data, errors, calls, and dependencies
+```
+
+An operation has a principal result and a declared error family:
+
+```text
+Operation<T, E> = Success(T) | Failure(E)
+```
+
+Expected unsuccessful outcomes are first-class data. A processing node should
+not combine unrelated operation and error domains merely because their source
+code happens to be nearby. Type nodes define the contracts carried by result
+and error links. Library links identify capability use; data and error links
+identify runtime communication.
+
+This is an architectural guideline rather than a restriction on valid node
+content. A node may contain a composite implementation when its internal
+steps share one responsibility, result contract, and failure family.
+
 ## 1. Universal Entity
 
 `Node` is the document's universal entity. Processors, composites, links, shared

@@ -2,11 +2,44 @@
 
 This guide is the operating contract for an agent that can use the Threadwork MCP server without access to the Threadwork source code. The live open document is the source of truth.
 
+## Core design guide — read this first
+
+The canonical human-facing manifesto is `docs/design-guide.md`.
+This resource is its machine-facing delivery copy, with MCP protocol and
+mutation rules added.
+
+Threadwork is a topology-first application for designing, explaining,
+implementing, testing, and generating software systems. The central artifact
+is a typed network of responsibilities:
+
+```text
+libraries define reusable algorithms and capabilities
+processing nodes employ capabilities and route their outcomes
+types define values and error contracts crossing boundaries
+links show data flow, error flow, calls, dependencies, and recovery
+```
+
+The core operation model is:
+
+```text
+Operation<T, E> = Success(T) | Failure(E)
+```
+
+`T` is the principal result and `E` is one coherent error family. A library
+may be unable to perform its normal responsibility, but it must synthesize that
+outcome into its declared error rather than hide it in unchecked control flow.
+A processing node should remain thin: receive inputs, invoke the library,
+forward the result, and forward or route the operation error. It should not
+silently introduce another algorithm or unrelated failure domain.
+
+These are design defaults, not an enforcement mechanism. An explicit,
+documented exception is valid when the designer understands the trade-off.
+
 ## Mental model
 
 Threadwork is a topology-first IDE. A project is a `ThreadworkDocument` containing one root entity and a graph of entities:
 
-- `Processor`: executable component or service/library component.
+- `Processor`: processing boundary that employs a capability and routes its result/error.
 - `Group`: composite/container; hierarchy is structural.
 - `Type`: shared wire type with a compiler-neutral `typeDefinition`.
 - `Link`: directed edge with endpoint ports and optional data/capability semantics.
@@ -58,6 +91,10 @@ Example:
 
 ## Designing a workflow
 
+Apply the design guide before writing implementation text. Decompose by
+specialized responsibility and coherent failure domain, not merely by source
+file or helper-function count.
+
 For each processing node, define the contract before implementation:
 
 1. Name the node with a stable role, such as `read_csv_file`, `extract_data`, or `write_result`.
@@ -67,6 +104,12 @@ For each processing node, define the contract before implementation:
 5. Create data links from output port to input port.
 6. Put behavior in `specification`, examples and edge cases in JSON `tests`, and implementation in the declaration/source section.
 7. Keep service/library dependencies as separate library nodes with `lib` links rather than mixing service code into processing nodes.
+
+For every operation, identify both the principal result and its error family.
+If a node fetches, transforms, and transmits while exposing unrelated read,
+parse, and transmission failures, split those capabilities and route their
+outcomes explicitly. Keep private library implementation steps together when
+they do not have an independent contract or failure route.
 
 Data links use `interactionKind: "data"`. Service dependencies use `interactionKind: "lib"`; the provider is the link source and the processing node is the target.
 
@@ -93,6 +136,8 @@ The C compiler treats service-library declarations specially:
 - A library link gives the processing node a qualified callable alias, for example `csv_reader_io__read_file_text`.
 - Data flow uses generated `push(port, &value)`, `pop(port, &value)`, and `threadwork_buffer_count(port)` operations.
 - Library functions must document ownership and clean up allocated memory on all failure paths.
+- Library functions must report expected failure through an explicit result/error contract; they must not rely on unchecked exceptions or ambiguous sentinel values.
+- Processing-node declarations should invoke library functions and pipe their principal result/error; substantial business algorithms belong in libraries.
 
 For a CSV workflow, a reasonable pair of shared types is:
 
@@ -100,6 +145,11 @@ For a CSV workflow, a reasonable pair of shared types is:
 - `CityCount`: contains a city string and its aggregate user count.
 
 The file library should own complete file reads/writes. The table library should own parsing, table allocation/freeing, city-column detection, and aggregation. Processing nodes should orchestrate those methods through library links.
+
+For this workflow, typical operation contracts are `read text or CsvIoError`,
+`parse/aggregate a CsvUsers or CsvTableError`, and `write text or CsvIoError`.
+The exact names are design choices, but the failure domains should remain
+visible and should not be collapsed into one generic processing-node error.
 
 ## Layout and readability
 
@@ -124,6 +174,9 @@ MCP edits change the open in-memory document. An untitled document has no `.orch
 - Keep specifications, tests, and declarations together in text patches.
 - Keep includes and reusable service methods in library cards.
 - Use explicit types and link interaction kinds.
+- Give each processing node one principal result and one coherent error family.
+- Make expected library errors visible in the topology and route them to a deliberate handler or sink.
+- Keep processing nodes as capability-employment and routing boundaries.
 - Validate with zero errors.
 - Confirm network counts and expected dependencies.
 - If generating, invoke only an enabled command and report whether it was executed.

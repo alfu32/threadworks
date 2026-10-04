@@ -13,6 +13,22 @@ Threadwork is a Kotlin/JVM topology-first IDE and compiler framework. Keep chang
 - `app-desktop/`: CLI, Swing UI, canvas, sheet export, plugins, and code editor.
 - `spec/`: functional and architectural specifications.
 
+## Design Guide (Read First)
+
+Before designing or implementing a workflow, read
+[`docs/design-guide.md`](docs/design-guide.md). It is the architectural
+manifesto for both human and machine contributors:
+
+- libraries define reusable algorithms and capabilities;
+- processing nodes employ capabilities and route one principal result plus one
+  coherent error family;
+- Type entities define values and error contracts crossing boundaries;
+- links expose data flow, error flow, calls, dependencies, and recovery.
+
+Keep business definition in libraries, business employment in processing nodes,
+and the responsibility/failure topology visible in the model. These are
+guiding defaults, not a prohibition against explicit, documented exceptions.
+
 ## Build, Test, and Development Commands
 
 Use the Gradle wrapper with the workspace-local cache:

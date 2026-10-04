@@ -1,5 +1,11 @@
 # Compiler Template API
 
+This specification follows the [Threadwork Design Guide](../docs/design-guide.md).
+Compiler templates must preserve its separation between library definition,
+processing-node employment, and visible result/error topology. Generated code
+may use functional or object-oriented idioms, but expected operation outcomes
+must remain explicit.
+
 `TemplateSetCompiler` supplies traversal, node classification, layout handling, file assembly, and template context construction. A compiler specialization can therefore be defined as a `CompilerTemplateSet` instead of implementing Kotlin generation methods.
 
 Templates use Pebble syntax. Values use `{{ value }}`, branches use `{% if ... %}`, and collections use `{% for ... %}`. Legacy `${value}` placeholders remain accepted.
@@ -62,6 +68,31 @@ because the Type is a sibling elsewhere in the hierarchy.
 
 Legacy inline `typeName` and `payloadDefinition` link fields remain available to
 compiler templates as a fallback. They do not replace shared Type declarations.
+
+## Operation Results and Errors
+
+The conceptual contract of a capability is:
+
+```text
+Operation<T, E> = Success(T) | Failure(E)
+```
+
+`T` is the principal product and `E` is one coherent error family. A library
+template may implement a class method, an associated function, or a service
+object method. The processing template represents the employment of that
+capability: it binds parameters, invokes the operation, and forwards its
+principal result or error through the modeled topology.
+
+Templates must not silently turn an operation error into an empty value,
+boolean with no explanation, or an unrelated exception. Target-language
+adapters may use exceptions internally, but the generated boundary must retain
+the explicit result/error meaning so error handling can be analyzed and routed
+by Threadwork.
+
+If a generated processor performs its own substantial transformation,
+validation, retry, or fallback, that behavior should be represented by a
+separate capability or processing boundary rather than hidden in a generic
+wrapper template.
 
 ## Double-Buffered Link Transport
 

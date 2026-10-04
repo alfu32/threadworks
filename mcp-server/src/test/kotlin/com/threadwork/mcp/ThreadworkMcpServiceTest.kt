@@ -118,6 +118,8 @@ class ThreadworkMcpServiceTest {
         }))
         val contents = assertNotNull(read).getValue("result").jsonObject.getValue("contents").toString()
         assertTrue(contents.contains("Threadwork MCP Agent Guide"))
+        assertTrue(contents.contains("Operation<T, E> = Success(T) | Failure(E)"))
+        assertTrue(contents.contains("processing node should remain thin"))
         assertTrue(contents.contains("text/markdown"))
     }
 

@@ -1,5 +1,10 @@
 # Single-Node Object Model Specification
 
+> The canonical design principles for this model are in the
+> [Threadwork Design Guide](../docs/design-guide.md). This older foundational
+> specification describes the structural model; the guide supplies the
+> responsibility, library, result, error, and topology semantics.
+
 ## 1. Core Principle
 
 The entire document model is built from one object type:
@@ -24,6 +29,13 @@ A node may behave as:
 But these are roles, not separate structural classes.
 
 The node object should be flexible enough to represent all of them.
+
+Structural flexibility does not mean that every node should contain an entire
+workflow. A processing node normally represents the employment of one
+specialized capability. Reusable algorithms and class/method implementations
+belong in library nodes; result and error contracts belong on typed ports and
+links; the surrounding network shows who calls whom and how failures are
+handled.
 
 ---
 

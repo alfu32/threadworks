@@ -1,5 +1,10 @@
 # C17 Template Set
 
+This template set follows the [Threadwork Design Guide](../../../../../../docs/design-guide.md).
+It keeps reusable algorithms and class/method implementations in libraries,
+keeps generated processors as thin capability-employment boundaries, and keeps
+principal results and operation errors visible in the generated contract.
+
 This template set generates one portable C17 translation unit. `processor.peb` and
 `composite.peb` define setup/run functions, while their forward-declaration templates
 place prototypes before all generated bodies. `type-declaration.peb` maps shared Type
