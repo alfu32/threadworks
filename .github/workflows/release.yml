@@ -46,14 +46,24 @@ jobs:
 
       - name: Build Threadwork fat JAR
         env:
-          THREADWORK_GOOGLE_CLIENT_ID: ${{ secrets.THREADWORK_GOOGLE_CLIENT_ID }}
           THREADWORK_GOOGLE_CLIENT_SECRET: ${{ secrets.THREADWORK_GOOGLE_CLIENT_SECRET }}
-          THREADWORK_GITHUB_CLIENT_ID: ${{ secrets.THREADWORK_GITHUB_CLIENT_ID }}
+          THREADWORK_GITHUB_CLIENT_ID: ${{ secrets.THREADWORK_GITHUB_CLIENT_ID || vars.THREADWORK_GITHUB_CLIENT_ID }}
           THREADWORK_GITHUB_CLIENT_SECRET: ${{ secrets.THREADWORK_GITHUB_CLIENT_SECRET }}
-          THREADWORK_MICROSOFT_CLIENT_ID: ${{ secrets.THREADWORK_MICROSOFT_CLIENT_ID }}
-          THREADWORK_MICROSOFT_TENANT: ${{ secrets.THREADWORK_MICROSOFT_TENANT }}
+          THREADWORK_GOOGLE_CLIENT_ID: ${{ secrets.THREADWORK_GOOGLE_CLIENT_ID || vars.THREADWORK_GOOGLE_CLIENT_ID }}
+          THREADWORK_MICROSOFT_CLIENT_ID: ${{ secrets.THREADWORK_MICROSOFT_CLIENT_ID || vars.THREADWORK_MICROSOFT_CLIENT_ID }}
+          THREADWORK_MICROSOFT_TENANT: ${{ secrets.THREADWORK_MICROSOFT_TENANT || vars.THREADWORK_MICROSOFT_TENANT }}
         run: |
           set -euo pipefail
+          missing=0
+          for name in THREADWORK_GOOGLE_CLIENT_ID THREADWORK_GITHUB_CLIENT_ID THREADWORK_MICROSOFT_CLIENT_ID; do
+            if [[ -z "${!name:-}" ]]; then
+              echo "::error title=Missing OAuth client ID::$name must be configured as a repository secret or variable before packaging."
+              missing=1
+            fi
+          done
+          if (( missing != 0 )); then
+            exit 1
+          fi
           ./gradlew --no-daemon fatJar -Prelease_number="${{ steps.release_version.outputs.version }}"
 
       - uses: actions/upload-artifact@v4
