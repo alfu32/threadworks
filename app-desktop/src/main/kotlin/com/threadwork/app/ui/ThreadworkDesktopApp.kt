@@ -101,6 +101,7 @@ import com.threadwork.mcp.McpCommandDescriptor
 import com.threadwork.mcp.McpDocumentGateway
 import com.threadwork.mcp.McpServerController
 import com.threadwork.mcp.McpTechnologyDescriptor
+import com.threadwork.mcp.ThreadworkMcpGuide
 import com.threadwork.mcp.ThreadworkMcpContext
 import com.threadwork.mcp.ThreadworkMcpService
 import kotlinx.serialization.json.Json
@@ -185,6 +186,7 @@ import javax.swing.JCheckBox
 import javax.swing.JColorChooser
 import javax.swing.JComponent
 import javax.swing.JDialog
+import javax.swing.JEditorPane
 import javax.swing.DropMode
 import javax.swing.JFileChooser
 import javax.swing.Icon
@@ -442,8 +444,7 @@ class ThreadworkDesktopApp(
 
         override fun <T> mutate(label: String, block: (DocumentRepository) -> T): T = onEdt {
             block(repository).also {
-                status.text = label
-                refreshAll()
+                refreshAfterMcpMutation(label)
             }
         }
     }
@@ -745,6 +746,7 @@ class ThreadworkDesktopApp(
         })
         add(JMenu("Help").apply {
             add(commandItem("help.about"))
+            add(commandItem("help.mcpAgentGuide"))
         })
         add(currentFileLabel)
         add(Box.createHorizontalGlue())
@@ -838,6 +840,7 @@ class ThreadworkDesktopApp(
         registerCommand(AppCommand("compile.compiler", "Generate: Compiler from Overrides") { generateCompilerFromDesign() })
         registerCommand(AppCommand("commands.palette", "Commands: Open Palette", KeyStroke.getKeyStroke(KeyEvent.VK_P, shiftShortcut)) { showCommandPalette() })
         registerCommand(AppCommand("help.about", "Help: About") { showAbout() })
+        registerCommand(AppCommand("help.mcpAgentGuide", "Help: MCP Agent Guide...") { showMcpAgentGuide() })
     }
 
     private fun registerCommand(command: AppCommand) {
@@ -884,6 +887,7 @@ class ThreadworkDesktopApp(
         val command = commands[id] ?: return@onEdt false
         if (!command.enabled()) return@onEdt false
         command.action()
+        refreshAfterMcpMutation("MCP command: ${command.title}")
         true
     }
 
@@ -1509,6 +1513,55 @@ class ThreadworkDesktopApp(
             appendLine("Loaded compiler plugins: ${compilerPlugins.size}")
         }
         JOptionPane.showMessageDialog(frame, details, "About Threadwork", JOptionPane.INFORMATION_MESSAGE)
+    }
+
+    private fun showMcpAgentGuide() {
+        val markdown = ThreadworkMcpGuide.markdown()
+        val viewer = JEditorPane("text/html", markdownToHtml(markdown)).apply {
+            isEditable = false
+            putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, true)
+        }
+        val dialog = JDialog(frame, "Threadwork MCP Agent Guide", false).apply {
+            defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
+            layout = BorderLayout(8, 8)
+            add(JScrollPane(viewer), BorderLayout.CENTER)
+            add(JPanel(FlowLayout(FlowLayout.RIGHT)).apply {
+                add(JButton("Save As...").apply {
+                    addActionListener { saveMcpAgentGuide(markdown) }
+                })
+                add(JButton("Close").apply { addActionListener { dispose() } })
+            }, BorderLayout.SOUTH)
+            size = Dimension(980, 760)
+            setLocationRelativeTo(frame)
+        }
+        dialog.isVisible = true
+    }
+
+    private fun saveMcpAgentGuide(markdown: String) {
+        val chooser = JFileChooser(
+            currentFile?.parent?.toFile() ?: Path.of(".").toAbsolutePath().normalize().toFile(),
+        ).apply {
+            dialogTitle = "Save MCP Agent Guide As Markdown"
+            fileFilter = FileNameExtensionFilter("Markdown files (*.md)", "md", "markdown")
+            isAcceptAllFileFilterUsed = false
+            selectedFile = Path.of("threadwork-mcp-agent-guide.md").toFile()
+        }
+        if (chooser.showSaveDialog(frame) != JFileChooser.APPROVE_OPTION) return
+
+        var path = chooser.selectedFile.toPath()
+        if (path.fileName.toString().substringAfterLast('.', "").isBlank()) {
+            path = path.resolveSibling("${path.fileName}.md")
+        }
+        runCatching { Files.writeString(path, markdown, StandardCharsets.UTF_8) }
+            .onSuccess { status.text = "Saved MCP agent guide to ${path.toAbsolutePath().normalize()}" }
+            .onFailure { error ->
+                JOptionPane.showMessageDialog(
+                    frame,
+                    error.message ?: "Could not save the MCP agent guide.",
+                    "Save MCP Agent Guide",
+                    JOptionPane.ERROR_MESSAGE,
+                )
+            }
     }
 
     private fun availableCompilerTechnologies(): List<CompilerTechnology> =
@@ -2553,6 +2606,13 @@ class ThreadworkDesktopApp(
         if (::projectManagementPanel.isInitialized) projectManagementPanel.refresh()
         invalidateNetworkAnalysis()
         checkpointHistory()
+    }
+
+    private fun refreshAfterMcpMutation(label: String) {
+        status.text = label
+        refreshAll()
+        updateWindowTitle()
+        updateResourceStatus()
     }
 
     private fun refreshAfterInspectorEdit() {

@@ -423,6 +423,7 @@ class ThreadworkMcpService(
     private fun resourcesList(): JsonObject = buildJsonObject {
         putJsonArray("resources") {
             add(resource("threadwork://instructions", "Threadwork instructions", "text/plain"))
+            add(resource(ThreadworkMcpGuide.RESOURCE_URI, "Threadwork MCP agent guide", "text/markdown"))
             add(resource("threadwork://technologies", "Available compiler technologies", "application/json"))
             add(resource("threadwork://commands", "Desktop command catalog", "application/json"))
             add(resource("threadwork://design", "Current Threadwork design", "application/json"))
@@ -433,6 +434,7 @@ class ThreadworkMcpService(
         val uri = params.string("uri") ?: error("Resource URI is required")
         val text = when (uri) {
             "threadwork://instructions" -> instructions()
+            ThreadworkMcpGuide.RESOURCE_URI -> ThreadworkMcpGuide.markdown()
             "threadwork://technologies" -> json.encodeToString(executeTool("threadwork.list_technologies", buildJsonObject { }))
             "threadwork://commands" -> json.encodeToString(commandCatalog())
             "threadwork://design" -> json.encodeToString(gateway.read { encode(it) })
@@ -440,9 +442,15 @@ class ThreadworkMcpService(
         }
         return buildJsonObject {
             putJsonArray("contents") {
-                add(buildJsonObject { put("uri", uri); put("mimeType", if (uri.endsWith("instructions")) "text/plain" else "application/json"); put("text", text) })
+                add(buildJsonObject { put("uri", uri); put("mimeType", resourceMimeType(uri)); put("text", text) })
             }
         }
+    }
+
+    private fun resourceMimeType(uri: String): String = when (uri) {
+        "threadwork://instructions" -> "text/plain"
+        ThreadworkMcpGuide.RESOURCE_URI -> "text/markdown"
+        else -> "application/json"
     }
 
     private fun promptsList(): JsonObject = buildJsonObject {
@@ -481,6 +489,7 @@ class ThreadworkMcpService(
         appendLine("The open document is the source of truth. Read before editing, use entity IDs rather than names, and use the repository tools for mutations so parent/child and link references remain synchronized.")
         appendLine("threadwork.get_design returns the complete JSON model. threadwork.get_fragment returns a JSON slice for one entity and optionally its descendants and related links.")
         appendLine("Use threadwork.list_technologies before assigning compiler technology. Use threadwork.validate_design after structural changes.")
+        appendLine("Read ${ThreadworkMcpGuide.RESOURCE_URI} for the complete agent workflow, mutation semantics, topology conventions, C/library rules, layout guidance, and persistence behavior.")
         appendLine("The desktop command catalog is available through threadwork.get_command_catalog and commands can be invoked with threadwork.execute_command when the command is enabled.")
         appendLine("Available technologies:")
         context.technologies().distinctBy { listOf(it.compilerId, it.languageId, it.technologyId) }

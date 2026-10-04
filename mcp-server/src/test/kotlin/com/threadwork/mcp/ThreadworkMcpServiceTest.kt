@@ -89,6 +89,21 @@ class ThreadworkMcpServiceTest {
     }
 
     @Test
+    fun `agent guide is advertised and readable as markdown`() {
+        val listed = service.handle(request("resources/list", 3, buildJsonObject { }))
+            ?.getValue("result")?.jsonObject
+            ?.getValue("resources")?.toString()
+        assertTrue(listed.orEmpty().contains(ThreadworkMcpGuide.RESOURCE_URI))
+
+        val read = service.handle(request("resources/read", 4, buildJsonObject {
+            put("uri", ThreadworkMcpGuide.RESOURCE_URI)
+        }))
+        val contents = assertNotNull(read).getValue("result").jsonObject.getValue("contents").toString()
+        assertTrue(contents.contains("Threadwork MCP Agent Guide"))
+        assertTrue(contents.contains("text/markdown"))
+    }
+
+    @Test
     fun `HTTP endpoint accepts modern routing headers`() {
         val controller = McpServerController(service, requestedPort = 0)
         try {
