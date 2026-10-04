@@ -1,6 +1,6 @@
 package com.threadwork.app.ui
 
-import com.threadwork.mcp.McpPingResult
+import com.threadwork.mcp.McpHealthResult
 import com.threadwork.mcp.McpServerController
 import com.threadwork.mcp.McpServerStatus
 import java.awt.BorderLayout
@@ -34,7 +34,7 @@ class McpServerDialog(
         horizontalAlignment = SwingConstants.LEFT
     }
     private val endpointField = readOnlyField("MCP endpoint")
-    private val pingField = readOnlyField("Liveness ping")
+    private val healthField = readOnlyField("Health endpoint")
     private val messageLabel = JLabel()
     private val accessLogArea = JTextArea().apply {
         isEditable = false
@@ -45,11 +45,11 @@ class McpServerDialog(
     private val startButton = JButton("Start")
     private val restartButton = JButton("Restart")
     private val stopButton = JButton("Stop")
-    private val pingButton = JButton("Ping now")
+    private val healthButton = JButton("Check health")
     private var controllerRunning = false
-    private var pingAlive: Boolean? = null
-    private var pingMessage = ""
-    private val pollingTimer = Timer(15_000) { ping() }.apply { isRepeats = true }
+    private var healthAlive: Boolean? = null
+    private var healthMessage = ""
+    private val pollingTimer = Timer(15_000) { checkHealth() }.apply { isRepeats = true }
     private val statusListener: (McpServerStatus) -> Unit = ::showStatus
     private val accessLogListener: (String) -> Unit = ::showAccessLog
 
@@ -63,13 +63,13 @@ class McpServerDialog(
             add(JPanel().apply {
                 layout = javax.swing.BoxLayout(this, javax.swing.BoxLayout.Y_AXIS)
                 add(endpointField)
-                add(pingField)
+                add(healthField)
             }, BorderLayout.CENTER)
             add(JPanel(FlowLayout(FlowLayout.RIGHT, 6, 0)).apply {
                 add(startButton)
                 add(restartButton)
                 add(stopButton)
-                add(pingButton)
+                add(healthButton)
             }, BorderLayout.SOUTH)
         }, BorderLayout.NORTH)
 
@@ -85,14 +85,14 @@ class McpServerDialog(
 
         startButton.addActionListener {
             controller.start()
-            ping()
+            checkHealth()
         }
         restartButton.addActionListener {
             controller.restart()
-            ping()
+            checkHealth()
         }
         stopButton.addActionListener { controller.stop() }
-        pingButton.addActionListener { ping() }
+        healthButton.addActionListener { checkHealth() }
 
         controller.addStatusListener(statusListener)
         controller.addAccessLogListener(accessLogListener)
@@ -107,7 +107,7 @@ class McpServerDialog(
         setMinimumSize(Dimension(760, 420))
         setLocationRelativeTo(owner)
         pollingTimer.start()
-        ping()
+        checkHealth()
     }
 
     private fun readOnlyField(title: String): JTextField = JTextField().apply {
@@ -119,9 +119,9 @@ class McpServerDialog(
     private fun showStatus(status: McpServerStatus) {
         val update = {
             controllerRunning = status.running
-            if (!status.running) pingAlive = false
+            if (!status.running) healthAlive = false
             endpointField.text = status.endpoint
-            pingField.text = status.pingEndpoint
+            healthField.text = status.healthEndpoint
             messageLabel.text = status.message
             startButton.isEnabled = !status.running
             restartButton.isEnabled = status.running
@@ -139,21 +139,21 @@ class McpServerDialog(
         if (SwingUtilities.isEventDispatchThread()) update() else SwingUtilities.invokeLater(update)
     }
 
-    private fun ping() {
-        pingAlive = null
-        pingMessage = "Checking ${controller.status.pingEndpoint}..."
+    private fun checkHealth() {
+        healthAlive = null
+        healthMessage = "Checking ${controller.status.healthEndpoint}..."
         updateState()
-        controller.pingAsync(::showPing)
+        controller.healthAsync(::showHealth)
     }
 
-    private fun showPing(result: McpPingResult) {
+    private fun showHealth(result: McpHealthResult) {
         val update = {
             if (controller.status.running) {
-                pingAlive = result.alive
-                pingMessage = result.message
+                healthAlive = result.alive
+                healthMessage = result.message
             } else {
-                pingAlive = false
-                pingMessage = "MCP server is stopped"
+                healthAlive = false
+                healthMessage = "MCP server is stopped"
             }
             updateState()
         }
@@ -163,16 +163,16 @@ class McpServerDialog(
     private fun updateState() {
         val state = when {
             !controllerRunning -> "MCP SERVER: OFF"
-            pingAlive == true -> "MCP SERVER: ON"
-            pingAlive == false -> "MCP SERVER: OFF (NOT RESPONDING)"
+            healthAlive == true -> "MCP SERVER: ON"
+            healthAlive == false -> "MCP SERVER: OFF (NOT RESPONDING)"
             else -> "MCP SERVER: CHECKING..."
         }
         stateLabel.text = state
         stateLabel.foreground = when {
-            !controllerRunning || pingAlive == false -> Color(0xff9b1c1c)
-            pingAlive == true -> Color(0xff18723b)
+            !controllerRunning || healthAlive == false -> Color(0xff9b1c1c)
+            healthAlive == true -> Color(0xff18723b)
             else -> Color(0xff8a6500)
         }
-        if (pingMessage.isNotBlank()) messageLabel.text = pingMessage
+        if (healthMessage.isNotBlank()) messageLabel.text = healthMessage
     }
 }

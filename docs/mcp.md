@@ -8,10 +8,9 @@ http://127.0.0.1:8765/mcp
 
 The server supports the current stateless MCP protocol (`2026-07-28`) through `server/discover` and retains the legacy `initialize` handshake for older clients. It does not require an account or internet connection. The server is reachable only from the local machine.
 
-In addition to `/mcp`, it exposes `GET /health` for a service health view and
-`GET /ping` as a minimal liveness route. `/ping` returns a small JSON response
-with status and timestamp so clients and the desktop UI can poll availability
-without performing an MCP operation.
+In addition to `/mcp`, it exposes `GET /health` as a lightweight service
+health and liveness route. It returns the service health JSON so clients and
+the desktop UI can poll availability without performing an MCP operation.
 
 ## Design guide first
 
@@ -52,8 +51,8 @@ On Linux and macOS this is normally `~/.codex/config.toml`. On Windows use `%USE
 The server starts automatically when the desktop app opens. Use the desktop
 `MCP` menu and choose `Manage Server...` to open the modeless management
 dialog. It shows the endpoint, liveness state, start/restart/stop controls, a
-manual ping action, and the read-only timestamped HTTP access log. The dialog
-polls `/ping` lightly while it is open.
+manual health check, and the read-only timestamped HTTP access log. The dialog
+polls `/health` lightly while it is open.
 
 ## Exposed operations
 

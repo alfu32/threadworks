@@ -144,17 +144,17 @@ class ThreadworkMcpServiceTest {
     }
 
     @Test
-    fun `HTTP ping endpoint reports liveness and records access`() {
+    fun `HTTP health endpoint reports liveness and records access`() {
         val controller = McpServerController(service, requestedPort = 0)
         try {
             val status = controller.start()
             val response = HttpClient.newHttpClient().send(
-                HttpRequest.newBuilder(URI(status.pingEndpoint)).GET().build(),
+                HttpRequest.newBuilder(URI(status.healthEndpoint)).GET().build(),
                 HttpResponse.BodyHandlers.ofString(),
             )
             assertEquals(200, response.statusCode())
             assertTrue(response.body().contains("\"status\":\"ok\""))
-            assertTrue(controller.accessLogText().contains("GET /ping -> 200"))
+            assertTrue(controller.accessLogText().contains("GET /health -> 200"))
         } finally {
             controller.stop()
         }

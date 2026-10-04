@@ -6,10 +6,8 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.put
 import java.io.IOException
 import java.net.InetSocketAddress
 import java.net.URI
@@ -30,10 +28,10 @@ data class McpServerStatus(
     val endpoint: String,
     val message: String = "",
 ) {
-    val pingEndpoint: String get() = "http://$host:$port/ping"
+    val healthEndpoint: String get() = "http://$host:$port/health"
 }
 
-data class McpPingResult(
+data class McpHealthResult(
     val alive: Boolean,
     val statusCode: Int? = null,
     val message: String = "",
@@ -65,7 +63,6 @@ class McpServerController(
             val created = HttpServer.create(InetSocketAddress(host, port), 0)
             created.createContext("/mcp") { exchange -> withAccessLog(exchange) { handleMcp(exchange) } }
             created.createContext("/health") { exchange -> withAccessLog(exchange) { handleHealth(exchange) } }
-            created.createContext("/ping") { exchange -> withAccessLog(exchange) { handlePing(exchange) } }
             created.createContext("/") { exchange -> withAccessLog(exchange) { respond(exchange, 404, "Not Found") } }
             executor = Executors.newCachedThreadPool { runnable ->
                 Thread(runnable, "threadwork-mcp-http").apply { isDaemon = true }
@@ -118,13 +115,13 @@ class McpServerController(
 
     fun accessLogText(): String = synchronized(accessLog) { accessLog.joinToString("\n") }
 
-    /** Poll the public liveness route without blocking the Swing event thread. */
-    fun pingAsync(listener: (McpPingResult) -> Unit) {
+    /** Poll the public health route without blocking the Swing event thread. */
+    fun healthAsync(listener: (McpHealthResult) -> Unit) {
         if (!status.running) {
-            listener(McpPingResult(false, message = "MCP server is stopped"))
+            listener(McpHealthResult(false, message = "MCP server is stopped"))
             return
         }
-        val request = HttpRequest.newBuilder(URI(status.pingEndpoint))
+        val request = HttpRequest.newBuilder(URI(status.healthEndpoint))
             .timeout(Duration.ofSeconds(2))
             .GET()
             .build()
@@ -132,16 +129,16 @@ class McpServerController(
             .orTimeout(3, TimeUnit.SECONDS)
             .whenComplete { response, error ->
                 if (error != null) {
-                    listener(McpPingResult(false, message = error.message ?: "MCP ping failed"))
+                    listener(McpHealthResult(false, message = error.message ?: "MCP health check failed"))
                 } else {
                     listener(
-                        McpPingResult(
+                        McpHealthResult(
                             alive = response.statusCode() == 200,
                             statusCode = response.statusCode(),
                             message = if (response.statusCode() == 200) {
                                 "MCP server responded"
                             } else {
-                                "MCP ping returned HTTP ${response.statusCode()}"
+                                "MCP health check returned HTTP ${response.statusCode()}"
                             },
                         ),
                     )
@@ -193,20 +190,6 @@ class McpServerController(
             return
         }
         respondJson(exchange, 200, json.encodeToString(kotlinx.serialization.json.JsonObject.serializer(), service.health()))
-    }
-
-    private fun handlePing(exchange: HttpExchange) {
-        if (!exchange.requestMethod.equals("GET", ignoreCase = true)) {
-            exchange.responseHeaders.add("Allow", "GET")
-            respond(exchange, 405, "Method Not Allowed")
-            return
-        }
-        val response = buildJsonObject {
-            put("status", "ok")
-            put("service", "threadwork-mcp")
-            put("timestamp", Instant.now().toString())
-        }
-        respondJson(exchange, 200, json.encodeToString(JsonObject.serializer(), response))
     }
 
     private fun validateModernHeaders(exchange: HttpExchange, parsed: kotlinx.serialization.json.JsonElement) {
