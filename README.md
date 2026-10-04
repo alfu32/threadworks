@@ -124,7 +124,12 @@ Compilation may target the current selection or the full project. When child tec
 
 ## Plugins
 
-At startup Threadwork loads JARs from a plugin directory. By default this is `plugins/` beside the running JAR; `--plugins <dir>` or `--plugins-dir <dir>` overrides it. The directory is created on first use and its resolved path is shown in About.
+At startup Threadwork loads JARs from a plugin directory. By default this is a
+user-writable application-data directory (`%LOCALAPPDATA%/Threadwork/plugins`
+on Windows, or the platform data directory on Linux/macOS); `--plugins <dir>`
+or `--plugins-dir <dir>` overrides it. The directory is created on first use
+and its resolved path is shown in About. The `threadwork.plugins` system
+property is also available to packaged or automated launches.
 
 Compiler plugins are discovered with Java `ServiceLoader`. Desktop plugins can read the current document, post repository updates, add toolbar commands, add command-palette entries, and contribute center workspace tabs. Plugins compile against the public `com.threadwork` APIs; the package rename is intentionally a breaking change from pre-Threadwork builds.
 

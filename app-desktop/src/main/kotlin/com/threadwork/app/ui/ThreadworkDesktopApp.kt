@@ -10076,14 +10076,32 @@ interface ThreadworkPluginContext {
 }
 
 fun defaultPluginsFolder(): Path {
-    val location = ThreadworkDesktopApp::class.java.protectionDomain.codeSource?.location?.toURI()
-    val binary = location?.let(Path::of)
-    val base = when {
-        binary == null -> Path.of(".")
-        Files.isRegularFile(binary) -> binary.parent ?: Path.of(".")
-        else -> binary
+    System.getProperty("threadwork.plugins")
+        ?.trim()
+        ?.takeIf(String::isNotEmpty)
+        ?.let { return Path.of(it).toAbsolutePath().normalize() }
+
+    val userHome = Path.of(System.getProperty("user.home"))
+    val osName = System.getProperty("os.name").orEmpty()
+    val applicationData = when {
+        osName.contains("win", ignoreCase = true) ->
+            System.getenv("LOCALAPPDATA")
+                ?.trim()
+                ?.takeIf(String::isNotEmpty)
+                ?.let(Path::of)
+                ?: userHome.resolve("AppData").resolve("Local")
+
+        osName.contains("mac", ignoreCase = true) ->
+            userHome.resolve("Library").resolve("Application Support")
+
+        else ->
+            System.getenv("XDG_DATA_HOME")
+                ?.trim()
+                ?.takeIf(String::isNotEmpty)
+                ?.let(Path::of)
+                ?: userHome.resolve(".local").resolve("share")
     }
-    return base.resolve("plugins").toAbsolutePath().normalize()
+    return applicationData.resolve("Threadwork").resolve("plugins").toAbsolutePath().normalize()
 }
 
 fun loadDesktopPlugins(folder: Path): List<ThreadworkDesktopPlugin> {
@@ -10101,14 +10119,18 @@ fun loadCompilerPlugins(folder: Path): List<CompilerPlugin> {
 }
 
 private fun pluginJarUrls(folder: Path): Array<java.net.URL> {
-    Files.createDirectories(folder)
-    val jars = Files.list(folder).use { stream ->
-        stream
-            .filter { Files.isRegularFile(it) && it.fileName.toString().endsWith(".jar", ignoreCase = true) }
-            .sorted()
-            .toList()
+    return runCatching {
+        Files.createDirectories(folder)
+        val jars = Files.list(folder).use { stream ->
+            stream
+                .filter { Files.isRegularFile(it) && it.fileName.toString().endsWith(".jar", ignoreCase = true) }
+                .sorted()
+                .toList()
+        }
+        jars.map { it.toUri().toURL() }.toTypedArray()
+    }.getOrElse {
+        emptyArray()
     }
-    return jars.map { it.toUri().toURL() }.toTypedArray()
 }
 
 private class CommandListCellRenderer : DefaultListCellRenderer() {
