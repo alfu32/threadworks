@@ -48,11 +48,12 @@ url = "http://127.0.0.1:8765/mcp"
 
 On Linux and macOS this is normally `~/.codex/config.toml`. On Windows use `%USERPROFILE%\\.codex\\config.toml`. Codex Desktop and the Codex CLI share this configuration.
 
-The server starts automatically when the desktop app opens. Use the desktop
-`MCP` menu and choose `Manage Server...` to open the modeless management
-dialog. It shows the endpoint, liveness state, start/restart/stop controls, a
-manual health check, and the read-only timestamped HTTP access log. The dialog
-polls `/health` lightly while it is open.
+The server is off by default when the desktop app opens. Use the desktop `MCP`
+menu and choose `Manage Server...` to open the modeless management dialog. It
+shows the endpoint, liveness state, start/restart/stop controls, a manual
+health check, and the read-only timestamped HTTP access log. Start the server
+from this dialog when an MCP client needs it; the dialog polls `/health`
+lightly while it is open.
 
 ## Exposed operations
 

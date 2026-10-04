@@ -517,7 +517,6 @@ class ThreadworkDesktopApp(
         frame.isVisible = true
         frame.rootPane.putClientProperty(FlatClientProperties.TITLE_BAR_SHOW_TITLE, false)
         frame.rootPane.putClientProperty(FlatClientProperties.TITLE_BAR_SHOW_ICON, false)
-        mcpServer.start()
     }
 
     private fun loadInitialFile() {
