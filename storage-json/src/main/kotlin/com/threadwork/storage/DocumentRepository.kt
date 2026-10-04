@@ -19,6 +19,7 @@ import com.threadwork.core.model.ProjectStatusChange
 import com.threadwork.core.model.Revision
 import com.threadwork.core.model.TechnologyMetadata
 import com.threadwork.core.model.TypeDefinition
+import com.threadwork.core.model.VOID_LAYOUT_STRATEGY_ID
 import com.threadwork.core.model.closestCommonAncestorId
 import com.threadwork.core.model.compositeBoundaryIdsBetween
 import java.util.UUID
@@ -119,6 +120,10 @@ class InMemoryDocumentRepository(
             name = name,
             kind = kind,
             parentId = parentId,
+            // New entities inherit compiler and layout settings from their
+            // parent until an explicit override is selected.
+            fileLayoutStrategyId = VOID_LAYOUT_STRATEGY_ID,
+            technology = TechnologyMetadata(),
             typeDefinition = TypeDefinition().takeIf { kind == NodeKind.Type },
             status = ProjectStatus.BUSINESS,
             statusChanges = mutableListOf(
@@ -485,6 +490,8 @@ class InMemoryDocumentRepository(
             name = name,
             kind = NodeKind.Link,
             parentId = owningParentId,
+            fileLayoutStrategyId = VOID_LAYOUT_STRATEGY_ID,
+            technology = TechnologyMetadata(),
             link = LinkData(
                 sourceNodeId,
                 sourcePortName,
@@ -626,7 +633,13 @@ class UuidIdGenerator : IdGenerator {
 
 fun newDocument(name: String): ThreadworkDocument {
     val rootId = NodeId("root")
-    val root = Node(rootId, name, NodeKind.Processor)
+    val root = Node(
+        id = rootId,
+        name = name,
+        kind = NodeKind.Processor,
+        fileLayoutStrategyId = VOID_LAYOUT_STRATEGY_ID,
+        technology = TechnologyMetadata(),
+    )
     return ThreadworkDocument(
         id = "document_${System.currentTimeMillis()}",
         name = name,

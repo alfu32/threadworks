@@ -32,6 +32,8 @@ The document model also stores text sections:
 7. Use `threadwork.analyze_network` to confirm counts and topology.
 8. Use `threadwork.get_command_catalog` before invoking a desktop command. A command can be listed but disabled because the required UI selection/state is missing.
 
+New entities are created for inheritance: their stored technology metadata is empty and their stored file layout strategy is `none`. The effective technology and layout are resolved from the parent. Omit `technology` and `fileLayoutStrategyId` from an initial patch unless the entity is intentionally an override; explicit values in `attributes` are preserved.
+
 ## Important mutation rule
 
 An `update_entity` text patch replaces the editable text object. When changing one text section, send the complete text payload and preserve the other sections. In practice, include `declaration`, `declarationLanguageId`, `specification`, `specificationLanguageId`, `tests`, and `testsLanguageId` together. Otherwise a later specification or test update can erase the source declaration.

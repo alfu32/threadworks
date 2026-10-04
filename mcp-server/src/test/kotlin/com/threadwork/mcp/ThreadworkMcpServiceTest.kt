@@ -1,6 +1,9 @@
 package com.threadwork.mcp
 
 import com.threadwork.core.model.NodeKind
+import com.threadwork.core.model.NodeId
+import com.threadwork.core.model.TechnologyMetadata
+import com.threadwork.core.model.VOID_LAYOUT_STRATEGY_ID
 import com.threadwork.storage.InMemoryDocumentRepository
 import com.threadwork.storage.newDocument
 import java.net.URI
@@ -86,6 +89,21 @@ class ThreadworkMcpServiceTest {
         })
         assertTrue(fragment.getValue("entities").toString().contains(workerId))
         assertTrue(fragment.getValue("entities").toString().contains(linkId))
+    }
+
+    @Test
+    fun `created MCP entities inherit technology and layout from their parent`() {
+        val root = repository.getDocument().rootNodeId.value
+        val created = call("threadwork.create_entity", buildJsonObject {
+            put("name", "Inherited worker")
+            put("kind", NodeKind.Processor.name)
+            put("parentId", root)
+        })
+        val id = created.getValue("entity").jsonObject.getValue("id").jsonPrimitive.content
+        val entity = repository.requireNode(NodeId(id))
+
+        assertEquals(TechnologyMetadata(), entity.technology)
+        assertEquals(VOID_LAYOUT_STRATEGY_ID, entity.fileLayoutStrategyId)
     }
 
     @Test

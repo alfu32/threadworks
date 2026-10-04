@@ -489,6 +489,7 @@ class ThreadworkMcpService(
         appendLine("The open document is the source of truth. Read before editing, use entity IDs rather than names, and use the repository tools for mutations so parent/child and link references remain synchronized.")
         appendLine("threadwork.get_design returns the complete JSON model. threadwork.get_fragment returns a JSON slice for one entity and optionally its descendants and related links.")
         appendLine("Use threadwork.list_technologies before assigning compiler technology. Use threadwork.validate_design after structural changes.")
+        appendLine("New entities inherit parent technology and file layout: omit technology and fileLayoutStrategyId unless an explicit override is intended; the stored layout sentinel is 'none'.")
         appendLine("Read ${ThreadworkMcpGuide.RESOURCE_URI} for the complete agent workflow, mutation semantics, topology conventions, C/library rules, layout guidance, and persistence behavior.")
         appendLine("The desktop command catalog is available through threadwork.get_command_catalog and commands can be invoked with threadwork.execute_command when the command is enabled.")
         appendLine("Available technologies:")
@@ -567,7 +568,7 @@ class ThreadworkMcpService(
         tool("threadwork.list_technologies", "List compiler technologies available in this app instance.", emptySchema()),
         tool("threadwork.get_command_catalog", "List desktop commands available to the agent.", emptySchema()),
         tool("threadwork.execute_command", "Execute an enabled desktop command by ID.", schema(mapOf("commandId" to stringProperty("Command ID", true)), listOf("commandId"))),
-        tool("threadwork.create_entity", "Create an entity under a parent.", schema(mapOf(
+        tool("threadwork.create_entity", "Create an entity under a parent; new entities inherit the parent's technology and file layout unless explicitly overridden.", schema(mapOf(
             "name" to stringProperty("Entity name", true),
             "kind" to stringProperty("Entity kind", enum = NodeKind.entries.map(NodeKind::name), default = "Processor"),
             "parentId" to stringProperty("Parent entity ID"),

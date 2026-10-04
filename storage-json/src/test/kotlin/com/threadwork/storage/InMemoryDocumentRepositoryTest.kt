@@ -12,6 +12,10 @@ import com.threadwork.core.model.ProjectStatus
 import com.threadwork.core.model.Revision
 import com.threadwork.core.model.TypeDefinition
 import com.threadwork.core.model.TypeFieldDefinition
+import com.threadwork.core.model.TechnologyMetadata
+import com.threadwork.core.model.VOID_LAYOUT_STRATEGY_ID
+import com.threadwork.core.model.effectiveLayoutStrategyId
+import com.threadwork.core.model.effectiveTechnologyId
 import com.threadwork.core.model.linksUsingType
 import com.threadwork.core.validation.DocumentValidator
 import kotlin.test.Test
@@ -80,6 +84,26 @@ class InMemoryDocumentRepositoryTest {
         assertEquals(ProjectStatus.BUSINESS, source.statusChanges.single().endStatus)
         assertTrue(source.statusChanges.single().userId.isNotBlank())
         assertTrue(source.statusChanges.single().changedDate.isNotBlank())
+    }
+
+    @Test
+    fun `new entities leave technology and layout unset for parent inheritance`() {
+        val repository = InMemoryDocumentRepository(newDocument("inheritance"))
+        val root = repository.getDocument().rootNodeId
+        repository.updateNodeTechnology(root, TechnologyMetadata(languageId = "c", technologyId = "c-native"))
+        repository.updateNodeFileLayoutStrategy(root, "single-file")
+        val source = repository.createNode(root, "source", NodeKind.Processor)
+        val target = repository.createNode(root, "target", NodeKind.Processor)
+        repository.addPort(source.id, NodePort("out", "out", PortDirection.Output))
+        repository.addPort(target.id, NodePort("in", "in", PortDirection.Input))
+        val link = repository.createLink(root, "transport", source.id, "out", target.id, "in")
+
+        listOf(source, target, link).forEach { entity ->
+            assertEquals(TechnologyMetadata(), entity.technology)
+            assertEquals(VOID_LAYOUT_STRATEGY_ID, entity.fileLayoutStrategyId)
+            assertEquals("c-native", repository.getDocument().effectiveTechnologyId(entity.id))
+            assertEquals("single-file", repository.getDocument().effectiveLayoutStrategyId(entity.id))
+        }
     }
 
     @Test
