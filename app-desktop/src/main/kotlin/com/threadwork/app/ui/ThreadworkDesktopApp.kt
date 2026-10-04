@@ -432,7 +432,6 @@ class ThreadworkDesktopApp(
     private lateinit var archetypesPanel: WorkflowArchetypesPanel
     private lateinit var projectManagementPanel: ProjectManagementPanel
     private lateinit var analysisPanel: NetworkAnalysisPanel
-    private lateinit var mcpPanel: McpServerPanel
     private lateinit var userIdentityTitleBar: UserIdentityTitleBar
     private val modeButtons = mutableMapOf<CanvasMode, JToggleButton>()
     private var sheetButton: JToggleButton? = null
@@ -677,8 +676,6 @@ class ThreadworkDesktopApp(
             )
             analysisPanel = NetworkAnalysisPanel(::refreshNetworkAnalysis, ::selectAnalysisNodes)
             addTab("Analysis", analysisPanel)
-            mcpPanel = McpServerPanel(mcpServer)
-            addTab("MCP", mcpPanel)
             pluginContentTabs.forEach { tab ->
                 addTab(tab.title, tab.createPanel())
             }
@@ -736,6 +733,9 @@ class ThreadworkDesktopApp(
         add(JMenu("Generate").apply {
             add(commandItem("compile.project", "build", "Generate"))
             add(commandItem("compile.compiler", "build", "Generate Compiler from Overrides"))
+        })
+        add(JMenu("MCP").apply {
+            add(commandItem("mcp.manage"))
         })
         add(JMenu("AI Support").apply {
             add(commandItem("ai.copyComponentFiches"))
@@ -838,6 +838,7 @@ class ThreadworkDesktopApp(
         })
         registerCommand(AppCommand("compile.project", "Generate: Project or Selection") { compileProject() })
         registerCommand(AppCommand("compile.compiler", "Generate: Compiler from Overrides") { generateCompilerFromDesign() })
+        registerCommand(AppCommand("mcp.manage", "MCP: Manage Server...") { showMcpManagement() })
         registerCommand(AppCommand("commands.palette", "Commands: Open Palette", KeyStroke.getKeyStroke(KeyEvent.VK_P, shiftShortcut)) { showCommandPalette() })
         registerCommand(AppCommand("help.about", "Help: About") { showAbout() })
         registerCommand(AppCommand("help.mcpAgentGuide", "Help: MCP Agent Guide...") { showMcpAgentGuide() })
@@ -1513,6 +1514,10 @@ class ThreadworkDesktopApp(
             appendLine("Loaded compiler plugins: ${compilerPlugins.size}")
         }
         JOptionPane.showMessageDialog(frame, details, "About Threadwork", JOptionPane.INFORMATION_MESSAGE)
+    }
+
+    private fun showMcpManagement() {
+        McpServerDialog(frame, mcpServer).isVisible = true
     }
 
     private fun showMcpAgentGuide() {

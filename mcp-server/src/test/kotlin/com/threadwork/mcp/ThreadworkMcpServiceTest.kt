@@ -143,6 +143,23 @@ class ThreadworkMcpServiceTest {
         }
     }
 
+    @Test
+    fun `HTTP ping endpoint reports liveness and records access`() {
+        val controller = McpServerController(service, requestedPort = 0)
+        try {
+            val status = controller.start()
+            val response = HttpClient.newHttpClient().send(
+                HttpRequest.newBuilder(URI(status.pingEndpoint)).GET().build(),
+                HttpResponse.BodyHandlers.ofString(),
+            )
+            assertEquals(200, response.statusCode())
+            assertTrue(response.body().contains("\"status\":\"ok\""))
+            assertTrue(controller.accessLogText().contains("GET /ping -> 200"))
+        } finally {
+            controller.stop()
+        }
+    }
+
     private fun call(name: String, params: JsonObject): JsonObject {
         val response = service.handle(request("tools/call", 10, buildJsonObject {
             put("name", name)

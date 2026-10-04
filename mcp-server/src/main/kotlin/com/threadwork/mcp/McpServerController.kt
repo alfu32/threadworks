@@ -6,12 +6,21 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.put
 import java.io.IOException
 import java.net.InetSocketAddress
+import java.net.URI
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
 import java.nio.charset.StandardCharsets
+import java.time.Duration
+import java.time.Instant
 import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicReference
 
 data class McpServerStatus(
@@ -19,6 +28,14 @@ data class McpServerStatus(
     val host: String,
     val port: Int,
     val endpoint: String,
+    val message: String = "",
+) {
+    val pingEndpoint: String get() = "http://$host:$port/ping"
+}
+
+data class McpPingResult(
+    val alive: Boolean,
+    val statusCode: Int? = null,
     val message: String = "",
 )
 
@@ -30,6 +47,11 @@ class McpServerController(
 ) {
     private val statusRef = AtomicReference(McpServerStatus(false, host, requestedPort, endpoint(host, requestedPort)))
     private val listeners = mutableListOf<(McpServerStatus) -> Unit>()
+    private val accessLogListeners = mutableListOf<(String) -> Unit>()
+    private val accessLog = ArrayDeque<String>()
+    private val httpClient = HttpClient.newBuilder()
+        .connectTimeout(Duration.ofSeconds(1))
+        .build()
     private var server: HttpServer? = null
     private var executor: java.util.concurrent.ExecutorService? = null
     private var port = requestedPort
@@ -41,8 +63,10 @@ class McpServerController(
         if (server != null) return status
         return try {
             val created = HttpServer.create(InetSocketAddress(host, port), 0)
-            created.createContext("/mcp") { exchange -> handleMcp(exchange) }
-            created.createContext("/health") { exchange -> handleHealth(exchange) }
+            created.createContext("/mcp") { exchange -> withAccessLog(exchange) { handleMcp(exchange) } }
+            created.createContext("/health") { exchange -> withAccessLog(exchange) { handleHealth(exchange) } }
+            created.createContext("/ping") { exchange -> withAccessLog(exchange) { handlePing(exchange) } }
+            created.createContext("/") { exchange -> withAccessLog(exchange) { respond(exchange, 404, "Not Found") } }
             executor = Executors.newCachedThreadPool { runnable ->
                 Thread(runnable, "threadwork-mcp-http").apply { isDaemon = true }
             }
@@ -77,6 +101,52 @@ class McpServerController(
     fun addStatusListener(listener: (McpServerStatus) -> Unit) {
         synchronized(listeners) { listeners += listener }
         listener(status)
+    }
+
+    fun removeStatusListener(listener: (McpServerStatus) -> Unit) {
+        synchronized(listeners) { listeners -= listener }
+    }
+
+    fun addAccessLogListener(listener: (String) -> Unit) {
+        synchronized(accessLogListeners) { accessLogListeners += listener }
+        listener(accessLogText())
+    }
+
+    fun removeAccessLogListener(listener: (String) -> Unit) {
+        synchronized(accessLogListeners) { accessLogListeners -= listener }
+    }
+
+    fun accessLogText(): String = synchronized(accessLog) { accessLog.joinToString("\n") }
+
+    /** Poll the public liveness route without blocking the Swing event thread. */
+    fun pingAsync(listener: (McpPingResult) -> Unit) {
+        if (!status.running) {
+            listener(McpPingResult(false, message = "MCP server is stopped"))
+            return
+        }
+        val request = HttpRequest.newBuilder(URI(status.pingEndpoint))
+            .timeout(Duration.ofSeconds(2))
+            .GET()
+            .build()
+        httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+            .orTimeout(3, TimeUnit.SECONDS)
+            .whenComplete { response, error ->
+                if (error != null) {
+                    listener(McpPingResult(false, message = error.message ?: "MCP ping failed"))
+                } else {
+                    listener(
+                        McpPingResult(
+                            alive = response.statusCode() == 200,
+                            statusCode = response.statusCode(),
+                            message = if (response.statusCode() == 200) {
+                                "MCP server responded"
+                            } else {
+                                "MCP ping returned HTTP ${response.statusCode()}"
+                            },
+                        ),
+                    )
+                }
+            }
     }
 
     private fun handleMcp(exchange: HttpExchange) {
@@ -125,6 +195,20 @@ class McpServerController(
         respondJson(exchange, 200, json.encodeToString(kotlinx.serialization.json.JsonObject.serializer(), service.health()))
     }
 
+    private fun handlePing(exchange: HttpExchange) {
+        if (!exchange.requestMethod.equals("GET", ignoreCase = true)) {
+            exchange.responseHeaders.add("Allow", "GET")
+            respond(exchange, 405, "Method Not Allowed")
+            return
+        }
+        val response = buildJsonObject {
+            put("status", "ok")
+            put("service", "threadwork-mcp")
+            put("timestamp", Instant.now().toString())
+        }
+        respondJson(exchange, 200, json.encodeToString(JsonObject.serializer(), response))
+    }
+
     private fun validateModernHeaders(exchange: HttpExchange, parsed: kotlinx.serialization.json.JsonElement) {
         val request = parsed as? JsonObject ?: return
         val bodyMethod = (request["method"] as? JsonPrimitive)?.contentOrNull ?: return
@@ -160,9 +244,29 @@ class McpServerController(
     }
 
     private fun respond(exchange: HttpExchange, status: Int, body: String) {
+        exchange.setAttribute(RESPONSE_STATUS_ATTRIBUTE, status)
         val bytes = body.toByteArray(StandardCharsets.UTF_8)
         exchange.sendResponseHeaders(status, bytes.size.toLong())
         exchange.responseBody.use { output -> output.write(bytes) }
+    }
+
+    private fun withAccessLog(exchange: HttpExchange, action: () -> Unit) {
+        val startedAt = System.nanoTime()
+        try {
+            action()
+        } finally {
+            val status = exchange.getAttribute(RESPONSE_STATUS_ATTRIBUTE) as? Int ?: 500
+            val elapsedMs = (System.nanoTime() - startedAt) / 1_000_000
+            val line = "${Instant.now()} ${exchange.requestMethod} ${exchange.requestURI.path} -> $status ${elapsedMs}ms"
+            val snapshot = synchronized(accessLog) {
+                accessLog.addLast(line)
+                while (accessLog.size > MAX_ACCESS_LOG_ENTRIES) accessLog.removeFirst()
+                accessLog.joinToString("\n")
+            }
+            synchronized(accessLogListeners) { accessLogListeners.toList() }.forEach { listener ->
+                runCatching { listener(snapshot) }
+            }
+        }
     }
 
     private fun publish(value: McpServerStatus) {
@@ -185,6 +289,8 @@ class McpServerController(
 
     private companion object {
         const val MAX_REQUEST_BYTES = 10 * 1024 * 1024
+        const val MAX_ACCESS_LOG_ENTRIES = 500
         const val MODERN_PROTOCOL_VERSION = "2026-07-28"
+        const val RESPONSE_STATUS_ATTRIBUTE = "threadwork.mcp.responseStatus"
     }
 }
