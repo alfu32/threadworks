@@ -169,9 +169,9 @@ class McpServerDialog(
         }
         stateLabel.text = state
         stateLabel.foreground = when {
-            !controllerRunning || healthAlive == false -> Color(0xff9b1c1c)
-            healthAlive == true -> Color(0xff18723b)
-            else -> Color(0xff8a6500)
+            !controllerRunning || healthAlive == false -> Color(0xff9b1c1c.toInt())
+            healthAlive == true -> Color(0xff18723b.toInt())
+            else -> Color(0xff8a6500.toInt())
         }
         if (healthMessage.isNotBlank()) messageLabel.text = healthMessage
     }
